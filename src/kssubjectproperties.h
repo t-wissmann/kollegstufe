@@ -17,45 +17,65 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSPLATTFORMSPEC_H
-#define KSPLATTFORMSPEC_H
+#ifndef KSSUBJECTPROPERTIES_H
+#define KSSUBJECTPROPERTIES_H
 
-#include <QString>
+
+// layouts
+class QHBoxLayout;
+class QVBoxLayout;
+class QGridLayout;
+
+// widgets
+class QPushButton;
+class QLabel;
+class QLineEdit;
+class QSpinBox;
+class QRadioButton;
+class QDateEdit;
+class QGroupBox;
+
+class xmlObject;
+
+#include <QDialog>
 
 /**
 	@author Thorsten Wissmann <towi89@web.de>
 */
-class xmlObject;
-class QStringList;
-
-class ksPlattformSpec{
+class ksSubjectProperties : public QDialog
+{
+Q_OBJECT
 public:
-    ksPlattformSpec();
+    ksSubjectProperties(QWidget *parent = 0);
 
-    ~ksPlattformSpec();
-    static bool createKsDir(); // creates a kollegstufe-directory
-                        //returns true on success, false on error
-    static QString getKsDir(); // allways ends with QDir::separator()
-    static bool createConfigFile(); // creates a kollegstufe-config-file
-                                    //returns true on success, false on error
+    ~ksSubjectProperties();
+    void setSubjectToEdit(xmlObject* newSubjectToEdit);
+    void setCathegoryOfSubject(xmlObject* newCathegory); // needed to avoid multible same Names
+public slots:
+    void writeWidgetAttributesToSubject();
+    void checkForMultibleNames();
+private:
+    void allocateWidgets();
+    void createLayouts();
+    void connectSlots();
+    void initWidgets();
     
-    // xmlObject - Functions
-    static void   addMissingExamAttributes(xmlObject*  ExamToComplete);
-    static void   addMissingSubjectAttributes(xmlObject*  SubjectToComplete);
-    static void   addMissingConfigAttributes(xmlObject* configFileToComplete);
-    static void   addMissingDatabaseAttributes(xmlObject* databaseToComplete);
-    static void   addMissingPropertiesAttributes(xmlObject* propertiesToComplete);
-    static void   catchFileList(QStringList*    targetList);
+    // bottom widgets
+    QPushButton*    btnOk;
+    QPushButton*    btnCancel;
+    // input widgets
+    QLabel*         lblName;
+    QLineEdit*      txtName;
+    QLabel*         lblTeacher;
+    QLineEdit*      txtTeacher;
     
-    static QString getUserName();
-    enum kasus
-    {
-        kasusNominativ,
-        kasusGenitiv,
-        kasusDativ,
-        kasusAkkusativ
-    };
-    static QString  getArticleForNoun(QString noun, kasus kasusOfNoun);
+    // layouts
+    QHBoxLayout*    layoutBottom;
+    QGridLayout*    layoutParent;
+
+    // members
+    xmlObject*      subjectToEdit;
+    xmlObject*      currentCathegory;
 };
 
 #endif

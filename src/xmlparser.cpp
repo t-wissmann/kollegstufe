@@ -25,7 +25,6 @@
 
 int nLayer; //nLayer shows the depth of the current object
 
-
 int xmlAttribute::nValueToInt()
 {
     int nReturnValue;
@@ -122,16 +121,26 @@ long           xmlObject::nSetAttributeCounter(int nNewAttributeCounter)
     int nOldAttributeCounter = nAttributeCounter;
     int nCurrentAttributeItem = 0;
     
-    cAttributeList = (xmlAttribute*) malloc(nNewAttributeCounter * sizeof(xmlAttribute));
-    if (cAttributeList == NULL)
-        return ErrorNoMemory;
+    if (nNewAttributeCounter > 0)
+    {
+        cAttributeList = (xmlAttribute*) malloc(nNewAttributeCounter * sizeof(xmlAttribute));
+        if (cAttributeList == NULL)
+            return ErrorNoMemory;
+    }
+    else
+    {
+        cAttributeList = NULL;
+    }
     
-    while (nCurrentAttributeItem < nOldAttributeCounter && nCurrentAttributeItem < nNewAttributeCounter)
+    while ((nCurrentAttributeItem < nOldAttributeCounter) && (nCurrentAttributeItem < nNewAttributeCounter))
     {
         cAttributeList[nCurrentAttributeItem] = cOldAttributeList[nCurrentAttributeItem];
         nCurrentAttributeItem++;
     }
-    free(cOldAttributeList);
+    if(cOldAttributeList)
+    {
+        free(cOldAttributeList);
+    }
     nAttributeCounter = nNewAttributeCounter;
     
     return 0;
@@ -270,18 +279,25 @@ long           xmlObject::nSetObjectCounter(int nNewObjectCounter)
     int nOldObjectCounter = nObjectCounter;
     int nCurrentObjectItem = 0;
     
-    cObjectList = (xmlObject**) malloc(nNewObjectCounter * sizeof(xmlObject*));
-    if (cObjectList == NULL)
-        return ErrorNoMemory;
+    if( nNewObjectCounter > 0)
+    {
+        cObjectList = (xmlObject**) malloc(nNewObjectCounter * sizeof(xmlObject*));
+        if (cObjectList == NULL)
+            return ErrorNoMemory;
+    }
+    else
+    {
+        cObjectList = NULL;
+    }
     
-    while (nCurrentObjectItem < nOldObjectCounter && nCurrentObjectItem < nNewObjectCounter)
+    while ((nCurrentObjectItem < nOldObjectCounter) && (nCurrentObjectItem < nNewObjectCounter))
     {
         cObjectList[nCurrentObjectItem] = cOldObjectList[nCurrentObjectItem];
         nCurrentObjectItem++;
     }
     while (nCurrentObjectItem < nOldObjectCounter)        //free/delete not copied and so not used items from the Old List
     {
-        delete cObjectList[nCurrentObjectItem];
+        delete cOldObjectList[nCurrentObjectItem];
         nCurrentObjectItem++;
     }
     while (nCurrentObjectItem < nNewObjectCounter)        //initialize new pointers in our new list
@@ -289,7 +305,10 @@ long           xmlObject::nSetObjectCounter(int nNewObjectCounter)
         cObjectList[nCurrentObjectItem] = new xmlObject;
         nCurrentObjectItem++;
     }
-    free(cOldObjectList);
+    if (cOldObjectList)
+    {
+        free(cOldObjectList);
+    }
     nObjectCounter = nNewObjectCounter;
     
     return 0;

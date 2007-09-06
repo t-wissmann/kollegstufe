@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "ksplattformspec.h"
 #include <QDir>
+#include <QStringList>
 #include "xmlparser.h"
 #include "dateConverter.h"
 
@@ -34,11 +35,9 @@ ksPlattformSpec::~ksPlattformSpec()
 
 bool ksPlattformSpec::createKsDir()
 {
-    QString directoryName = "";
+    QString directoryName = ".kollegstufe";
 #if defined(Q_WS_WIN)
     directoryName = "kollegstufe";
-#else
-    directoryName = ".kollegstufe";
 #endif
     QDir ksDir = QDir::home();
     if(ksDir.exists(directoryName))
@@ -72,6 +71,31 @@ QString ksPlattformSpec::getKsDir()
     return ksDir;
 }
 
+void ksPlattformSpec::catchFileList(QStringList*    targetList)
+{
+    if (!targetList)
+    {
+        return;
+    }
+    // clear old list:
+    targetList->clear();
+    
+    QString ksPath = getKsDir();
+    QDir ksDir(ksPath);
+    
+    (*targetList) = ksDir.entryList( QStringList("*.xml"), QDir::Files);
+    for (int i = 0; i < targetList->size(); i++)
+    {
+        if(targetList->at(i) == "config.xml")
+        {
+            targetList->removeAt(i);
+            i--;
+            continue;
+        }
+        (*targetList)[i] = ksPath + (*targetList)[i];
+    }
+    
+}
 
 bool ksPlattformSpec::createConfigFile()
 {
@@ -93,6 +117,10 @@ bool ksPlattformSpec::createConfigFile()
     return TRUE;
 }
 
+QString ksPlattformSpec::getUserName()
+{
+    return "thorsten";
+}
 
 QString  ksPlattformSpec::getArticleForNoun(QString noun, kasus kasusOfNoun)
 {
@@ -194,12 +222,39 @@ void ksPlattformSpec::addMissingConfigAttributes(xmlObject* configFileToComplete
 }
 
 
+void    ksPlattformSpec::addMissingSubjectAttributes(xmlObject*  SubjectToComplete)
+{
+    if(SubjectToComplete == NULL)
+    {
+        return;
+    }
+    if(SubjectToComplete->szGetName() != QString("subject"))
+    {
+        SubjectToComplete->setName("subject");
+    }
+    if(! SubjectToComplete->cGetAttributeByName("name"))
+    {
+        SubjectToComplete->nAddAttribute("name", "neues Fach");
+    }
+    if(! SubjectToComplete->cGetAttributeByName("teacher"))
+    {
+        SubjectToComplete->nAddAttribute("teacher", "");
+    }
+    
+}
 
 
 void    ksPlattformSpec::addMissingExamAttributes(xmlObject*  ExamToComplete)
 {
     if(!ExamToComplete)
+    {
         return;
+    }
+    
+    if(ExamToComplete->szGetName() != QString("exam"))
+    {
+        ExamToComplete->setName("exam");
+    }
     
     xmlObject* newObject;
     
@@ -257,11 +312,52 @@ void    ksPlattformSpec::addMissingExamAttributes(xmlObject*  ExamToComplete)
 
 
 
+void ksPlattformSpec::addMissingDatabaseAttributes(xmlObject* databaseToComplete)
+{
+    if(!databaseToComplete)
+    {
+        return;
+    }
+    if(databaseToComplete->szGetName() != QString("archiv"))
+    {
+        databaseToComplete->setName("archiv");
+    }
+    if(!databaseToComplete->cGetObjectByName("properties"))
+    {
+        databaseToComplete->nAddObject("properties");
+    }
+    if(!databaseToComplete->cGetObjectByName("data"))
+    {
+        databaseToComplete->nAddObject("data");
+    }
+}
 
 
-
-
-
+void ksPlattformSpec::addMissingPropertiesAttributes(xmlObject* propertiesToComplete)
+{
+    xmlObject* currentObject;
+    if(!propertiesToComplete)
+    {
+        return;
+    }
+    if(propertiesToComplete->szGetName() != QString("properties"))
+    {
+        propertiesToComplete->setName("properties");
+    }
+    if(!propertiesToComplete->cGetObjectByName("author"))
+    {
+        propertiesToComplete->nAddObject("author");
+    }
+    if(propertiesToComplete->cGetObjectByName("author")->nGetContentLength() < 1)
+    {
+        propertiesToComplete->cGetObjectByName("author")->nSetContent(getUserName().toAscii().data());
+    }
+    if(propertiesToComplete->cGetObjectByName("time"))
+    {
+        propertiesToComplete->nAddObject("time");
+    }
+    
+}
 
 
 

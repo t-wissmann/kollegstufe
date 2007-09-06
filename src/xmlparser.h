@@ -80,6 +80,7 @@ class xmlObject
         //about content
         char*          szGetContent ( void );
         long            nSetContent ( char* szNewContent );
+        long            nGetContentLength(){return nContentLength;};
         //about name
         char*          szGetName( void );
         void           setName(char* szNewName);

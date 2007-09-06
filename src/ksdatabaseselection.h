@@ -17,45 +17,58 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSPLATTFORMSPEC_H
-#define KSPLATTFORMSPEC_H
+#ifndef KSDATABASESELECTION_H
+#define KSDATABASESELECTION_H
 
+#include <QDialog>
 #include <QString>
+#include <QStringList>
 
+class QListWidget;
+class QLabel;
+class QPushButton;
+
+
+//layouts
+
+class QHBoxLayout;
+class QVBoxLayout;
+class QGridLayout;
 /**
 	@author Thorsten Wissmann <towi89@web.de>
 */
-class xmlObject;
-class QStringList;
-
-class ksPlattformSpec{
+class ksDatabaseSelection : public QDialog
+{
+Q_OBJECT
 public:
-    ksPlattformSpec();
+    ksDatabaseSelection(QWidget *parent = 0);
 
-    ~ksPlattformSpec();
-    static bool createKsDir(); // creates a kollegstufe-directory
-                        //returns true on success, false on error
-    static QString getKsDir(); // allways ends with QDir::separator()
-    static bool createConfigFile(); // creates a kollegstufe-config-file
-                                    //returns true on success, false on error
+    ~ksDatabaseSelection();
+    QString getCurrentFile();
+    void    setCurrentFile(QString szNewFile);
+    void    catchStringList();
+public slots:
+    void    refreshFileList();
+    void    selectedFileChanged();
+private:
     
-    // xmlObject - Functions
-    static void   addMissingExamAttributes(xmlObject*  ExamToComplete);
-    static void   addMissingSubjectAttributes(xmlObject*  SubjectToComplete);
-    static void   addMissingConfigAttributes(xmlObject* configFileToComplete);
-    static void   addMissingDatabaseAttributes(xmlObject* databaseToComplete);
-    static void   addMissingPropertiesAttributes(xmlObject* propertiesToComplete);
-    static void   catchFileList(QStringList*    targetList);
+    void    allocateWidgets();
+    void    createLayouts();
+    void    connectSlots();
     
-    static QString getUserName();
-    enum kasus
-    {
-        kasusNominativ,
-        kasusGenitiv,
-        kasusDativ,
-        kasusAkkusativ
-    };
-    static QString  getArticleForNoun(QString noun, kasus kasusOfNoun);
+    // widgets
+    QPushButton*    btnOk;
+    QPushButton*    btnCancel;
+    QListWidget*    lstFileList;
+    QLabel*         lblInfo;
+    
+    //layouts:
+    QHBoxLayout*    layoutBottom;
+    QGridLayout*    layoutParent;
+    
+    //members
+    QStringList szFileList;
+    QString     szCurrentFile;
 };
 
 #endif

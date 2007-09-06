@@ -17,45 +17,71 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSPLATTFORMSPEC_H
-#define KSPLATTFORMSPEC_H
+#include "ksdatabaseproperties.h"
+#include "xmlparser.h"
 
-#include <QString>
+#include <QDateEdit>
+#include <QPushButton>
+#include <QLabel>
+#include <QGroupBox>
 
-/**
-	@author Thorsten Wissmann <towi89@web.de>
-*/
-class xmlObject;
-class QStringList;
+// layouts
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QGridLayout>
 
-class ksPlattformSpec{
-public:
-    ksPlattformSpec();
 
-    ~ksPlattformSpec();
-    static bool createKsDir(); // creates a kollegstufe-directory
-                        //returns true on success, false on error
-    static QString getKsDir(); // allways ends with QDir::separator()
-    static bool createConfigFile(); // creates a kollegstufe-config-file
-                                    //returns true on success, false on error
+ksDatabaseProperties::ksDatabaseProperties(QWidget *parent)
+ : QDialog(parent)
+{
+    allocateWidgets();
+    createLayouts();
+    connectSlots();
+}
+
+
+ksDatabaseProperties::~ksDatabaseProperties()
+{
+}
+
+void ksDatabaseProperties::allocateWidgets()
+{
+    btnOk     = new QPushButton("Ok");
+    btnCancel = new QPushButton("Abbrechen");
+}
+
+void ksDatabaseProperties::createLayouts()
+{
+    layoutBottom = new QHBoxLayout;
+    layoutBottom->addStretch(1);
+    layoutBottom->addWidget(btnOk);
+    layoutBottom->addWidget(btnCancel);
     
-    // xmlObject - Functions
-    static void   addMissingExamAttributes(xmlObject*  ExamToComplete);
-    static void   addMissingSubjectAttributes(xmlObject*  SubjectToComplete);
-    static void   addMissingConfigAttributes(xmlObject* configFileToComplete);
-    static void   addMissingDatabaseAttributes(xmlObject* databaseToComplete);
-    static void   addMissingPropertiesAttributes(xmlObject* propertiesToComplete);
-    static void   catchFileList(QStringList*    targetList);
+    layoutParent = new QGridLayout;
+    layoutParent->addLayout(layoutBottom, 0, 0);
     
-    static QString getUserName();
-    enum kasus
+    setLayout(layoutParent);
+}
+
+void ksDatabaseProperties::connectSlots()
+{
+    connect(btnOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(btnCancel, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(this, SIGNAL(accepted()), this, SLOT(writeWidgetAttributesToProperties()));
+}
+
+void ksDatabaseProperties::setDatabasePropertiesToEdit(xmlObject* newProperties)
+{
+    propertiesToEdit = newProperties;
+    if(propertiesToEdit == NULL)
     {
-        kasusNominativ,
-        kasusGenitiv,
-        kasusDativ,
-        kasusAkkusativ
-    };
-    static QString  getArticleForNoun(QString noun, kasus kasusOfNoun);
-};
+        return;
+    }
+}
 
-#endif
+void ksDatabaseProperties::writeWidgetAttributesToProperties()
+{
+    
+}
+
+

@@ -6,7 +6,11 @@ SOURCES += main.cpp \
  dateConverter.cpp \
  examitem.cpp \
  ksplattformspec.cpp \
- ksexamproperties.cpp
+ ksexamproperties.cpp \
+ ksabout.cpp \
+ kssubjectproperties.cpp \
+ ksdatabaseselection.cpp \
+ ksdatabaseproperties.cpp
 TEMPLATE = app
 CONFIG += warn_on \
 	  thread \
@@ -21,4 +25,8 @@ ksdebugoutput.h \
  dateConverter.h \
  examitem.h \
  ksplattformspec.h \
- ksexamproperties.h
+ ksexamproperties.h \
+ ksabout.h \
+ kssubjectproperties.h \
+ ksdatabaseselection.h \
+ ksdatabaseproperties.h

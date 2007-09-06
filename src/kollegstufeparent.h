@@ -28,6 +28,10 @@
 class ksDebugOutput;
 // own dialogs
 class ksExamProperties;
+class ksSubjectProperties;
+class ksDatabaseSelection;
+class ksDatabaseProperties;
+class ksAbout;
 
 
 // normal widgets
@@ -62,9 +66,12 @@ class kollegstufeParent : public QWidget
 {
     Q_OBJECT
 public slots:
+    void showAboutDialog();
     // Save/load
     void loadConfigFile();
     void saveConfigFile();
+    void showDatabaseSelection();
+    void showDatabaseProperties();
     // view editor:
     void refreshCathegoryList();
     void refreshSubjectList();
@@ -90,7 +97,9 @@ public:
     kollegstufeParent(QWidget* parent = 0);
     ~kollegstufeParent();
     
-    bool loadFile(QString newFilename); // returns true on success, otherwise false
+    void loadFile(QString newFilename, bool showErrorMsg = FALSE); // returns true on success, otherwise false
+    
+    bool askForSavingChangedDatabase();//returns true if everything is okey, false if file mustn't be closed
     void setDatabaseChanged( bool newChangeState = TRUE) {  bDatabaseChanged = newChangeState; };
     bool databaseChanged(){ return bDatabaseChanged; };
     
@@ -118,6 +127,8 @@ private:
     //actions
     QAction*        mnaAboutKs;
     QAction*        mnaAboutQt;
+    QAction*        mnaLoadDatabase;
+    QAction*        mnaDatabaseProperties;
     QAction*        mnaSave;
     QAction*        mnaQuit;
     
@@ -143,7 +154,11 @@ private:
     ksDebugOutput*  debugOutput;
     
     // dialog windows
-    ksExamProperties* diaExamProperties;
+    ksExamProperties*       diaExamProperties;
+    ksSubjectProperties*    diaSubjectProperties;
+    ksDatabaseProperties*   diaDatabaseProperties;
+    ksDatabaseSelection*    diaDatabaseSelection;
+    ksAbout*                diaAbout;
     
     // member variables
     QString     szApplicationPath;
