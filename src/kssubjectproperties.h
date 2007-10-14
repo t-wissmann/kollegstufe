@@ -35,6 +35,7 @@ class QRadioButton;
 class QDateEdit;
 class QGroupBox;
 
+class QEvent;
 class xmlObject;
 
 #include <QDialog>
@@ -51,9 +52,14 @@ public:
     ~ksSubjectProperties();
     void setSubjectToEdit(xmlObject* newSubjectToEdit);
     void setCathegoryOfSubject(xmlObject* newCathegory); // needed to avoid multible same Names
+    
+    void retranslateUi();
 public slots:
     void writeWidgetAttributesToSubject();
     void checkForMultibleNames();
+    
+protected:
+    virtual void changeEvent(QEvent* event);
 private:
     void allocateWidgets();
     void createLayouts();

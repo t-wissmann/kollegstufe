@@ -426,10 +426,98 @@ xmlObject*      xmlObject::cGetObjectByAttributeValue (char szAttributeName[80],
     return NULL;
 }
 
-int            xmlObject::nGetObjectCounter()
+void  xmlObject::swapObjects(xmlObject* objectOne, xmlObject* objectTwo)
+{
+    int idOfObjectOne;
+    int idOfObjectTwo;
+    //get identifiers
+    idOfObjectOne = nGetIdentifierOf(objectOne);
+    idOfObjectTwo = nGetIdentifierOf(objectTwo);
+    //swap objects will check if there are not-existing identifiers
+    swapObjects(idOfObjectOne, idOfObjectTwo);
+}
+
+void xmlObject::swapObjects(int objectOne, int objectTwo)
+{
+    if(objectOne < 0 || objectOne >= nGetObjectCounter())
+    {
+        return;
+    }
+    
+    if(objectTwo < 0 || objectTwo >= nGetObjectCounter())
+    {
+        return;
+    }
+    
+    xmlObject* backupObject;
+    //backup object one
+    backupObject = cObjectList[objectOne];
+    //write objectTwo to position of objectOne
+    cObjectList[objectOne] = cObjectList[objectTwo];
+    //write backupedObject to object Two
+    cObjectList[objectTwo] = backupObject;
+}
+
+int xmlObject::nGetIdentifierOf(xmlObject* objectToFind) const
+{
+    for (int i = 0; i < nObjectCounter; i++)
+    {
+        if(cObjectList[i] == objectToFind)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void xmlObject::moveObjectTo(xmlObject* objectToMove, int newPosition)
+{
+    moveObjectTo(nGetIdentifierOf(objectToMove), newPosition);
+}
+
+void xmlObject::moveObjectTo(int idToMove, int newPosition)
+{
+    if (idToMove == newPosition)
+    {
+        //nothing to do ;-D
+        return;
+    }
+    if(newPosition < 0 || newPosition >= nObjectCounter)
+    {
+        return;
+    }
+    if(idToMove < 0 || idToMove >= nObjectCounter)
+    {
+        return;
+    }
+    
+    xmlObject* objectBU = cObjectList[idToMove];
+    int movingDirection;
+    int startPosition;
+    if(idToMove < newPosition) // if item shall be moved to back, i.e. to higher id
+    {
+        movingDirection = +1;
+        startPosition = idToMove;
+    }
+    else  // if item shall be moved to front, i.e. to lower id
+    {
+        movingDirection = -1;
+        startPosition = idToMove;
+    }
+    
+    for(int currentId = idToMove; currentId != newPosition; currentId += movingDirection)
+    {
+        cObjectList[currentId] = cObjectList[currentId + movingDirection];
+    }
+    
+    cObjectList[newPosition] = objectBU;
+}
+
+int xmlObject::nGetObjectCounter()
 {
     return nObjectCounter;
 }
+
 
 /* END OF OBJECT FUNCTIONS */
 

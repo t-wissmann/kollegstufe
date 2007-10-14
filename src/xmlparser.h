@@ -77,12 +77,18 @@ class xmlObject
         xmlObject*      cGetObjectByName (char szObjectName[80]);
         xmlObject*      cGetObjectByAttributeValue (char szAttributeName[80], char szAttributeValue[80]);
         int             nGetObjectIdentifierByAttributeValue (char szAttributeName[80], char szAttributeValue[80]);
+        void            swapObjects(xmlObject* objectOne, xmlObject* objectTwo);
+        void            swapObjects(int objectOne, int objectTwo);
+        void            moveObjectTo(xmlObject* objectToMove, int newPosition);
+        void            moveObjectTo(int idToMove, int newPosition);
+        int             nGetIdentifierOf(xmlObject* objectToFind) const;
         //about content
         char*          szGetContent ( void );
         long            nSetContent ( char* szNewContent );
         long            nGetContentLength(){return nContentLength;};
         //about name
         char*          szGetName( void );
+        char*          name(){ return szGetName(); };
         void           setName(char* szNewName);
         
 //        xmlAttribute*  cGetAttribute(int n AttributeCounter);

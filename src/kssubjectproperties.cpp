@@ -23,6 +23,8 @@
 #include "xmlparser.h"
 
 #include <QString>
+#include <QEvent>
+
 // widgets:
 #include <QPushButton>
 #include <QLabel>
@@ -48,6 +50,12 @@ ksSubjectProperties::ksSubjectProperties(QWidget *parent)
     createLayouts();
     connectSlots();
     initWidgets();
+    
+    if(parent)
+    {
+        setWindowIcon(parent->windowIcon());
+    }
+    retranslateUi();
 }
 
 
@@ -56,16 +64,36 @@ ksSubjectProperties::~ksSubjectProperties()
 }
 
 
+void ksSubjectProperties::changeEvent(QEvent* event)
+{
+    QDialog::changeEvent(event);
+    if(event->type() == QEvent::LanguageChange)
+    {
+        retranslateUi();
+    }
+}
+
+
+void ksSubjectProperties::retranslateUi()
+{
+    btnOk->setText(tr("Ok"));
+    btnCancel->setText(tr("Cancel"));
+    lblName->setText(tr("Name:"));
+    lblTeacher->setText(tr("Teacher:"));
+    
+    
+}
+
 
 
 void ksSubjectProperties::allocateWidgets()
 {
-    btnOk     = new QPushButton("Ok");
-    btnCancel = new QPushButton("Abbrechen");
+    btnOk     = new QPushButton;
+    btnCancel = new QPushButton;
     
-    lblName   = new QLabel("Name:");
+    lblName   = new QLabel;
     txtName   = new QLineEdit;
-    lblTeacher= new QLabel("Lehrer:");
+    lblTeacher= new QLabel;
     txtTeacher= new QLineEdit;
     
 }
@@ -106,18 +134,18 @@ void ksSubjectProperties::setSubjectToEdit(xmlObject* newSubjectToEdit)
     subjectToEdit = newSubjectToEdit;
     if(subjectToEdit == NULL)
     {
-        QString errormsg = QString::fromLocal8Bit("pointerfehler in ksSubjectProperties::setSubjectToEdit, NULL wurde als newSubjectToEdit übergeben");
+        QString errormsg = tr("pointerfehler in ksSubjectProperties::setSubjectToEdit, NULL wurde als newSubjectToEdit uebergeben");
         setWindowTitle(errormsg);
         return;
     }
     ksPlattformSpec::addMissingSubjectAttributes(subjectToEdit);
-    txtName->setText(subjectToEdit->cGetAttributeByName("name")->value());
-    txtTeacher->setText(subjectToEdit->cGetAttributeByName("teacher")->value());
+    txtName->setText(ksPlattformSpec::szToUmlauts(subjectToEdit->cGetAttributeByName("name")->value()));
+    txtTeacher->setText(ksPlattformSpec::szToUmlauts(subjectToEdit->cGetAttributeByName("teacher")->value()));
     
     QString newWindowTitle;
-    newWindowTitle  = "Eigenschaften des Faches \'";
+    newWindowTitle  = tr("Properties of subject \'");
     newWindowTitle += txtName->text();
-    newWindowTitle += "\'";
+    newWindowTitle += tr("\'");
     
     setWindowTitle(newWindowTitle);
 }
@@ -127,12 +155,12 @@ void ksSubjectProperties::writeWidgetAttributesToSubject()
 {
     if(subjectToEdit == NULL)
     {
-        QString errormsg = QString::fromLocal8Bit("pointerfehler in ksSubjectProperties::setSubjectToEdit, NULL wurde als newSubjectToEdit übergeben");
+        QString errormsg = tr("pointerfehler in ksSubjectProperties::setSubjectToEdit, NULL wurde als newSubjectToEdit uebergeben");
         setWindowTitle(errormsg);
         return;
     }
-    subjectToEdit->cGetAttributeByName("name")->SetValue(txtName->text().toAscii().data());
-    subjectToEdit->cGetAttributeByName("teacher")->SetValue(txtTeacher->text().toAscii().data());
+    subjectToEdit->cGetAttributeByName("name")->SetValue(ksPlattformSpec::qstringToSz(txtName->text()));
+    subjectToEdit->cGetAttributeByName("teacher")->SetValue(ksPlattformSpec::qstringToSz(txtTeacher->text()));
 }
 
 void ksSubjectProperties::setCathegoryOfSubject(xmlObject* newCathegory)

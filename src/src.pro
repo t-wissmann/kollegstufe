@@ -10,7 +10,12 @@ SOURCES += main.cpp \
  ksabout.cpp \
  kssubjectproperties.cpp \
  ksdatabaseselection.cpp \
- ksdatabaseproperties.cpp
+ ksdatabaseproperties.cpp \
+ ksstatisticsdialog.cpp \
+ ksstatisticswidget.cpp \
+ ksstatisticsitem.cpp \
+ ksconfigure.cpp \
+ kscathegoryeditorwidget.cpp
 TEMPLATE = app
 CONFIG += warn_on \
 	  thread \
@@ -29,4 +34,9 @@ ksdebugoutput.h \
  ksabout.h \
  kssubjectproperties.h \
  ksdatabaseselection.h \
- ksdatabaseproperties.h
+ ksdatabaseproperties.h \
+ ksstatisticsdialog.h \
+ ksstatisticswidget.h \
+ ksstatisticsitem.h \
+ ksconfigure.h \
+ kscathegoryeditorwidget.h

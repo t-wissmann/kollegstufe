@@ -20,7 +20,7 @@
 #ifndef KSABOUT_H
 #define KSABOUT_H
 
-
+class QEvent;
 class QPushButton;
 class QLabel;
 class QFrame;
@@ -46,17 +46,24 @@ public:
     ksAbout(QWidget *parent = 0);
 
     ~ksAbout();
+    
+    void retranslateUi();
+    
+protected:
+    virtual void changeEvent(QEvent* event);
 private:
     void createGui();
     void initGui();
     //widgets
     QLabel*         lblHeader;
+    QLabel*         lblVersion;
     QLabel*         lblIcon;
     QPushButton*    btnClose;
     QGroupBox*      frmContainer;
     QTextEdit*      txtInfoText;
     
     //layouts
+    QHBoxLayout*    layoutTop;
     QVBoxLayout*    layoutParent;
     QHBoxLayout*    layoutBottom;
     QHBoxLayout*    layoutFrame;

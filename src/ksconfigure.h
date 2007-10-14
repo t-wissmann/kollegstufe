@@ -17,23 +17,70 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef KSCONFIGURE_H
+#define KSCONFIGURE_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+#include <QDialog>
+#include <QTranslator>
+#include <QStringList>
 
-int main(int argc, char *argv[])
+class QEvent;
+class QPushButton;
+class QLabel;
+class QFrame;
+class QTextEdit;
+class QGroupBox;
+class QListWidget;
+
+// layouts
+class QHBoxLayout;
+class QVBoxLayout;
+class QGridLayout;
+
+class xmlObject;
+
+/**
+	@author Thorsten Wissmann <towi89@web.de>
+*/
+class ksConfigure : public QDialog
 {
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
+Q_OBJECT
+        
+public slots:
+    void applyChanges();
+public:
+    ksConfigure(QWidget *parent = 0);
+    ~ksConfigure();
     
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+    void retranslateUi();
+    void setConfigToEdit(xmlObject* newConfig);
+    
+protected:
+    virtual void changeEvent(QEvent* event);
+    
+private:
+    void allocateWidgets();
+    void createLayouts();
+    void connectSlots();
+    void initWidgets();
+    void catchLanguageList();
+    
+    //layouts
+    QGridLayout* layoutParent;
+    QHBoxLayout* layoutBottom;
+    
+    // Widgets
+    QPushButton* btnOk;
+    QPushButton* btnCancel;
+    
+    QGridLayout* layoutLanguageSelection;
+    QListWidget* lstLanguageSelection;
+    QGroupBox*   grpLanguageSelection;
+    
+    
+    
+    QStringList  languageList;
+    xmlObject*   config;
+};
 
+#endif

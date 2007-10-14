@@ -23,6 +23,8 @@
 #include "ksplattformspec.h"
 #include "ksdatabaseselection.h"
 #include "ksdatabaseproperties.h"
+#include "ksstatisticsdialog.h"
+#include "ksconfigure.h"
 #include "examitem.h"
 
 // dialogs:
@@ -32,6 +34,7 @@
 
 // normal widgets
 #include <QComboBox>
+#include <QWidget>
 #include <QListWidget>
 #include <QPushButton>
 #include <QTreeWidget>
@@ -59,19 +62,28 @@
 #include <QHeaderView>
 #include <QSizePolicy>
 #include <QCloseEvent>
+#include <QEvent>
 #include <QModelIndex>
 
-kollegstufeParent::kollegstufeParent(QWidget* parent)
- : QWidget(parent)
+kollegstufeParent::kollegstufeParent(QWidget* parentWidget)
+
+
+#ifdef KS_IS_MAIN_WINDOW
+    : QMainWindow(parentWidget)
+#else
+    : QWidget(parentWidget)
+#endif
+        
 {
     initMembers();
     allocateWidgets();
     allocateDialogs();
     createMenuBar();
-    connectSlots();
     createLayouts();
+    connectSlots();
     initWidgets();
     
+    retranslateUi(); // ensure, that there are texts
     loadConfigFile();
 }
 
@@ -84,8 +96,11 @@ kollegstufeParent::~kollegstufeParent()
     delete debugOutput;
 }
 
+
 void kollegstufeParent::initMembers()
 {
+    bWantsToBeShown = TRUE;
+    
     // init pointers
     currentDataPart     = NULL;
     currentPropertyPart = NULL;
@@ -115,17 +130,20 @@ void kollegstufeParent::allocateWidgets()
     lstSubjectList  = new QListWidget;
     wdgSubjectSelection = new QWidget;
     // subject tools:
-    btnSubjectAdd       = new QPushButton(QString::fromLocal8Bit("Hinzufügen"));
-    btnSubjectDelete    = new QPushButton("Entfernen");
-    btnSubjectEdit      = new QPushButton("Fach Beartbeiten");
-    
+    /*btnSubjectAdd       = new QPushButton(tr("Hinzufuegen"));
+    btnSubjectDelete    = new QPushButton("Entfernen");*/
+    btnSubjectAdd       = new QPushButton("");
+    btnSubjectDelete    = new QPushButton("");
+    btnSubjectEdit      = new QPushButton;
+    btnSubjectMoveUp    = new QPushButton("");
+    btnSubjectMoveDown  = new QPushButton("");
     
     //exam selection
-    grpExamList     = new QGroupBox("Subject Properties");
+    grpExamList     = new QGroupBox;
     lstExamList     = new QTreeWidget;
-    btnExamAdd      = new QPushButton(QString::fromLocal8Bit("Neue Leistung"));
-    btnExamDelete   = new QPushButton("Entfernen");
-    btnExamEdit     = new QPushButton("Bearbeiten");
+    btnExamAdd      = new QPushButton;
+    btnExamDelete   = new QPushButton;
+    btnExamEdit     = new QPushButton;
     
 }
 
@@ -136,6 +154,9 @@ void kollegstufeParent::allocateDialogs()
     diaDatabaseSelection = NULL;
     diaDatabaseProperties= NULL;
     diaAbout             = NULL;
+    diaConfigureKs       = NULL;
+    
+    diaStatistics = new ksStatisticsDialog(this);
 }
 
 void kollegstufeParent::createMenuBar()
@@ -144,36 +165,42 @@ void kollegstufeParent::createMenuBar()
     mnbMenuBar  = new QMenuBar;
     mnbMenuBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     //add menus to menubar
-    mnmFile     = mnbMenuBar->addMenu(tr("&Datei"));
-    mnmExtras   = mnbMenuBar->addMenu(tr("&Extras"));
+    mnmFile     = mnbMenuBar->addMenu("&File");
+    mnmExtras   = mnbMenuBar->addMenu("&Extras");
     
     //add actions to menus
     // 1. File - menu
-    mnaLoadDatabase      = mnmFile->addAction(tr("Archiv Laden"));
-    mnaDatabaseProperties= mnmFile->addAction(tr("Eigenschaften"));
-    mnaSave              = mnmFile->addAction(tr("Speichern"));
-    mnaQuit              = mnmFile->addAction(tr("Beenden"));
-    mnaLoadDatabase->setShortcut(tr("Ctrl+O"));
-    mnaSave->setShortcut(tr("Ctrl+S"));
-    mnaQuit->setShortcut(tr("Ctrl+Q"));
+    mnaLoadDatabase      = mnmFile->addAction("");
+    mnaSave              = mnmFile->addAction("");
+    mnaDatabaseProperties= mnmFile->addAction("");
+    mnmFile->addSeparator();
+    mnaQuit              = mnmFile->addAction("");
     
     // 2. Extras - menu
-    mnaAboutQt  = mnmExtras->addAction(QString::fromLocal8Bit("Über Qt"));
-    mnaAboutKs  = mnmExtras->addAction(QString::fromLocal8Bit("Über Kollegstufe"));
-    // icons will be set at initWidgets
+    mnaStatistics = mnmExtras->addAction("statistics");
+    mnmExtras->addSeparator();
+    mnaConfigureKs= mnmExtras->addAction("");
+    mnmExtras->addSeparator();
+    mnaAboutQt    = mnmExtras->addAction("");
+    mnaAboutKs    = mnmExtras->addAction("");
+    mnaStatistics->setCheckable(TRUE);
+    
+    // INFO: icons will be set at initWidgets
     
 }
+
 
 void kollegstufeParent::createLayouts()
 {
     // Subject selection layout
     layoutSubjectSelection = new QGridLayout;
     
-    layoutSubjectSelection->addWidget(cmbCathegory, 0, 0, 1, 2);
-    layoutSubjectSelection->addWidget(lstSubjectList, 1, 0, 1, 2);
-    layoutSubjectSelection->addWidget(lstSubjectList, 1, 0, 1, 2);
+    layoutSubjectSelection->addWidget(cmbCathegory, 0, 0, 1, 4);
+    layoutSubjectSelection->addWidget(lstSubjectList, 1, 0, 1, 4);
     layoutSubjectSelection->addWidget(btnSubjectAdd, 3, 0, 1, 1);
     layoutSubjectSelection->addWidget(btnSubjectDelete, 3, 1, 1, 1);
+    layoutSubjectSelection->addWidget(btnSubjectMoveUp, 3, 2, 1, 1);
+    layoutSubjectSelection->addWidget(btnSubjectMoveDown, 3, 3, 1, 1);
     wdgSubjectSelection->setLayout(layoutSubjectSelection);
     
     //exam List layout
@@ -193,17 +220,25 @@ void kollegstufeParent::createLayouts()
     splitterParent->addWidget(wdgSubjectSelection);
     splitterParent->addWidget(grpExamList);
     
+#ifndef KS_IS_MAIN_WINDOW
     layoutParent = new QVBoxLayout;
     layoutParent->setMargin(0);
     layoutParent->addWidget(mnbMenuBar);
     layoutParent->addWidget(splitterParent);
     
     setLayout(layoutParent);
+#else
+    setCentralWidget(splitterParent);
+    setMenuBar(mnbMenuBar);
+#endif
+    
 }
 
 
 void kollegstufeParent::connectSlots()
 {
+    
+    // selection-change-handling
     connect(cmbCathegory, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedCathegoryChanged()));
     connect(lstSubjectList, SIGNAL(currentRowChanged(int)), this, SLOT(selectedSubjectChanged()));
     connect(lstExamList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedExamChanged()));
@@ -212,6 +247,8 @@ void kollegstufeParent::connectSlots()
     connect(btnSubjectAdd, SIGNAL(clicked()), this, SLOT(subjectAdd()));
     connect(btnSubjectDelete, SIGNAL(clicked()), this, SLOT(subjectDelete()));
     connect(btnSubjectEdit, SIGNAL(clicked()), this, SLOT(subjectEdit()));
+    connect(btnSubjectMoveUp, SIGNAL(clicked()), this, SLOT(subjectMoveUp()));
+    connect(btnSubjectMoveDown, SIGNAL(clicked()), this, SLOT(subjectMoveDown()));
     
     //menubar-menu-actions
     // mnmFile
@@ -220,6 +257,10 @@ void kollegstufeParent::connectSlots()
     connect(mnaLoadDatabase, SIGNAL(triggered()), this, SLOT(showDatabaseSelection()));
     connect(mnaDatabaseProperties, SIGNAL(triggered()), this, SLOT(showDatabaseProperties()));
     // mnmExtras
+    connect(mnaStatistics, SIGNAL(toggled(bool)), diaStatistics, SLOT(setVisible(bool)));
+    connect(diaStatistics, SIGNAL(rejected()), this, SLOT(refreshMnaStatisticsChecked()));
+    connect(diaStatistics, SIGNAL(accepted()), this, SLOT(refreshMnaStatisticsChecked()));
+    connect(mnaConfigureKs, SIGNAL(triggered()), this, SLOT(showConfigureDialog()));
     connect(mnaAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(mnaAboutKs, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
     
@@ -237,15 +278,16 @@ void kollegstufeParent::initWidgets()
     QTreeWidgetItem* examListHeader = new QTreeWidgetItem(QTreeWidgetItem::UserType);
     examListHeader->setText(0, "id");
     examListHeader->setText(1, "Semester");
-    examListHeader->setText(2, "Datum");
+    examListHeader->setText(2, "Date");
     examListHeader->setText(3, "Nr");
-    examListHeader->setText(4, "Typ");
-    examListHeader->setText(5, "Punkte");
+    examListHeader->setText(4, "Type");
+    examListHeader->setText(5, "Points");
     lstExamList->setHeaderItem(examListHeader);
     lstExamList->hideColumn(0);
     lstExamList->header()->setClickable(TRUE);
     lstExamList->header()->setMovable(TRUE);
     lstExamList->setSortingEnabled(TRUE);
+    lstExamList->sortByColumn(2, Qt::AscendingOrder);
     
     // subject selection widgets:
     layoutSubjectSelection->setMargin(1);
@@ -257,17 +299,24 @@ void kollegstufeParent::initWidgets()
     iconDir.cdUp();
     iconDir.cd("pic");
     setWindowIcon(QPixmap(iconDir.filePath("kollegstufe.png")));
-    setWindowTitle("Kollegstufe");
+    setWindowTitle(tr("Kollegstufe"));
     
     // set Icons for MenuBar:
-    mnaAboutKs->setIcon(windowIcon());
+    mnaLoadDatabase->setIcon(QIcon(QPixmap(iconDir.filePath("fileopen.png"))));
+    mnaSave->setIcon(QIcon(QPixmap(iconDir.filePath("filesave.png"))));
+    mnaQuit->setIcon(QIcon(QPixmap(iconDir.filePath("exit.png"))));
+    mnaAboutKs->setIcon(QIcon(QPixmap(iconDir.filePath("kollegstufe16.png"))));
+    // set Icons for Subject-control-buttons
+    btnSubjectAdd->setIcon(QIcon(QPixmap(iconDir.filePath("add.png"))));
+    btnSubjectDelete->setIcon(QIcon(QPixmap(iconDir.filePath("remove.png"))));
+    btnSubjectMoveUp->setIcon(QIcon(QPixmap(iconDir.filePath("up.png"))));
+    btnSubjectMoveDown->setIcon(QIcon(QPixmap(iconDir.filePath("down.png"))));
     
     
     //set alternatingrowcolors
     lstSubjectList->setAlternatingRowColors(TRUE);
     lstExamList->setAlternatingRowColors(TRUE);
     
-
 }
 
 void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
@@ -276,7 +325,7 @@ void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
     currentDatabase.nSetAttributeCounter(0);
     currentDatabase.nSetObjectCounter(0);
     
-    int nResult = ReadFileToClass(newFilename.toAscii().data(), &currentDatabase);
+    int nResult = ReadFileToClass( ksPlattformSpec::qstringToSz(newFilename), &currentDatabase);
     szFilename = newFilename;
     if( nResult != 0)
     {
@@ -284,9 +333,9 @@ void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
         szFilename = "";
         if ( showErrorMsg )
         {
-            QMessageBox::critical(this, tr("Fehler beim Datei-Laden - Kollegstufe"),
-                                "Fehler beim Laden der Date <i>" + newFilename + "</i>\n"
-                                + QString::fromLocal8Bit("Anscheinend haben sie nicht die nötigen Leserechte dazu oder diese existiert nicht!"));
+            QMessageBox::critical(this, tr("Error when loading File - Kollegstufe"),
+                                tr("Error when trying to load File <i>") + newFilename + "</i>\n"
+                                  + tr("It seems, you haven't got enough Read-Rights"));
         }
     }
     else
@@ -299,6 +348,11 @@ void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
     currentCathegory    = NULL;
     currentSubject      = NULL;
     currentExam         = NULL;
+    
+    
+    ksPlattformSpec::addMissingDatabaseAttributes(&currentDatabase);
+    currentPropertyPart = currentDatabase.cGetObjectByName("properties");
+    ksPlattformSpec::addMissingPropertiesAttributes(currentPropertyPart);
     
     // reset Database change state:
     setDatabaseChanged(FALSE);
@@ -317,17 +371,17 @@ void kollegstufeParent::saveFile(QString newFilename)
     //create kollegstufe dir in home
     if(!ksPlattformSpec::createKsDir())
     {
-        QMessageBox::critical(this, tr("Fehler beim Ordner-Erstellen - Kollegstufe"),
-                              "Fehler beim Erstellen des Ordners <i>" + ksPlattformSpec::getKsDir() + "</i>\n"
-                                      + QString::fromLocal8Bit("Anscheinend haben sie nicht die nötigen Schreibrechte dazu!"));
+        QMessageBox::critical(this, tr("Error when creating Folder - Kollegstufe"),
+                              "Error during creating folder <i>" + ksPlattformSpec::getKsDir() + "</i>\n"
+                                      + tr("It seems, you haven't got the necessary Write-Rights!"));
         return;
     }
     //create config File home/.kollegstufe
-    if(0 != WriteClassToFile(newFilename.toAscii().data(), &currentDatabase))
+    if(0 != WriteClassToFile( ksPlattformSpec::qstringToSz(newFilename), &currentDatabase))
     {
-        QMessageBox::critical(this, tr("Fehler beim Datei-Speichern - Kollegstufe"),
-                              "Fehler beim Speichern der Date <i>" + newFilename + "</i>\n"
-                                      + QString::fromLocal8Bit("Anscheinend haben sie nicht die nötigen Schreibrechte dazu!"));
+        QMessageBox::critical(this, tr("Error during saving file- Kollegstufe"),
+                              "Error during saving file <i>" + newFilename + "</i>\n"
+                                      + tr("It seems, you haven't got the necessary Write-Rights!"));
         return;
     }
     else
@@ -346,7 +400,7 @@ void kollegstufeParent::loadConfigFile()
     {
         QMessageBox::critical(this, tr("Fehler beim Ordner-Erstellen - Kollegstufe"),
                               "Fehler beim Erstellen des Ordners <i>" + ksPlattformSpec::getKsDir() + "</i>\n"
-                                      + QString::fromLocal8Bit("Anscheinend haben sie nicht die nötigen Schreibrechte dazu!"));
+                                      + tr("It seems, you haven't got the necessary Write-Rights!"));
         return;
     }
     //create config File home/.kollegstufe
@@ -354,22 +408,23 @@ void kollegstufeParent::loadConfigFile()
     {
         QMessageBox::critical(this, tr("Fehler beim Datei-Laden/Erstellen - Kollegstufe"),
                               "Fehler beim Erstellen oder Laden der Date <i>" + ksPlattformSpec::getKsDir() + "config.xml</i>\n"
-                                      + QString::fromLocal8Bit("Anscheinend haben sie nicht die nötigen Schreib- und/oder Leserechte dazu!"));
+                                      + tr("It seems, you haven't got the necessary Write- or Read-Rights!"));
         return;
     }
     
     //clear old config;
     xmlConfig.nSetObjectCounter(0);
     xmlConfig.nSetAttributeCounter(0);
-    if(0 != ReadFileToClass(QString(ksPlattformSpec::getKsDir() + "config.xml").toAscii().data(), &xmlConfig))
+    if(0 != ReadFileToClass(ksPlattformSpec::qstringToSz(QString(ksPlattformSpec::getKsDir() + "config.xml")), &xmlConfig))
     {
         QMessageBox::critical(this, tr("Fehler beim Datei-Laden - Kollegstufe"),
                               "Fehler beim Laden der Date <i>" + ksPlattformSpec::getKsDir() + "config.xml</i>\n"
-                                      + QString::fromLocal8Bit("Anscheinend haben sie nicht die nötigen Leserechte dazu!"));
+                                      + tr("It seems, you haven't got the necessary Read-Rights!"));
         return;
     }
     // add missing Attributes in config File
     ksPlattformSpec::addMissingConfigAttributes(&xmlConfig);
+    
     
     // write config Attributes to widget-attributes:
     // 1. window size
@@ -384,9 +439,35 @@ void kollegstufeParent::loadConfigFile()
     ++it;
     *it = this->width() - nSplitterCoord;
     splitterParent->setSizes(list);
-    // 3. file
     
-    loadFile(xmlConfig.cGetObjectByName("session")->cGetObjectByName("file")->szGetContent());
+    // 3. update Language
+    reloadTranslator();
+    
+    // 4. file
+    if(ksPlattformSpec::fileExists(xmlConfig.cGetObjectByName("session")->cGetObjectByName("file")->szGetContent()))
+    {
+        loadFile(xmlConfig.cGetObjectByName("session")->cGetObjectByName("file")->szGetContent(), TRUE);
+    }
+    else
+    {
+        if(!diaDatabaseSelection)
+        {
+            diaDatabaseSelection = new ksDatabaseSelection(this);
+        }
+        diaDatabaseSelection->setCurrentFile("");
+        diaDatabaseSelection->exec();
+        switch(diaDatabaseSelection->result())
+        {
+            case QDialog::Accepted:
+                loadFile(diaDatabaseSelection->getCurrentFile(), TRUE);
+                break;
+            case QDialog::Rejected:
+                dontShowMe();
+                break;
+            default:
+                break;
+        }
+    }
     
 }
 
@@ -404,22 +485,73 @@ void kollegstufeParent::saveConfigFile()
     QList<int>::Iterator it = list.begin();
     xmlConfig.cGetObjectByName("window-settings")->cGetObjectByName("splitterMain")->cGetAttributeByName("coord")->SetValueToInt(*it);
     // 3. file
-    xmlConfig.cGetObjectByName("session")->cGetObjectByName("file")->nSetContent(szFilename.toAscii().data());
+    xmlConfig.cGetObjectByName("session")->cGetObjectByName("file")->nSetContent(ksPlattformSpec::qstringToSz(szFilename));
     // create .kollegstufe direcotry if it doesnt exist
     if(!ksPlattformSpec::createKsDir())
     {
         QMessageBox::critical(this, tr("Fehler beim Ordner-Erstellen - Kollegstufe"),
                               "Fehler beim Erstellen des Ordners <i>" + ksPlattformSpec::getKsDir() + "</i>\n"
-                                      + QString::fromLocal8Bit("Anscheinend haben sie nicht die nötigen Schreibrechte dazu!"));
+                                      + tr("Anscheinend haben sie nicht die noetigen Schreibrechte dazu!"));
         return;
     }
     // write config  to file
-    if(0 != WriteClassToFile(QString(ksPlattformSpec::getKsDir() + "config.xml").toAscii().data(), &xmlConfig))
+    if(0 != WriteClassToFile(ksPlattformSpec::qstringToSz(QString(ksPlattformSpec::getKsDir() + "config.xml")), &xmlConfig))
     {
         QMessageBox::critical(this, tr("Fehler beim Datei-Schreiben - Kollegstufe"),
                               "Fehler beim Schreiben der Date <i>" + ksPlattformSpec::getKsDir() + "config.xml</i>\n"
-                                      + QString::fromLocal8Bit("Anscheinend haben sie nicht die nötigen Schreibrechte dazu!"));
+                                      + tr("Anscheinend haben sie nicht die noetigen Schreibrechte dazu!"));
         return;
+    }
+}
+
+void kollegstufeParent::retranslateUi()
+{
+    //subject selection
+        btnSubjectEdit->setText(tr("Edit Subject"));
+        btnSubjectAdd->setToolTip(tr("Add Subject"));
+        btnSubjectDelete->setToolTip(tr("Delete Subject"));
+        btnSubjectMoveUp->setToolTip(tr("Move Subject Up"));
+        btnSubjectMoveDown->setToolTip(tr("Move Subject Down"));
+    // exam selection
+        grpExamList->setTitle(tr("Subject Properties"));
+        btnExamAdd->setText(tr("New Exam"));
+        btnExamDelete->setText(tr("Delete"));
+        btnExamEdit->setText(tr("Edit"));
+    
+    // menubar - menus
+        mnmFile->setTitle(tr("&File"));
+        mnmExtras->setTitle(tr("&Extras"));
+    //file menu
+        mnaLoadDatabase->setText(tr("Load archiv"));
+        mnaLoadDatabase->setShortcut(tr("Ctrl+O"));
+        mnaSave->setShortcut(tr("Ctrl+S"));
+        mnaQuit->setShortcut(tr("Ctrl+Q"));
+        mnaSave->setText(tr("Save"));
+        mnaDatabaseProperties->setText(tr("Eigenschaften"));
+        mnaQuit->setText(tr("Quit"));
+    // extras menu
+        mnaStatistics->setText(tr("Statistics"));
+        mnaConfigureKs->setText(tr("Configure Kollegstufe"));
+        mnaAboutQt->setText(tr("About Qt"));
+        mnaAboutKs->setText(tr("About Kollegstufe"));
+    
+    // exam list table
+    QTreeWidgetItem* examListHeader = lstExamList->headerItem();
+    examListHeader->setText(1, tr("Semester"));
+    examListHeader->setText(2, tr("Date"));
+    examListHeader->setText(3, tr("Nr"));
+    examListHeader->setText(4, tr("Type"));
+    examListHeader->setText(5, tr("Points"));
+    
+    selectedCathegoryChanged();
+    
+}
+
+void kollegstufeParent::reloadTranslator()
+{
+    if(xmlConfig.cGetObjectByName("language")->szGetContent())
+    {
+        ksPlattformSpec::setLanguage(xmlConfig.cGetObjectByName("language")->szGetContent(), &appTranslator);
     }
 }
 
@@ -454,12 +586,23 @@ void kollegstufeParent::closeEvent(QCloseEvent* event)
     {
         saveConfigFile();
         event->accept();
+        diaStatistics->close();
     }
     else
     {
         event->ignore();
     }
 }
+
+void kollegstufeParent::changeEvent(QEvent* event)
+{
+    QWidget::changeEvent(event);
+    if(event->type() == QEvent::LanguageChange)
+    {
+        retranslateUi();
+    }
+}
+
 
 bool kollegstufeParent::askForSavingChangedDatabase()
 {
@@ -468,13 +611,13 @@ bool kollegstufeParent::askForSavingChangedDatabase()
     
     if (databaseChanged())
     {
-        QMessageBox questionBox;
-        questionBox.addButton(tr("Speichern"), QMessageBox::ApplyRole);
-        questionBox.addButton(tr("Verwerfen"), QMessageBox::DestructiveRole);
-        questionBox.addButton(tr("Nicht Beenden"), QMessageBox::RejectRole);
+        QMessageBox questionBox(this);
+        questionBox.addButton(tr("Save"), QMessageBox::ApplyRole);
+        questionBox.addButton(tr("Discard"), QMessageBox::DestructiveRole);
+        questionBox.addButton(tr("Don't Close"), QMessageBox::RejectRole);
         questionBox.setIcon(QMessageBox::Question);
-        questionBox.setText(QString::fromLocal8Bit("Seit dem letzten Speichern haben sich Daten verändert!\nMöchten Sie diese vor dem Beenden speichern oder verwerfen ?"));
-        questionBox.setWindowTitle(QString::fromLocal8Bit("Beenden bestätigen - Kollegstufe"));
+        questionBox.setText(tr("Seit dem letzten Speichern haben sich Daten verandert!\nMoechten Sie diese vor dem Schliessen speichern oder verwerfen ?"));
+        questionBox.setWindowTitle(tr("Closing Database - Kollegstufe"));
         
         switch (questionBox.exec()) {
             case 0:
@@ -505,47 +648,91 @@ void kollegstufeParent::showDatabaseProperties()
         diaDatabaseProperties = new ksDatabaseProperties(this);
     }
     diaDatabaseProperties->setDatabasePropertiesToEdit(currentDatabase.cGetObjectByName("properties"));
+    diaDatabaseProperties->setDatabaseToEdit(currentDataPart);
     diaDatabaseProperties->exec();
     if(diaDatabaseProperties->result() == QDialog::Accepted)
     {
+        refreshCathegoryList();
+        if(diaStatistics)
+        {
+            diaStatistics->setProperties(currentPropertyPart);
+        }
         setDatabaseChanged();
+        refreshExamList();
     }
 }
 
 void kollegstufeParent::showAboutDialog()
 {
     if (!diaAbout)
+    {
         diaAbout = new ksAbout(this);
+    }
     diaAbout->exec();
 }
 
+void kollegstufeParent::showConfigureDialog()
+{
+    if(!diaConfigureKs)
+    {
+        diaConfigureKs = new ksConfigure(this);
+    }
+    diaConfigureKs->setConfigToEdit(&xmlConfig);
+    if(diaConfigureKs->exec())
+    {
+        reloadTranslator();
+    }
+    
+}
+
+
+void kollegstufeParent::refreshMnaStatisticsChecked()
+{
+    // only set, if there is something to change.
+    //this had been done to avoid infinite recursion
+    
+    if(mnaStatistics->isChecked() != diaStatistics->isVisible())
+    {
+        mnaStatistics->setChecked(diaStatistics->isVisible());
+    }
+}
 
 void kollegstufeParent::subjectAdd()
 {
+    if( currentCathegory == NULL)
+    {
+        return;
+    }
     
-    QString    szNewSubject = "Neues Fach";
+    QString    szNewSubjectName;
+    QString    szBasicName;
+    
     int        nNewSubjectId;
     xmlObject* newSubject;
+    if ((nNewSubjectId = currentCathegory->nAddObject("subject")) < 0)
+        return;
+    
+    newSubject = currentCathegory->cGetObjectByIdentifier(nNewSubjectId);
+    ksPlattformSpec::addMissingSubjectAttributes(newSubject);
+    
+     // set strings to current subject name
+    szNewSubjectName = newSubject->cGetAttributeByName("name")->value();
+    szBasicName = szNewSubjectName;
     
     //Find first "free" Subject Name
     int SubjectNumber = 1;
-    while(currentCathegory->cGetObjectByAttributeValue("name", szNewSubject.toAscii().data()))
+    xmlObject*  foundedSubject;
+    while((foundedSubject=currentCathegory->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(szNewSubjectName))) && foundedSubject != newSubject)
     {
         SubjectNumber++;
-        szNewSubject = "Neues Fach " + QString::number(SubjectNumber);
+        szNewSubjectName = szBasicName + " " + QString::number(SubjectNumber);
     }
-    
-    if ((nNewSubjectId = currentCathegory->nAddObject("subject")) < 0)
-        return;
-    newSubject = currentCathegory->cGetObjectByIdentifier(nNewSubjectId);
-    newSubject->nAddAttribute("name", szNewSubject.toAscii().data());
-    ksPlattformSpec::addMissingSubjectAttributes(newSubject);
-    
+    newSubject->cGetAttributeByName("name")->SetValue(ksPlattformSpec::qstringToSz(szNewSubjectName));
     
     //run subject dialog
     if(!diaSubjectProperties)
     {
-        diaSubjectProperties = new ksSubjectProperties;
+        diaSubjectProperties = new ksSubjectProperties(this);
     }
     
     diaSubjectProperties->setSubjectToEdit(newSubject);
@@ -557,9 +744,10 @@ void kollegstufeParent::subjectAdd()
         case QDialog::Accepted:
             setDatabaseChanged();
             refreshSubjectList();
-            if(lstSubjectList->findItems(szNewSubject, Qt::MatchExactly).size() > 0)
+            szNewSubjectName = newSubject->cGetAttributeByName("name")->value();
+            if(lstSubjectList->findItems(szNewSubjectName, Qt::MatchExactly).size() > 0)
             {
-                lstSubjectList->setCurrentItem(lstSubjectList->findItems(szNewSubject, Qt::MatchExactly).first());
+                lstSubjectList->setCurrentItem(lstSubjectList->findItems(szNewSubjectName, Qt::MatchExactly).first());
             }
             break;
         case QDialog::Rejected:
@@ -577,12 +765,12 @@ void kollegstufeParent::subjectDelete()
     if(!lstSubjectList->currentItem())
         return;
     
-    QString message = QString::fromLocal8Bit("Möchten Sie das Fach \'");
+    QString message = tr("Do you really want to delete the subject\'");
     message += lstSubjectList->currentItem()->text();
-    message += QString::fromLocal8Bit("\' wirklich löschen?");
-    if(QMessageBox::question ( this, QString::fromLocal8Bit("Löschen eines Faches"), message , QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+    message += tr("\' ?");
+    if(QMessageBox::question ( this, tr("Deleting a subject"), message , QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
     {
-        currentCathegory->nDeleteObject(currentCathegory->nGetObjectIdentifierByAttributeValue("name", lstSubjectList->currentItem()->text().toAscii().data()));
+        currentCathegory->nDeleteObject(currentCathegory->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(lstSubjectList->currentItem()->text())));
 
         
         refreshSubjectList();
@@ -619,6 +807,39 @@ void kollegstufeParent::subjectEdit()
     }
 }
 
+
+void kollegstufeParent::subjectMoveUp()
+{
+    if(!currentSubject || !currentCathegory)
+    {
+        return;
+    }
+    if(lstSubjectList->count() <= 1)
+    {
+        return;
+    }
+    currentCathegory->moveObjectTo(currentSubject, lstSubjectList->currentRow()-1);
+    refreshSubjectList(lstSubjectList->currentRow()-1);
+    setDatabaseChanged();
+}
+
+void kollegstufeParent::subjectMoveDown()
+{
+    if(!currentSubject || !currentCathegory)
+    {
+        return;
+    }
+    if(lstSubjectList->count() <= 1)
+    {
+        return;
+    }
+    
+    currentCathegory->moveObjectTo(currentSubject, lstSubjectList->currentRow()+1);
+    
+    refreshSubjectList(lstSubjectList->currentRow()+1);
+    setDatabaseChanged();
+}
+
 void kollegstufeParent::examAdd()
 {
     if(currentSubject == NULL)
@@ -635,12 +856,12 @@ void kollegstufeParent::examAdd()
     int i = 0;
     QString newId;
     newId.setNum(i);
-    while (currentSubject->cGetObjectByAttributeValue("id", newId.toAscii().data()) != NULL)
+    while (currentSubject->cGetObjectByAttributeValue("id", ksPlattformSpec::qstringToSz(newId)) != NULL)
     {
         i++;
         newId.setNum(i);
     }
-    newExam->nAddAttribute("id",newId.toAscii().data());
+    newExam->nAddAttribute("id",ksPlattformSpec::qstringToSz(newId));
     ksPlattformSpec::addMissingExamAttributes(newExam);
     
     // run exam property dialog
@@ -648,6 +869,7 @@ void kollegstufeParent::examAdd()
     {
         diaExamProperties = new ksExamProperties(this);
     }
+    diaExamProperties->setProperties(currentPropertyPart);
     diaExamProperties->setExamToEdit(newExam);
     diaExamProperties->exec();
     switch(diaExamProperties->result())
@@ -693,7 +915,7 @@ void kollegstufeParent::examDelete()
         return;
     }
     
-    QString message = QString::fromLocal8Bit("Möchten Sie ");
+    QString message = tr("Do you really want to delete ");
     message += ksPlattformSpec::getArticleForNoun(currentExam->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value(), ksPlattformSpec::kasusAkkusativ);
     if(currentExam->cGetObjectByAttributeValue("name", "number")->cGetAttributeByName("value")->nValueToInt() > 0)
     {
@@ -701,12 +923,12 @@ void kollegstufeParent::examDelete()
         message += ". ";
     }
     message += currentExam->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value();
-    message += " vom ";
+    message += tr(" from ");
     cDateConverter date;
     date.setDateString(currentExam->cGetObjectByAttributeValue("name", "date")->cGetAttributeByName("value")->value());
     message += date.humanDate();
-    message += QString::fromLocal8Bit(" wirklich löschen?");
-    if(QMessageBox::question ( this, QString::fromLocal8Bit("Löschen einer Leistung"), message , QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+    message += tr(" ? Really Delete this exam ?");
+    if(QMessageBox::question ( this, tr("Deleting of an Exam"), message , QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
     {
         currentSubject->nDeleteObject(currentExam);
         refreshExamList();
@@ -725,6 +947,7 @@ void kollegstufeParent::examEdit()
     {
         return;
     }
+    diaExamProperties->setProperties(currentPropertyPart);
     diaExamProperties->setExamToEdit(currentExam);
     diaExamProperties->exec();
     switch(diaExamProperties->result())
@@ -746,30 +969,38 @@ void kollegstufeParent::selectedCathegoryChanged()
 {
     if (currentDataPart)
     {
-        currentCathegory = currentDataPart->cGetObjectByAttributeValue("name", (cmbCathegory->currentText().toAscii().data()));
+        currentCathegory = currentDataPart->cGetObjectByAttributeValue("name", (ksPlattformSpec::qstringToSz(cmbCathegory->currentText())));
     }
     else
     {
         currentCathegory = NULL;
     }
     refreshSubjectList();
+    //to refresh everything
+    selectedSubjectChanged();
 }
 
 void kollegstufeParent::selectedSubjectChanged()
 {
-    if (lstSubjectList->currentItem())
+    if (lstSubjectList->currentItem() && currentCathegory)
     {
         grpExamList->setEnabled(TRUE);
         btnSubjectDelete->setEnabled(TRUE);
-        currentSubject = currentCathegory->cGetObjectByAttributeValue("name", lstSubjectList->currentItem()->text().toAscii().data());
-        grpExamList->setTitle(lstSubjectList->currentItem()->text());
+        currentSubject = currentCathegory->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(lstSubjectList->currentItem()->text()));
+        grpExamList->setTitle(tr("Properties of subject ") + lstSubjectList->currentItem()->text());
+        
     }
     else
     {
         grpExamList->setEnabled(FALSE);
         btnSubjectDelete->setEnabled(FALSE);
-        grpExamList->setTitle( QString::fromLocal8Bit("Kein Fach ausgewählt"));
+        grpExamList->setTitle( tr("No Subject Selected"));
         currentSubject = NULL;
+    }
+    if(diaStatistics)
+    {
+        diaStatistics->setSubject(currentSubject);
+        diaStatistics->setProperties(currentPropertyPart);
     }
     refreshExamList();
 }
@@ -795,8 +1026,9 @@ void kollegstufeParent::selectedExamChanged()
     }
     else
     {
-        currentExam = currentSubject->cGetObjectByAttributeValue("id", selectedID.toAscii().data());
+        currentExam = currentSubject->cGetObjectByAttributeValue("id", ksPlattformSpec::qstringToSz(selectedID));
     }
+    diaStatistics->refreshExamListFromXmlSubject();
     
 }
 
@@ -833,22 +1065,27 @@ void kollegstufeParent::refreshCathegoryList()
             {
                 currentObjectToAdd->nAddAttribute("name", "Unbekannt");
             }
-            cmbCathegory->addItem(currentObjectToAdd->cGetAttributeByName("name")->value());
+            cmbCathegory->addItem(ksPlattformSpec::szToUmlauts(currentObjectToAdd->cGetAttributeByName("name")->value()));
         }
     }
     
     // restore Selection from before refresh
     cmbCathegory->setCurrentIndex(nBackupSelectedIndex);
-    currentCathegory = currentDataPart->cGetObjectByAttributeValue("name", cmbCathegory->currentText().toAscii().data());
+    currentCathegory = currentDataPart->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(cmbCathegory->currentText()));
+    
+    selectedSubjectChanged();
 }
 
-void kollegstufeParent::refreshSubjectList()
+void kollegstufeParent::refreshSubjectList(int rowToSelectAfterRefresh)
 {
-    //backup last Selection
-    int nBackupSelectedIndex = lstSubjectList->currentRow();
-    if(nBackupSelectedIndex < 0)
+    if(rowToSelectAfterRefresh < 0 || rowToSelectAfterRefresh >= lstSubjectList->count())
     {
-        nBackupSelectedIndex = 0;
+        //backup last Selection if there is no special row wanted
+        rowToSelectAfterRefresh = lstSubjectList->currentRow();
+    }
+    if(rowToSelectAfterRefresh < 0)
+    {
+        rowToSelectAfterRefresh = 0;
     }
     lstSubjectList->clear();
     if( !currentCathegory)
@@ -869,12 +1106,12 @@ void kollegstufeParent::refreshSubjectList()
             {
                 currentObjectToAdd->nAddAttribute("name", "Unbekannt");
             }
-            lstSubjectList->addItem(currentObjectToAdd->cGetAttributeByName("name")->value());
+            lstSubjectList->addItem(ksPlattformSpec::szToUmlauts(currentObjectToAdd->cGetAttributeByName("name")->value()));
         }
     }
     
     // restore Selection from before refresh
-    lstSubjectList->setCurrentRow(nBackupSelectedIndex);
+    lstSubjectList->setCurrentRow(rowToSelectAfterRefresh);
 }
 
 void kollegstufeParent::refreshExamList()
@@ -888,9 +1125,24 @@ void kollegstufeParent::refreshExamList()
     
     // refresh list
     lstExamList->clear();
-    if(currentSubject == NULL)
+    if(!currentPropertyPart || !currentSubject)
     {
         return;
+    }
+    
+    int best  = currentPropertyPart->cGetObjectByName("rating")->cGetAttributeByName("best")->nValueToInt();
+    int worst = currentPropertyPart->cGetObjectByName("rating")->cGetAttributeByName("worst")->nValueToInt();
+    
+    if (best > worst)
+    {
+        // point  mode
+        QTreeWidgetItem* head = lstExamList->headerItem();
+        head->setText(head->columnCount()-1, tr("Points"));
+    }else
+    {
+        // mark- mode
+        QTreeWidgetItem* head = lstExamList->headerItem();
+        head->setText(head->columnCount()-1, tr("Mark"));
     }
     
     ExamItem*           examToAdd;
@@ -910,17 +1162,25 @@ void kollegstufeParent::refreshExamList()
         }
         ksPlattformSpec::addMissingExamAttributes(currentXmlExam);
         
-        currentSemester = QString::fromLocal8Bit(currentXmlExam->cGetObjectByAttributeValue("name", "semester")->cGetAttributeByName("value")->value());
-        currentDate     = QString::fromLocal8Bit(currentXmlExam->cGetObjectByAttributeValue("name", "date")->cGetAttributeByName("value")->value());
-        currentNumber   = QString::fromLocal8Bit(currentXmlExam->cGetObjectByAttributeValue("name", "number")->cGetAttributeByName("value")->value());
-        currentType     = QString::fromLocal8Bit(currentXmlExam->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value());
-        currentPoints   = QString::fromLocal8Bit(currentXmlExam->cGetObjectByAttributeValue("name", "points")->cGetAttributeByName("value")->value());
+        currentSemester = ksPlattformSpec::szToUmlauts(currentXmlExam->cGetObjectByAttributeValue("name", "semester")->cGetAttributeByName("value")->value());
+        currentDate     = ksPlattformSpec::szToUmlauts(currentXmlExam->cGetObjectByAttributeValue("name", "date")->cGetAttributeByName("value")->value());
+        currentNumber   = ksPlattformSpec::szToUmlauts(currentXmlExam->cGetObjectByAttributeValue("name", "number")->cGetAttributeByName("value")->value());
+        currentType     = ksPlattformSpec::szToUmlauts(currentXmlExam->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value());
+        currentPoints   = ksPlattformSpec::szToUmlauts(currentXmlExam->cGetObjectByAttributeValue("name", "points")->cGetAttributeByName("value")->value());
+        
+        // transform date
+        currentDateClass.setDateString(ksPlattformSpec::qstringToSz(currentDate));
+        currentDate = currentDateClass.humanDate();
         
         // edit number:
         if (currentNumber == "0")
             currentNumber = "";
-        //if(currentSemester == "auto")
-        //    currentSemester = cFrmStatistic::getSemesterContainigDate( pCurrentArchive->cGetObjectByName("properties")->cGetObjectByName("time"),  Date.getDateString());
+        else
+            currentNumber += ".";
+        
+        // edit semester
+        if(currentSemester == "auto")
+            currentSemester = ksPlattformSpec::getSemesterContainigDate( currentDatabase.cGetObjectByName("properties")->cGetObjectByName("time"),  QString(currentDateClass.getDateString()));
         if(currentSemester == "12/1")
             currentSemester = "12 / 1";
         if(currentSemester == "12/2")
@@ -929,8 +1189,6 @@ void kollegstufeParent::refreshExamList()
             currentSemester = "13 / 1";
         if(currentSemester == "13/2")
             currentSemester = "13 /2";
-        currentDateClass.setDateString(currentDate.toAscii().data());
-        currentDate = currentDateClass.humanDate();
         
         examToAdd = new ExamItem(lstExamList);
         examToAdd->setText(0, currentXmlExam->cGetAttributeByName("id")->value());

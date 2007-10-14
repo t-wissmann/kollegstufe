@@ -21,33 +21,51 @@
 #define KSPLATTFORMSPEC_H
 
 #include <QString>
-
+#include <QObject>
 /**
 	@author Thorsten Wissmann <towi89@web.de>
 */
 class xmlObject;
 class QStringList;
+class QTranslator;
 
-class ksPlattformSpec{
+class ksPlattformSpec : public QObject {
+            
+    Q_OBJECT
+            
 public:
-    ksPlattformSpec();
+    ksPlattformSpec(): QObject()  {};
 
-    ~ksPlattformSpec();
+    ~ksPlattformSpec(){};
     static bool createKsDir(); // creates a kollegstufe-directory
                         //returns true on success, false on error
     static QString getKsDir(); // allways ends with QDir::separator()
     static bool createConfigFile(); // creates a kollegstufe-config-file
                                     //returns true on success, false on error
     
+    // language - Functions
+    static bool  setLanguage(QString language, QTranslator* translator);
+    static QString getLanguageString();
+    static QStringList getAvailibleLanguages();
+    
     // xmlObject - Functions
+    static void   addMissingCathegoryAttributes(xmlObject*  CathegoryToComplete);
     static void   addMissingExamAttributes(xmlObject*  ExamToComplete);
     static void   addMissingSubjectAttributes(xmlObject*  SubjectToComplete);
     static void   addMissingConfigAttributes(xmlObject* configFileToComplete);
     static void   addMissingDatabaseAttributes(xmlObject* databaseToComplete);
     static void   addMissingPropertiesAttributes(xmlObject* propertiesToComplete);
     static void   catchFileList(QStringList*    targetList);
-    
+    static QString getSemesterContainigDate(xmlObject* pSemesterList, QString  timestamp);
     static QString getUserName();
+    static QString getNewFilename(QString prefix, QString suffix = ".xml");
+    static bool    fileExists(QString filename);
+    
+    static QString szToUmlauts(char* string);
+    static char*   qstringToSz(QString string);
+    
+    static QString versionAsString();
+    
     enum kasus
     {
         kasusNominativ,
@@ -56,6 +74,7 @@ public:
         kasusAkkusativ
     };
     static QString  getArticleForNoun(QString noun, kasus kasusOfNoun);
+    static bool     deleteFile(QString fileToDelete);
 };
 
 #endif

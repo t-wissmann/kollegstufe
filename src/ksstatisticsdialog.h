@@ -17,23 +17,60 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef KSSTATISTICSDIALOG_H
+#define KSSTATISTICSDIALOG_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+#include <QDialog>
 
-int main(int argc, char *argv[])
+class xmlObject;
+class ksStatisticsWidget;
+
+class QVBoxLayout;
+class QHBoxLayout;
+class QGridLayout;
+
+class QPushButton;
+class QEvent;
+
+/**
+	@author Thorsten Wissmann <towi89@web.de>
+*/
+class ksStatisticsDialog : public QDialog
 {
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+Q_OBJECT
+public:
+    ksStatisticsDialog(QWidget *parent = 0);
 
+    ~ksStatisticsDialog();
+    
+    void setSubject(xmlObject* newSubject);
+    void setProperties(xmlObject* newProperties);
+    
+    void retranslateUi();
+public slots:
+    void refreshExamListFromXmlSubject();
+    
+protected:
+    virtual void changeEvent(QEvent* event);
+private:
+    void initMembers();
+    void allocateWidgets();
+    void createLayouts();
+    void connectSlots();
+    void initWidgets();
+    
+    //widgets
+    ksStatisticsWidget* statistics;
+    QPushButton*        btnClose;
+    
+    //layouts
+    QGridLayout*        layoutParent;
+    QHBoxLayout*        layoutBottom;
+    
+    //members
+    xmlObject*  subject;
+    xmlObject*  properties;
+
+};
+
+#endif

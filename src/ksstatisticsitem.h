@@ -17,23 +17,53 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef KSSTATISTICSITEM_H
+#define KSSTATISTICSITEM_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+#include <QString>
+#include <QDate>
 
-int main(int argc, char *argv[])
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
+/**
+	@author Thorsten Wissmann <towi89@web.de>
+*/
+class ksStatisticsItem{
+public:
+    ksStatisticsItem();
+    ksStatisticsItem(const ksStatisticsItem& newItem);
+    ksStatisticsItem(QString newCaption, QDate newX, int newY, QString newInformation = "");
+
+    ~ksStatisticsItem();
+    void operator=(const ksStatisticsItem& newItem);
+    bool operator<(const ksStatisticsItem& other) const;
+    bool operator>(const ksStatisticsItem& other) const;
+    bool operator==(const ksStatisticsItem& other) const;
+    bool operator!=(const ksStatisticsItem& other) const;
+    bool operator<=(const ksStatisticsItem& other) const;
+    bool operator>=(const ksStatisticsItem& other) const;
     
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+    
+    
+    QString caption() const { return szCaption; };
+    void setCaption(QString newCaption){ szCaption = newCaption; };
+    
+    QDate   x() const { return dateX; };
+    void setX(QDate newX ){ dateX = newX; };
+    
+    int     y() const { return nY; };
+    void setY( int newY ){ nY = newY; };
+    
+    QString information() const { return szInformation; };
+    void setInformation(QString newInformation){ szInformation = newInformation; };
+    
+    
+private:
+    QString  szCaption;
+    QDate    dateX;
+    int      nY;
+    
+    QString  szInformation;
 
+};
+
+
+#endif

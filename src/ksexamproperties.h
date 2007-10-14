@@ -37,7 +37,7 @@ class QRadioButton;
 class QDateEdit;
 class QGroupBox;
 
-
+class QEvent;
 class xmlObject;
 /**
 	@author Thorsten Wissmann <towi89@web.de>
@@ -49,9 +49,13 @@ Q_OBJECT
 public:
     ksExamProperties(QWidget *parent = 0);
     ~ksExamProperties();
+    void retranslateUi();
 public slots:
+    void setProperties(xmlObject*     newProperties);
     void setExamToEdit(xmlObject* newExamToEdit);
     void writeWidgetAttributesToExam();
+protected:
+    virtual void changeEvent(QEvent* event);
 private:
     
     void    initMembers();
@@ -97,6 +101,7 @@ private:
     
     // members
     xmlObject*  examToEdit;
+    xmlObject*  properties;
     
     
 };

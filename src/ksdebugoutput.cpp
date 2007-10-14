@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "ksdebugoutput.h"
+#include "ksplattformspec.h"
 #include <QtGlobal>
 #include <QChar>
 #include <string.h>
@@ -43,7 +44,7 @@ void ksDebugOutput::putStandartQtDebugOutut(QString outputString)
     // only put debug string if debug mode is enabled
     if (!bDebugMode)
         return;
-    qDebug(outputString.toAscii().constData());
+    qDebug(ksPlattformSpec::qstringToSz(outputString));
     
 }
 void ksDebugOutput::putDebugOutput(QString outputString)

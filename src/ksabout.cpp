@@ -46,6 +46,12 @@ ksAbout::ksAbout(QWidget *parent)
     setModal(TRUE);
     createGui();
     initGui();
+    retranslateUi();
+    
+    if(parent)
+    {
+        setWindowIcon(parent->windowIcon());
+    }
 }
 
 
@@ -54,16 +60,48 @@ ksAbout::~ksAbout()
     
 }
 
+
+void ksAbout::changeEvent(QEvent* event)
+{
+    QWidget::changeEvent(event);
+    if(event->type() == QEvent::LanguageChange)
+    {
+        retranslateUi();
+    }
+}
+
+
+void ksAbout::retranslateUi()
+{
+    lblHeader->setText(tr("Kollegstufe"));
+    lblVersion->setText(tr("version") + " " + ksPlattformSpec::versionAsString());
+    btnClose->setText(tr("close"));
+    QString infoText;
+    infoText  = tr("Kollegstufe is a small Programe, that allows you to manage your marks in the bavarian Kollegstufe.") + " ";
+    infoText += tr("It is released under the GPL - GNU General Public License.") + " ";
+    infoText += tr("So it's free Software. You are allowed to copy, modify and distribute it for non-comercial use.") + " \n ";
+    infoText += tr("You should have recieved a copy of the GPL with this.") + " ";
+    infoText += tr("If not, see <i>http://www.gnu.org/licenses/gpl-3.0.html</i> for more details");
+    txtInfoText->setHtml(infoText);
+    setWindowTitle(tr("About Kollegstufe"));
+}
+
 void ksAbout::createGui()
 {
     // widgets
-    lblHeader = new QLabel("Kollegstufe");
+    lblHeader = new QLabel;
+    lblVersion = new QLabel;
     lblIcon = new QLabel;
     frmContainer = new QGroupBox;
     txtInfoText = new QTextEdit;
-    btnClose = new QPushButton(QString::fromLocal8Bit("Schließen"));
+    btnClose = new QPushButton;
     
     // layouts
+    layoutTop = new QHBoxLayout;
+    layoutTop->setMargin(0);
+    layoutTop->addWidget(lblHeader);
+    layoutTop->addWidget(lblVersion);
+    
     layoutBottom = new QHBoxLayout;
     layoutBottom->addStretch(1);
     layoutBottom->addWidget(btnClose);
@@ -75,7 +113,7 @@ void ksAbout::createGui()
     frmContainer->setLayout(layoutFrame);
     
     layoutParent = new QVBoxLayout;
-    layoutParent->addWidget(lblHeader);
+    layoutParent->addLayout(layoutTop);
     layoutParent->addWidget(frmContainer);
     layoutParent->addLayout(layoutBottom);
     
@@ -91,18 +129,14 @@ void ksAbout::initGui()
     // info text
     txtInfoText->setReadOnly(TRUE);
     txtInfoText->setFrameStyle(QFrame::NoFrame);
-    QString infoText;
-    infoText  = "Kollegstufe is a small Programe, that allows you to manage your marks in the bavarian Kollegstufe. ";
-    infoText += "It is released under the GPL - GNU General Public License. ";
-    infoText += "So it's free Software. You are allowed to copy, modify and distribute it for non-comercial use. ";
-    infoText += "\n You should have recieved a copy of the GPL with this. ";
-    infoText += "If not, see <i>http://www.gnu.org/licenses/gpl-3.0.html</i> for more details";
     txtInfoText->setContentsMargins(0, 2, 22, 22);
-    txtInfoText->setHtml(infoText);
     // Header
     lblHeader->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    lblHeader->setFont(QFont("sdfsdf", 50, QFont::Bold));
+    lblHeader->setFont(QFont("sdfsdf", 30, QFont::Bold));
     lblHeader->setAlignment(Qt::AlignHCenter);
+    // Version
+    lblVersion->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    lblVersion->setAlignment(Qt::AlignBottom);
     // Frame
     frmContainer->setBackgroundRole(QPalette::Base);
     frmContainer->setAutoFillBackground(TRUE);
@@ -119,7 +153,7 @@ void ksAbout::initGui()
     iconDir.cdUp();
     iconDir.cd("pic");
     lblIcon->setPixmap(QPixmap(iconDir.filePath("kollegstufe.png")));
-    setWindowTitle(QString::fromLocal8Bit("Über Kollegstufe"));
+    
     
     resize(400, 250);
     

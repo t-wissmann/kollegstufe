@@ -17,23 +17,76 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#include "ksstatisticsitem.h"
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
-
-int main(int argc, char *argv[])
+ksStatisticsItem::ksStatisticsItem()
 {
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
+    nY = 0;
 }
+
+ksStatisticsItem::ksStatisticsItem(const ksStatisticsItem &other)
+{
+    nY = 0;
+    setCaption ( other.caption() );
+    setX ( other.x() );
+
+    setY ( other.y() );
+    setInformation ( other.information() );
+}
+
+ksStatisticsItem::ksStatisticsItem ( QString newCaption, QDate newX, int newY, QString newInformation )
+{
+	szCaption = newCaption;
+	dateX = newX;
+	nY = newY;
+	szInformation = newInformation;
+}
+
+
+ksStatisticsItem::~ksStatisticsItem()
+{
+}
+
+void ksStatisticsItem::operator= (const ksStatisticsItem& newItem )
+{
+    setCaption ( newItem.caption() );
+    setX ( newItem.x() );
+    setY ( newItem.y() );
+    setInformation ( newItem.information() );
+}
+
+
+bool ksStatisticsItem::operator<(const ksStatisticsItem& other) const
+{
+    return x() < other.x();
+}
+
+bool ksStatisticsItem::operator>(const ksStatisticsItem& other) const
+{
+    return x() > other.x();
+}
+
+bool ksStatisticsItem::operator<=(const ksStatisticsItem& other) const
+{
+    return x() <= other.x();
+}
+
+bool ksStatisticsItem::operator>=(const ksStatisticsItem& other) const
+{
+    return x() >= other.x();
+}
+
+
+bool ksStatisticsItem::operator==(const ksStatisticsItem& other) const
+{
+    return x() == other.x();
+}
+
+bool ksStatisticsItem::operator!=(const ksStatisticsItem& other) const
+{
+    return x() != other.x();
+}
+
+
+
 

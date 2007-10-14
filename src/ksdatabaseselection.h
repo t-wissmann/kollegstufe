@@ -27,6 +27,8 @@
 class QListWidget;
 class QLabel;
 class QPushButton;
+class QTextEdit;
+class QAction;
 
 
 //layouts
@@ -34,6 +36,8 @@ class QPushButton;
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
+class QSplitter;
+
 /**
 	@author Thorsten Wissmann <towi89@web.de>
 */
@@ -47,9 +51,19 @@ public:
     QString getCurrentFile();
     void    setCurrentFile(QString szNewFile);
     void    catchStringList();
+    void    printfFileInfo();
+    static QString getFileListLineForPath(QString path);
+    static QString getHtmlInfoForPath(QString path);
+    void   retranslateUi();
 public slots:
     void    refreshFileList();
-    void    selectedFileChanged();
+    void    selectedFileChanged(int newCurrentFile);
+    void    createNewDatabase();
+    void    deleteDatabase();
+    void    importDatabase();
+    void    exportDatabase();
+protected:
+    virtual void changeEvent(QEvent* event);
 private:
     
     void    allocateWidgets();
@@ -57,12 +71,19 @@ private:
     void    connectSlots();
     
     // widgets
+    QPushButton*    btnNew;
+    QPushButton*    btnDelete;
     QPushButton*    btnOk;
     QPushButton*    btnCancel;
     QListWidget*    lstFileList;
-    QLabel*         lblInfo;
+    QTextEdit*      txtInfo;
+    QPushButton*    btnExtras;
+    QAction*        mnaExtrasDelete;
+    QAction*        mnaExtrasImport;
+    QAction*        mnaExtrasExport;
     
     //layouts:
+    QSplitter*      layoutListOrInfo;
     QHBoxLayout*    layoutBottom;
     QGridLayout*    layoutParent;
     

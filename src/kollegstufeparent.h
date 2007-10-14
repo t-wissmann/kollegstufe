@@ -21,7 +21,20 @@
 #ifndef KOLLEGSTUFEPARENT_H
 #define KOLLEGSTUFEPARENT_H
 
-#include <QWidget>
+
+#ifndef KS_IS_MAIN_WINDOW
+ // defines wether kollegstufeParent shall be a QWidget with a menubar in its layout
+ // or if it shall be a QMainWindow with a central widget and with using setMenubar(mnbMenuBar)
+#define KS_IS_MAIN_WINDOW
+#endif
+
+#ifdef KS_IS_MAIN_WINDOW
+    #include <QMainWindow>
+#else
+    #include <QWidget>
+#endif
+
+#include <QTranslator>
 #include "xmlparser.h"
 
 // own qobjects
@@ -30,8 +43,10 @@ class ksDebugOutput;
 class ksExamProperties;
 class ksSubjectProperties;
 class ksDatabaseSelection;
+class ksStatisticsDialog;
 class ksDatabaseProperties;
 class ksAbout;
+class ksConfigure;
 
 
 // normal widgets
@@ -58,23 +73,35 @@ class QSplitter;
 
 // other Q_Objects
 class QCloseEvent;
+class QEvent;
 
 /**
 	@author Thorsten Wissmann <towi89@web.de>
 */
-class kollegstufeParent : public QWidget
+class kollegstufeParent
+#ifdef KS_IS_MAIN_WINDOW
+    : public QMainWindow
+#else
+    :public QWidget
+#endif
 {
     Q_OBJECT
+            
+signals:
+    //void languageChanged();
 public slots:
     void showAboutDialog();
+    void showConfigureDialog();
     // Save/load
     void loadConfigFile();
     void saveConfigFile();
     void showDatabaseSelection();
     void showDatabaseProperties();
+    
+    void refreshMnaStatisticsChecked();
     // view editor:
     void refreshCathegoryList();
-    void refreshSubjectList();
+    void refreshSubjectList(int rowToSelectAfterRefresh = -1); // -1 if currentRow shall be selected after refresh
     void refreshExamList();
     void selectedCathegoryChanged();
     void selectedSubjectChanged();
@@ -86,16 +113,23 @@ public slots:
     void subjectAdd();
     void subjectDelete();
     void subjectEdit();
+    void subjectMoveUp();
+    void subjectMoveDown();
     
     // exam control:
     void examAdd();
     void examDelete();
     void examEdit();
     
+    void retranslateUi();
+    
     
 public:
-    kollegstufeParent(QWidget* parent = 0);
+    kollegstufeParent(QWidget* parentWidget = 0);
     ~kollegstufeParent();
+    
+    bool wantsToBeShown(){ return bWantsToBeShown;};
+    void dontShowMe(){ bWantsToBeShown = FALSE;};
     
     void loadFile(QString newFilename, bool showErrorMsg = FALSE); // returns true on success, otherwise false
     
@@ -104,9 +138,11 @@ public:
     bool databaseChanged(){ return bDatabaseChanged; };
     
     QString getFilename(){ return szFilename; };
-    
+    void reloadTranslator();
 protected:
     virtual void closeEvent(QCloseEvent* event);
+    virtual void changeEvent(QEvent* event);
+
 private:
     void    initMembers();
     void    allocateWidgets();
@@ -125,8 +161,13 @@ private:
     QMenu*          mnmFile;
     QMenu*          mnmExtras;
     //actions
+    // extras - menu
+    QAction*        mnaStatistics;
+    
+    QAction*        mnaConfigureKs;
     QAction*        mnaAboutKs;
     QAction*        mnaAboutQt;
+    // file - menu
     QAction*        mnaLoadDatabase;
     QAction*        mnaDatabaseProperties;
     QAction*        mnaSave;
@@ -141,6 +182,8 @@ private:
     QPushButton*    btnSubjectAdd;
     QPushButton*    btnSubjectDelete;
     QPushButton*    btnSubjectEdit;
+    QPushButton*    btnSubjectMoveUp;
+    QPushButton*    btnSubjectMoveDown;
     
     // widgets for exam selection;
     QGridLayout*    layoutExamList;
@@ -159,8 +202,14 @@ private:
     ksDatabaseProperties*   diaDatabaseProperties;
     ksDatabaseSelection*    diaDatabaseSelection;
     ksAbout*                diaAbout;
+    ksConfigure*            diaConfigureKs;
+    ksStatisticsDialog*     diaStatistics;
     
     // member variables
+    
+    QTranslator appTranslator;
+    bool        bWantsToBeShown;
+    
     QString     szApplicationPath;
     QString     szFilename;
     bool        bDatabaseChanged;

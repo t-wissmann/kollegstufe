@@ -21,6 +21,7 @@
 #include "ksplattformspec.h"
 #include "dateConverter.h"
 
+
 #include "xmlparser.h"
 
 // widgets:
@@ -40,7 +41,8 @@
 // other qt -objects
 #include <QSizePolicy>
 #include <QDate>
-
+#include <QEvent>
+#include <QMessageBox>
 
 ksExamProperties::ksExamProperties(QWidget *parent)
  : QDialog(parent)
@@ -50,6 +52,12 @@ ksExamProperties::ksExamProperties(QWidget *parent)
     createLayouts();
     connectSlots();
     initWidgets();
+    
+    if(parent)
+    {
+        setWindowIcon(parent->windowIcon());
+    }
+    retranslateUi();
 }
 
 
@@ -61,37 +69,68 @@ void ksExamProperties::initMembers()
 {
     
     setModal(TRUE);
+    properties = NULL;
     examToEdit = NULL;
 }
+
+
+void ksExamProperties::changeEvent(QEvent* event)
+{
+    QWidget::changeEvent(event);
+    if(event->type() == QEvent::LanguageChange)
+    {
+        retranslateUi();
+    }
+}
+
+
+
+void ksExamProperties::retranslateUi()
+{
+    btnOk->setText(tr("Ok"));
+    btnCancel->setText(tr("Cancel"));
+    lblNumber->setText(tr("Number:"));
+    lblType->setText(tr("Type:"));
+    lblPoints->setText(tr("Points:"));
+    lblDate->setText(tr("Date:"));
+    lblWeighting->setText(tr("Weighting:"));
+    optWeightingWritten->setText(tr("written"));
+    optWeightingOral->setText(tr("oral"));
+    grpSemester->setTitle(tr("Semester:"));
+    optSemesterAuto->setText(tr("Automatische Zuordnung"));
+    
+    
+}
+
 
 void ksExamProperties::allocateWidgets()
 {
     // bottom buttons
-    btnOk     = new QPushButton(tr("Ok"));
-    btnCancel = new QPushButton(tr("Abbrechen"));
+    btnOk     = new QPushButton;
+    btnCancel = new QPushButton;
     btnOk->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     btnCancel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     
     // left column
-    lblNumber   = new QLabel("Nummer:");
+    lblNumber   = new QLabel;
     spinNumber  = new QSpinBox;
-    lblType     = new QLabel("Typ:");
+    lblType     = new QLabel;
     txtType     = new QLineEdit;
-    lblPoints   = new QLabel("Punkte:");
+    lblPoints   = new QLabel;
     spinPoints  = new QSpinBox;
-    lblDate     = new QLabel("Datum:");
+    lblDate     = new QLabel;
     dteDate     = new QDateEdit;
-    lblWeighting        = new QLabel("Gewichtung:");
-    optWeightingWritten = new QRadioButton("schriftlich");
-    optWeightingOral    = new QRadioButton(QString::fromLocal8Bit("mündlich"));
+    lblWeighting        = new QLabel;
+    optWeightingWritten = new QRadioButton;
+    optWeightingOral    = new QRadioButton;
     
     //semester Selection
-    grpSemester     = new QGroupBox("Semester:");
+    grpSemester     = new QGroupBox;
     optSemester121  = new QRadioButton("12 / 1");
     optSemester122  = new QRadioButton("12 / 2");
     optSemester131  = new QRadioButton("13 / 1");
     optSemester132  = new QRadioButton("13 / 2");
-    optSemesterAuto  = new QRadioButton("Automatische Zuordnung");
+    optSemesterAuto  = new QRadioButton;
 }
 
 void ksExamProperties::createLayouts()
@@ -143,12 +182,37 @@ void ksExamProperties::connectSlots()
 
 void ksExamProperties::initWidgets()
 {
-    spinPoints->setMinimum(0);
-    spinPoints->setMaximum(15);
-    
     spinNumber->setMinimum(0);
     spinNumber->setMaximum(999);
-    spinNumber->setSpecialValueText("keine Nummer");
+    spinNumber->setSpecialValueText(tr("no number"));
+    btnOk->setDefault(TRUE);
+}
+
+void ksExamProperties::setProperties(xmlObject* newProperties)
+{
+    properties = newProperties;
+    if(properties == NULL)
+    {
+        spinPoints->setMinimum(0);
+        spinPoints->setMaximum(99);
+        return;
+    }
+    ksPlattformSpec::addMissingPropertiesAttributes(properties);
+    
+    int best  = properties->cGetObjectByName("rating")->cGetAttributeByName("best")->nValueToInt();
+    int worst = properties->cGetObjectByName("rating")->cGetAttributeByName("worst")->nValueToInt();
+    if (best > worst)
+    {
+        lblPoints->setText(tr("Points:"));
+        spinPoints->setMinimum(worst);
+        spinPoints->setMaximum(best);
+    }
+    else
+    {
+        lblPoints->setText(tr("Mark:"));
+        spinPoints->setMinimum(best);
+        spinPoints->setMaximum(worst);
+    }
 }
 
 void ksExamProperties::setExamToEdit(xmlObject* newExamToEdit)
@@ -156,7 +220,7 @@ void ksExamProperties::setExamToEdit(xmlObject* newExamToEdit)
     examToEdit = newExamToEdit;
     if (!newExamToEdit)
     {
-        QString errormsg = "Interner Pointer-Fehler: newExamToEdit = NULL !";
+        QString errormsg = tr("Interner Pointer-Fehler: newExamToEdit = NULL !");
         setWindowTitle(errormsg);
         txtType->setText(errormsg);
         return;
@@ -166,8 +230,8 @@ void ksExamProperties::setExamToEdit(xmlObject* newExamToEdit)
     spinNumber->setValue(examToEdit->cGetObjectByAttributeValue("name", "number")->
                                         cGetAttributeByName("value")->nValueToInt());
     
-    txtType->setText(examToEdit->cGetObjectByAttributeValue("name", "type")->
-                                        cGetAttributeByName("value")->value());
+    txtType->setText(ksPlattformSpec::szToUmlauts(examToEdit->cGetObjectByAttributeValue("name", "type")->
+                                        cGetAttributeByName("value")->value()));
     
     spinPoints->setValue(examToEdit->cGetObjectByAttributeValue("name", "points")->
                                         cGetAttributeByName("value")->nValueToInt());
@@ -201,7 +265,18 @@ void ksExamProperties::setExamToEdit(xmlObject* newExamToEdit)
     else
         optWeightingOral->setChecked(TRUE);
     
-    
+    // set window title
+    QString newTitle;
+    if(spinNumber->value() > 0)
+    {
+        newTitle += QString::number(spinNumber->value());
+        newTitle += ". ";
+    }
+    newTitle += txtType->text();
+    newTitle += " vom ";
+    newTitle += dateFile.humanDate();
+    newTitle += " bearbeiten";
+    setWindowTitle(newTitle);
 }
 
 
@@ -209,7 +284,7 @@ void ksExamProperties::writeWidgetAttributesToExam()
 {
     if (!examToEdit)
     {
-        QString errormsg = "Interner Pointer-Fehler: newExamToEdit = NULL !";
+        QString errormsg = tr("Interner Pointer-Fehler: newExamToEdit = NULL !");
         setWindowTitle(errormsg);
         txtType->setText(errormsg);
         return;
@@ -222,7 +297,7 @@ void ksExamProperties::writeWidgetAttributesToExam()
     
     
     examToEdit->cGetObjectByAttributeValue("name", "type")->
-            cGetAttributeByName("value")->SetValue(txtType->text().toAscii().data());
+            cGetAttributeByName("value")->SetValue(ksPlattformSpec::qstringToSz(txtType->text()));
     
     examToEdit->cGetObjectByAttributeValue("name", "points")->
             cGetAttributeByName("value")->SetValueToInt(spinPoints->value());
@@ -249,7 +324,7 @@ void ksExamProperties::writeWidgetAttributesToExam()
     else if(optSemester132->isChecked())
         semester = "13/2";
     examToEdit->cGetObjectByAttributeValue("name", "semester")->
-            cGetAttributeByName("value")->SetValue(semester.toAscii().data());
+            cGetAttributeByName("value")->SetValue(ksPlattformSpec::qstringToSz(semester));
     
     // WEIGHTING
     QString weighting = "oral";
@@ -263,7 +338,7 @@ void ksExamProperties::writeWidgetAttributesToExam()
     }
     
     examToEdit->cGetObjectByAttributeValue("name", "weighting")->
-            cGetAttributeByName("value")->SetValue(weighting.toAscii().data());
+            cGetAttributeByName("value")->SetValue(ksPlattformSpec::qstringToSz(weighting));
     
     
 }

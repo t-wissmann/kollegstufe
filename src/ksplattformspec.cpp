@@ -19,27 +19,34 @@
  ***************************************************************************/
 #include "ksplattformspec.h"
 #include <QDir>
+#include <QApplication>
+#include <QFileInfo>
 #include <QStringList>
+#include <QTranslator>
+#include <QLocale>
 #include "xmlparser.h"
 #include "dateConverter.h"
 
-ksPlattformSpec::ksPlattformSpec()
+
+#if defined(Q_WS_WIN)
+#include <windows.h>
+#endif
+
+
+
+QString ksPlattformSpec::versionAsString()
 {
+    return "0.1 alpha";
 }
-
-
-ksPlattformSpec::~ksPlattformSpec()
-{
-}
-
 
 bool ksPlattformSpec::createKsDir()
 {
     QString directoryName = ".kollegstufe";
-#if defined(Q_WS_WIN)
-    directoryName = "kollegstufe";
-#endif
     QDir ksDir = QDir::home();
+#if defined(Q_WS_WIN)
+
+    directoryName =  "kollegstufe";
+#endif
     if(ksDir.exists(directoryName))
     {
         return TRUE;
@@ -48,30 +55,121 @@ bool ksPlattformSpec::createKsDir()
     {
         return ksDir.mkdir(directoryName);
     }
-    return TRUE;
+    return FALSE;
 }
 
 QString ksPlattformSpec::getKsDir()
 {
     
     QString directoryName = "";
-#if defined(Q_WS_WIN)
-    directoryName = "kollegstufe";
-#else
-    directoryName = ".kollegstufe";
-#endif
-    QString ksDir = QDir::homePath();
+    QString pathToReturn;
+    QDir myHome;
+    myHome.cd(QDir::homePath());
+    pathToReturn = myHome.path();
+    QString slash = QDir::separator();
     
-    if(!ksDir.endsWith(QDir::separator()))
+    if(!pathToReturn.endsWith(slash))
     {
-        ksDir += QDir::separator();
+        pathToReturn += slash;
     }
-    ksDir += directoryName;
-    ksDir += QDir::separator();
-    return ksDir;
+#ifdef Q_WS_WIN
+    pathToReturn += slash + "kollegstufe";
+#else
+    pathToReturn += slash + ".kollegstufe";
+#endif
+    pathToReturn += slash;
+    return pathToReturn;
 }
 
-void ksPlattformSpec::catchFileList(QStringList*    targetList)
+QString ksPlattformSpec::szToUmlauts(char* string)
+{
+    QString stringToReturn;
+    stringToReturn = QString::fromLocal8Bit(string);
+    //stringToReturn = string;
+    //return QString::fromLocal8Bit(string);
+    return stringToReturn;
+}
+
+char*   ksPlattformSpec::qstringToSz(QString string)
+{
+    return string.toLocal8Bit().data();
+}
+
+// language functions
+QString ksPlattformSpec::getLanguageString()
+{
+    QString language;
+    language = QLocale::languageToString(QLocale::system ().language());
+    language = language.toLower();
+    language = language.toLatin1();
+    return language;
+}
+
+bool ksPlattformSpec::setLanguage(QString language, QTranslator* translator)
+{
+    if( ! translator)
+    {
+        return FALSE;
+    }
+    
+    bool    returnValue = TRUE;
+    QString tsFileName;
+    QDir  translationDir(QApplication::applicationDirPath());
+    translationDir.cdUp();
+    translationDir.cd("translations");
+    tsFileName  = "ks_";
+    tsFileName += language;
+    tsFileName += ".qm";
+    if(!translator->load(translationDir.filePath(tsFileName)) && 0)
+    {
+        // if it wasn't able to load file; i.e.
+        // if file doesn't exists, choose system standart
+        tsFileName  = "ks_";
+        tsFileName += getLanguageString();
+        tsFileName += ".qm";
+        if(!translator->load(translationDir.filePath(tsFileName)))
+        {
+            //if system-standart doesn't exists, choose english
+            tsFileName  = "ks_";
+            tsFileName += "english";
+            tsFileName += ".qm";
+            if(!translator->load(translationDir.filePath(tsFileName)))
+            {
+                //if english translation doesn't exists, do nothing
+                returnValue = FALSE;
+            }
+        }
+    }
+    // install translator to application
+    qApp->installTranslator(translator);
+    return returnValue;
+}
+
+QStringList ksPlattformSpec::getAvailibleLanguages()
+{
+    QStringList list;
+    
+    QDir  translationDir(QApplication::applicationDirPath());
+    translationDir.cdUp();
+    translationDir.cd("translations");
+    list = translationDir.entryList( QStringList("*.qm"), QDir::Files);
+    for (int i = 0; i < list.count(); i++)
+    {
+        if(!list[i].startsWith("ks_"))
+        {
+            list.removeAt(i);
+            i--;
+            continue;
+        }
+        list[i] = list[i].remove("ks_");
+        list[i] = list[i].remove(".qm");
+    }
+    return list;
+}
+
+
+
+void ksPlattformSpec::catchFileList(QStringList* targetList)
 {
     if (!targetList)
     {
@@ -117,9 +215,47 @@ bool ksPlattformSpec::createConfigFile()
     return TRUE;
 }
 
+QString ksPlattformSpec::getNewFilename(QString prefix, QString suffix)
+{
+    QDir dir(getKsDir());
+    int number = 1;
+    while(dir.exists(prefix + QString::number(number) + suffix))
+    {
+        number++;
+    }
+    
+    return getKsDir() + prefix + QString::number(number) + suffix;
+}
+
 QString ksPlattformSpec::getUserName()
 {
-    return "thorsten";
+    QString userName;
+    //ON WINDOWS:
+#ifdef Q_WS_WIN
+
+    userName = tr("New Pupil");
+#else
+    //ON UNIX/LINUX:
+    userName = getenv("USER");
+#endif
+    return userName;
+}
+
+bool ksPlattformSpec::fileExists(QString filename)
+{
+    return QFileInfo(filename).exists();
+}
+
+bool ksPlattformSpec::deleteFile(QString fileToDelete)
+{
+    if( !ksPlattformSpec::fileExists(fileToDelete))
+    {
+        return TRUE;
+    }
+    
+    QFileInfo file (fileToDelete);
+    QDir      dir = file.dir();
+    return dir.remove(file.fileName());
 }
 
 QString  ksPlattformSpec::getArticleForNoun(QString noun, kasus kasusOfNoun)
@@ -211,6 +347,14 @@ void ksPlattformSpec::addMissingConfigAttributes(xmlObject* configFileToComplete
     {
         windowSettings->cGetObjectByName("splitterMain")->nAddAttribute("coord", "198");
     }
+    if (!configFileToComplete->cGetObjectByName("language"))
+    {
+        configFileToComplete->nAddObject("language");
+        
+        QString language = getLanguageString();
+        
+        configFileToComplete->cGetObjectByName("language")->nSetContent(qstringToSz(language));
+    }
     if (!configFileToComplete->cGetObjectByName("session"))
     {
         configFileToComplete->nAddObject("session");
@@ -221,6 +365,22 @@ void ksPlattformSpec::addMissingConfigAttributes(xmlObject* configFileToComplete
     }
 }
 
+
+void   ksPlattformSpec::addMissingCathegoryAttributes(xmlObject*  CathegoryToComplete)
+{
+    if(!CathegoryToComplete)
+    {
+        return;
+    }
+    if(CathegoryToComplete->name() != QString("cathegory"))
+    {
+        CathegoryToComplete->setName("cathegory");
+    }
+    if(CathegoryToComplete->cGetAttributeByName("name") == NULL)
+    {
+        CathegoryToComplete->nAddAttribute("name", qstringToSz(tr("New Subject")));
+    }
+}
 
 void    ksPlattformSpec::addMissingSubjectAttributes(xmlObject*  SubjectToComplete)
 {
@@ -330,12 +490,19 @@ void ksPlattformSpec::addMissingDatabaseAttributes(xmlObject* databaseToComplete
     {
         databaseToComplete->nAddObject("data");
     }
+    /*if(!databaseToComplete->cGetObjectByName("data")->cGetObjectByName("cathegory")) // if there is no cathegory
+    {
+    int newId = databaseToComplete->cGetObjectByName("data")->nAddObject("cathegory");
+    databaseToComplete->cGetObjectByName("data")->cGetObjectByIdentifier(newId)->nAddAttribute("name", "Leistungskurse");
+        
+    newId = databaseToComplete->cGetObjectByName("data")->nAddObject("cathegory");
+    databaseToComplete->cGetObjectByName("data")->cGetObjectByIdentifier(newId)->nAddAttribute("name", "Grundkurse");
+}*/
 }
 
 
 void ksPlattformSpec::addMissingPropertiesAttributes(xmlObject* propertiesToComplete)
 {
-    xmlObject* currentObject;
     if(!propertiesToComplete)
     {
         return;
@@ -352,12 +519,137 @@ void ksPlattformSpec::addMissingPropertiesAttributes(xmlObject* propertiesToComp
     {
         propertiesToComplete->cGetObjectByName("author")->nSetContent(getUserName().toAscii().data());
     }
-    if(propertiesToComplete->cGetObjectByName("time"))
+    // rating
+    if(!propertiesToComplete->cGetObjectByName("rating"))
+    {
+        propertiesToComplete->nAddObject("rating");
+    }
+    if(!propertiesToComplete->cGetObjectByName("rating")->cGetAttributeByName("best"))
+    {
+        propertiesToComplete->cGetObjectByName("rating")->nAddAttribute("best", "15");
+    }
+    
+    if(!propertiesToComplete->cGetObjectByName("rating")->cGetAttributeByName("worst"))
+    {
+        propertiesToComplete->cGetObjectByName("rating")->nAddAttribute("worst", "0");
+    }
+    
+    // ADD TIME
+    if(!propertiesToComplete->cGetObjectByName("time"))
     {
         propertiesToComplete->nAddObject("time");
     }
+    cDateConverter  dateToWrite;
+    cDateConverter  dateToRead;
     
+    int nCurrentSemester;
+    QStringList Semesters;
+    xmlObject*  currentSemester;
+    Semesters.append("12/1");
+    Semesters.append("12/2");
+    Semesters.append("13/1");
+    Semesters.append("13/2");
+    for(nCurrentSemester = 0; nCurrentSemester < 4; nCurrentSemester++)
+    {
+        currentSemester = propertiesToComplete->cGetObjectByName("time")->cGetObjectByAttributeValue("name", Semesters[nCurrentSemester].toAscii().data());
+        
+        if(!currentSemester)
+            currentSemester = propertiesToComplete->cGetObjectByName("time")->cGetObjectByIdentifier(propertiesToComplete->cGetObjectByName("time")->nAddObject( "semester"));
+        
+        if(QString("semester") != currentSemester->szName)
+            currentSemester = propertiesToComplete->cGetObjectByName("time")->cGetObjectByIdentifier(propertiesToComplete->cGetObjectByName("time")->nAddObject( "semester"));
+        
+        if(!currentSemester->cGetAttributeByName("name"))
+            currentSemester->nAddAttribute( "name", Semesters[nCurrentSemester].toAscii().data());
+        
+        if(!currentSemester->cGetAttributeByName( "start"))
+        {
+            if(nCurrentSemester == 0) //IF IT'S the first semester, then generate a new start of the semester
+            {
+                dateToWrite.setToCurrentDate();
+                if(dateToWrite.Month() >= AUGUST && dateToWrite.Month() <= DECEMBER)
+                    dateToWrite.setMonth( SEPTEMBER );
+                if(dateToWrite.Month() >= JANUARY && dateToWrite.Month() < FEBRUARY)
+                {
+                    dateToWrite.setMonth( SEPTEMBER );
+                    dateToWrite.addYears( -1);
+                }
+                if(dateToWrite.Month() >= FEBRUARY && dateToWrite.Month() <= JULY) // not the first semester, so just set start of 
+                {                                                                  // this semester one day after on day after end of semester before
+                    dateToWrite.setMonth( FEBRUARY );
+                    dateToWrite.setDay( 1 );
+                }
+            }
+            else
+            {
+                dateToWrite.setDateString (propertiesToComplete->cGetObjectByName("time")->cGetObjectByAttributeValue("name", Semesters[nCurrentSemester-1].toAscii().data())->cGetAttributeByName( "end")->value());
+                dateToWrite.addDays( 1); //START IS ONE DAY after the end of the semester before
+            }
+            currentSemester->nAddAttribute( "start", dateToWrite.getDateString());
+        }
+        
+        if(!currentSemester->cGetAttributeByName( "end"))
+        {
+            dateToRead.setDateString(currentSemester->cGetAttributeByName( "start")->value());
+            if(dateToRead.Month() >= AUGUST && dateToRead.Month() <= DECEMBER)
+            {
+                dateToWrite.setMonth( FEBRUARY);
+                dateToWrite.addYears( 1);
+            }
+            if(dateToRead.Month() >= JANUARY && dateToRead.Month() < FEBRUARY)
+            {
+                dateToWrite.setMonth( FEBRUARY);
+            }
+            if(dateToRead.Month() >= FEBRUARY && dateToRead.Month() <= JULY)
+                dateToWrite.setMonth( JULY);
+            dateToWrite.setDay(LAST_DAY_OF_MONTH);
+            currentSemester->nAddAttribute( "end", dateToWrite.getDateString());
+        }
+        
+    }
 }
+
+
+
+QString  ksPlattformSpec::getSemesterContainigDate(xmlObject* pSemesterList, QString  timestamp)
+{
+    xmlObject*      currentSemester;
+    cDateConverter  currentDate;
+    cDateConverter  currentSemStart;
+    cDateConverter  currentSemEnd;
+    currentDate.setDateString( timestamp.toAscii().data());
+    if(pSemesterList == NULL)
+        return QString::null;
+    
+    for(int i = 0; i < pSemesterList->nGetObjectCounter(); i++)
+    {
+        currentSemester = pSemesterList->cGetObjectByIdentifier(i);
+        if(currentSemester == NULL)
+            return QString::null;
+        if(currentSemester->szGetName() != QString("semester"))
+            continue;
+        if(!currentSemester->cGetAttributeByName( "start"))
+            continue;
+        if(!currentSemester->cGetAttributeByName( "end"))
+            continue;
+        if(!currentSemester->cGetAttributeByName( "name"))
+            continue;
+        currentSemStart.setDateString(currentSemester->cGetAttributeByName( "start")->value());
+        currentSemEnd.setDateString(currentSemester->cGetAttributeByName( "end")->value());
+        
+        if(currentDate.isContainedIn(currentSemStart, currentSemEnd))
+        {
+            return QString(currentSemester->cGetAttributeByName( "name")->value());
+        }
+    }
+            
+    return QString::null;
+}
+
+
+
+
+
 
 
 

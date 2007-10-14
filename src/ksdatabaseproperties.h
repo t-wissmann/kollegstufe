@@ -22,12 +22,20 @@
 
 #include <QDialog>
 
+class ksCathegoryEditorWidget;
 class xmlObject;
+
+class QEvent;
 
 class QPushButton;
 class QDateEdit;
+class QLineEdit;
 class QGroupBox;
+class QRadioButton;
 class QLabel;
+class QSpinBox;
+class QStackedWidget;
+class QListWidget;
 
 // layouts
 class QHBoxLayout;
@@ -46,22 +54,74 @@ public:
 
     ~ksDatabaseProperties();
     void setDatabasePropertiesToEdit(xmlObject* newProperties);
+    void setDatabaseToEdit(xmlObject* newDatabase);
+    void retranslateUi();
 public slots:
     void writeWidgetAttributesToProperties();
+    void setMinMaxDate();
+    void setBtnOkNotDefault(bool newDefaultValue);
+protected:
+    virtual void changeEvent(QEvent* event);
 private:
     void    allocateWidgets();
     void    createLayouts();
     void    connectSlots();
     
+    // date - min max 
+    void    connectMinMaxDate();
+    void    disconnectMinMaxDate();
+    
     QPushButton*    btnOk;
     QPushButton*    btnCancel;
     
+    QLabel*         lblName;
+    QLineEdit*      txtName;
+    
+    // mode selection:
+    QLabel*         lblRating;
+    QRadioButton*   optRatingMarks;
+    QRadioButton*   optRatingPoints;
+    QRadioButton*   optRatingOther;
+    QSpinBox*       spinRatingBest;
+    QSpinBox*       spinRatingWorst;
+    QLabel*         lblRatingBest;
+    QLabel*         lblRatingWorst;
+    QGridLayout*    layoutRatingOther;
+    
+    // semester List
+    QGroupBox*      grpSemesterList;
+    QLabel*         lblStart;
+    QLabel*         lblEnd;
+    
+    QLabel*         lbl121;
+    QLabel*         lbl122;
+    QLabel*         lbl131;
+    QLabel*         lbl132;
+    
+    QDateEdit*      dteSemester121Start;
+    QDateEdit*      dteSemester122Start;
+    QDateEdit*      dteSemester131Start;
+    QDateEdit*      dteSemester132Start;
+    QDateEdit*      dteSemester121End;
+    QDateEdit*      dteSemester122End;
+    QDateEdit*      dteSemester131End;
+    QDateEdit*      dteSemester132End;
+    
+    QGroupBox*                  grpCathegories;
+    QHBoxLayout*                layoutCathegories;
+    ksCathegoryEditorWidget*    wdgCathegoryEditor;
+    
     // Layouts
     QHBoxLayout*    layoutBottom;
+    QGridLayout*    layoutSemesterList;
+    QStackedWidget* stackMain;
     QGridLayout*    layoutParent;
     
+    QListWidget*    lstStackMainControl;
     xmlObject*      propertiesToEdit;
+    xmlObject*      databaseToEdit;
     
+    xmlObject*      testDatabase;
 };
 
 #endif
