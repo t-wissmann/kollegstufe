@@ -1,6 +1,7 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Thorsten W.	                                   *
- *   towi89@web.de towi16.piranho.de                                       *
+ *   Copyright (C) 2007 by Thorsten Wissmann                               *
+ *   E-Mail: kollegstufe@thorsten-wissmann.de                              *
+ *   Homepage: www.thorsten-wissmann.de                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -67,15 +68,15 @@
 
 kollegstufeParent::kollegstufeParent(QWidget* parentWidget)
 
-
 #ifdef KS_IS_MAIN_WINDOW
     : QMainWindow(parentWidget)
 #else
     : QWidget(parentWidget)
 #endif
-        
 {
     initMembers();
+    handleArguments();
+    debugOutput->putDebugOutput("Creating GUI");
     allocateWidgets();
     allocateDialogs();
     createMenuBar();
@@ -83,13 +84,18 @@ kollegstufeParent::kollegstufeParent(QWidget* parentWidget)
     connectSlots();
     initWidgets();
     
+    
+    debugOutput->putDebugOutput("Loading configuration");
     retranslateUi(); // ensure, that there are texts
     loadConfigFile();
+    debugOutput->putDebugOutput("MainWindow created");
 }
 
 
 kollegstufeParent::~kollegstufeParent()
 {
+    
+    debugOutput->putDebugOutput("MainWindow destroyed");
     if (diaExamProperties)
         delete diaExamProperties;
     
@@ -119,8 +125,31 @@ void kollegstufeParent::initMembers()
     
     // init output
     debugOutput = new ksDebugOutput;
-    debugOutput->enableDebugMode();
     connect(debugOutput, SIGNAL(printDebugLine(QString)), debugOutput, SLOT(putStandartQtDebugOutut(QString)));
+}
+
+void kollegstufeParent::handleArguments()
+{
+    QStringList args = QApplication::arguments();
+    if(args.contains("--debug"))
+    {
+        debugOutput->enableDebugMode();
+    }
+    if(args.contains("--help"))
+    {
+        debugOutput->putStandartQtDebugOutut("Usage: " + args[0] + " [--debug]");
+        debugOutput->putStandartQtDebugOutut("Possible arguments:");
+        debugOutput->putStandartQtDebugOutut("\t--version\t\tprints version");
+        debugOutput->putStandartQtDebugOutut("\t--debug\t\tprints debug information to screen");
+        debugOutput->putStandartQtDebugOutut("\t--help\t\tprints this help");
+        dontShowMe();
+    }
+    if(args.contains("--version"))
+    {
+        debugOutput->putStandartQtDebugOutut("version of kollegstufe: " + ksPlattformSpec::versionAsString());
+        debugOutput->putStandartQtDebugOutut("made by Thorsten Wissmann kollegstufe@thorsten-wissmann.de www.thorsten-wissmann.de");
+        dontShowMe();
+    }
 }
 
 void kollegstufeParent::allocateWidgets()
@@ -189,7 +218,6 @@ void kollegstufeParent::createMenuBar()
     
 }
 
-
 void kollegstufeParent::createLayouts()
 {
     // Subject selection layout
@@ -233,7 +261,6 @@ void kollegstufeParent::createLayouts()
 #endif
     
 }
-
 
 void kollegstufeParent::connectSlots()
 {
@@ -321,6 +348,8 @@ void kollegstufeParent::initWidgets()
 
 void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
 {
+    debugOutput->putDebugOutput("Loading file \'" + newFilename + "\'");
+    
     // clear current database
     currentDatabase.nSetAttributeCounter(0);
     currentDatabase.nSetObjectCounter(0);
@@ -394,7 +423,6 @@ void kollegstufeParent::saveFile(QString newFilename)
 
 void kollegstufeParent::loadConfigFile()
 {
-    
     //create kollegstufe dir in home
     if(!ksPlattformSpec::createKsDir())
     {
@@ -473,6 +501,7 @@ void kollegstufeParent::loadConfigFile()
 
 void kollegstufeParent::saveConfigFile()
 {
+    debugOutput->putDebugOutput("Saving Config File");
     // add missing Attributes in config File
     ksPlattformSpec::addMissingConfigAttributes(&xmlConfig);
     // write widget-attributes to config Attributes:
@@ -599,6 +628,12 @@ void kollegstufeParent::changeEvent(QEvent* event)
     QWidget::changeEvent(event);
     if(event->type() == QEvent::LanguageChange)
     {
+        QString newLanguage = "unknown language";
+        if(xmlConfig.cGetObjectByName("language")->szGetContent())
+        {
+            newLanguage = xmlConfig.cGetObjectByName("language")->szGetContent();
+        }
+        debugOutput->putDebugOutput("Translating GUI to \'" + newLanguage + "\'");
         retranslateUi();
     }
 }

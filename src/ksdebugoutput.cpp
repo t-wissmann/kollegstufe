@@ -1,6 +1,7 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Thorsten W.	                                   *
- *   towi89@web.de towi16.piranho.de                                       *
+ *   Copyright (C) 2007 by Thorsten Wissmann                               *
+ *   E-Mail: kollegstufe@thorsten-wissmann.de                              *
+ *   Homepage: www.thorsten-wissmann.de                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -42,13 +43,12 @@ ksDebugOutput::~ksDebugOutput()
 void ksDebugOutput::putStandartQtDebugOutut(QString outputString)
 {
     // only put debug string if debug mode is enabled
-    if (!bDebugMode)
-        return;
     qDebug(ksPlattformSpec::qstringToSz(outputString));
-    
 }
 void ksDebugOutput::putDebugOutput(QString outputString)
 {
+    if (!bDebugMode)
+        return;
     emit printDebugLine(outputString);
 }
 

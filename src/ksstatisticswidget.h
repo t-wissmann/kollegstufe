@@ -1,6 +1,7 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Thorsten W.	                                   *
- *   towi89@web.de towi16.piranho.de                                       *
+ *   Copyright (C) 2007 by Thorsten Wissmann                               *
+ *   E-Mail: kollegstufe@thorsten-wissmann.de                              *
+ *   Homepage: www.thorsten-wissmann.de                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -54,6 +55,9 @@ public:
     bool isItemListSorted() const { return bItemListSorted; };
     
     int  itemListSize() const { return itemList.size(); };
+    
+    static int rangeValue(int value, int minValue, int maxValue);
+    
 protected: // events
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

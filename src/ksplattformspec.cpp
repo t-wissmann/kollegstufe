@@ -1,6 +1,7 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Thorsten W.	                                   *
- *   towi89@web.de towi16.piranho.de                                       *
+ *   Copyright (C) 2007 by Thorsten Wissmann                               *
+ *   E-Mail: kollegstufe@thorsten-wissmann.de                              *
+ *   Homepage: www.thorsten-wissmann.de                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -36,7 +37,7 @@
 
 QString ksPlattformSpec::versionAsString()
 {
-    return "0.1 alpha";
+    return "1.0 Beta 1";
 }
 
 bool ksPlattformSpec::createKsDir()
@@ -399,6 +400,15 @@ void    ksPlattformSpec::addMissingSubjectAttributes(xmlObject*  SubjectToComple
     if(! SubjectToComplete->cGetAttributeByName("teacher"))
     {
         SubjectToComplete->nAddAttribute("teacher", "");
+    }
+    
+    if(! SubjectToComplete->cGetAttributeByName("weightingOral"))
+    {
+        SubjectToComplete->nAddAttribute("weightingOral", "1");
+    }
+    if(! SubjectToComplete->cGetAttributeByName("weightingWritten"))
+    {
+        SubjectToComplete->nAddAttribute("weightingWritten", "2");
     }
     
 }

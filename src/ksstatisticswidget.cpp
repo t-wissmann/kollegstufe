@@ -1,6 +1,7 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Thorsten W.	                                   *
- *   towi89@web.de towi16.piranho.de                                       *
+ *   Copyright (C) 2007 by Thorsten Wissmann                               *
+ *   E-Mail: kollegstufe@thorsten-wissmann.de                              *
+ *   Homepage: www.thorsten-wissmann.de                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -418,7 +419,11 @@ void ksStatisticsWidget::drawCircleAt(int circleX, int circleY)
     QLinearGradient bgGradient( circleX, circleY-nPointDiameter/2, circleX, circleY+nPointDiameter/2);
     QColor  bgColorTop = palette().highlight().color();
     QColor  bgColorBottom = palette().highlight().color();
-    bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), bgColorBottom.value()/2);
+    int newValueTop = rangeValue(bgColorTop.value() < 3 ? 100 : bgColorTop.value(), 0, 255);
+    int newValueBottom = rangeValue(bgColorTop.value()/2, 0, 255);
+    
+    bgColorTop.setHsv( bgColorTop.hue(), bgColorTop.saturation(), newValueTop);
+    bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueBottom);
     bgGradient.setColorAt(0, bgColorTop);
     bgGradient.setColorAt(1, bgColorBottom);
     
@@ -427,6 +432,20 @@ void ksStatisticsWidget::drawCircleAt(int circleX, int circleY)
     painter.setBrush(bgGradient);
     painter.setPen(Qt::NoPen);
     painter.drawEllipse(circleX-nPointDiameter/2, circleY-nPointDiameter/2, nPointDiameter, nPointDiameter);
+}
+
+int ksStatisticsWidget::rangeValue(int value, int minValue, int maxValue)
+{
+    int returnValue = value;
+    if(value < minValue)
+    {
+        returnValue = minValue;
+    }
+    else if(value > maxValue)
+    {
+        returnValue = maxValue;
+    }
+    return returnValue;
 }
 
 void ksStatisticsWidget::drawCaptionAt(int captionX, int captionY, QString caption, Qt::AlignmentFlag alignment, bool above)
@@ -464,7 +483,11 @@ void ksStatisticsWidget::drawCaptionAt(int captionX, int captionY, QString capti
     QLinearGradient bgGradient( captionX, captionY, captionX, captionY+captionHeight);
     QColor  bgColorTop = palette().highlight().color();
     QColor  bgColorBottom = palette().highlight().color();
-    bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), (int)(bgColorBottom.value()/1.5));
+    int newValueTop = rangeValue(bgColorTop.value() < 3 ? 100 : bgColorTop.value(), 0, 255);
+    int newValueBottom = rangeValue(bgColorTop.value()/2, 0, 255);
+    
+    bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueBottom);
+    bgColorTop.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueTop);
     bgGradient.setColorAt(0, bgColorTop);
     bgGradient.setColorAt(1, bgColorBottom);
     

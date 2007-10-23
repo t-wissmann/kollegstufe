@@ -1,0 +1,26 @@
+Hello,
+
+thank you for downloading kollegstufe.
+
+Do the following steps in your kollegstufe directory (not the src directory!) :
+
+make clean
+make
+
+if this doesn't work, try:
+
+qmake-qt4 -project
+qmake-qt4 kollegstufe.pro
+make
+
+
+Requirements:
+1. OS: a Linux like OS or Windows
+2. An installed and configured Qt4 environment 
+2. gcc and make
+
+
+
+
+
+

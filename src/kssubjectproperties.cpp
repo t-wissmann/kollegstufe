@@ -1,6 +1,7 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Thorsten W.	                                   *
- *   towi89@web.de towi16.piranho.de                                       *
+ *   Copyright (C) 2007 by Thorsten Wissmann                               *
+ *   E-Mail: kollegstufe@thorsten-wissmann.de                              *
+ *   Homepage: www.thorsten-wissmann.de                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -81,7 +82,11 @@ void ksSubjectProperties::retranslateUi()
     lblName->setText(tr("Name:"));
     lblTeacher->setText(tr("Teacher:"));
     
-    
+    lblWeightingPercentage->setText(tr("Weighting percentage:"));
+    lblWeightingTo->setText(tr("to"));
+    lblWeightingToExplanation->setText(lblWeightingTo->text());
+    lblWeightingWritten->setText(tr("Written"));
+    lblWeightingOral->setText(tr("Oral"));
 }
 
 
@@ -96,6 +101,14 @@ void ksSubjectProperties::allocateWidgets()
     lblTeacher= new QLabel;
     txtTeacher= new QLineEdit;
     
+    
+    lblWeightingPercentage = new QLabel;
+    spinWeightingOral = new QSpinBox;
+    spinWeightingWritten = new QSpinBox;
+    lblWeightingTo = new QLabel;
+    lblWeightingToExplanation = new QLabel;
+    lblWeightingWritten = new QLabel;
+    lblWeightingOral = new QLabel;
 }
 
 void ksSubjectProperties::createLayouts()
@@ -105,12 +118,23 @@ void ksSubjectProperties::createLayouts()
     layoutBottom->addWidget(btnOk);
     layoutBottom->addWidget(btnCancel);
     
+    layoutWeightingPercentage = new QGridLayout;
+    layoutWeightingPercentage->addWidget(lblWeightingPercentage, 0, 0, 2, 1);
+    layoutWeightingPercentage->addWidget(lblWeightingOral, 0, 1);
+    layoutWeightingPercentage->addWidget(lblWeightingToExplanation, 0, 2);
+    layoutWeightingPercentage->addWidget(lblWeightingWritten, 0, 3);
+    layoutWeightingPercentage->addWidget(spinWeightingOral, 1, 1);
+    layoutWeightingPercentage->addWidget(lblWeightingTo, 1, 2);
+    layoutWeightingPercentage->addWidget(spinWeightingWritten, 1, 3);
+    
+    
     layoutParent = new QGridLayout;
     layoutParent->addWidget(lblName, 0, 0);
     layoutParent->addWidget(txtName, 0, 1);
     layoutParent->addWidget(lblTeacher, 1, 0);
     layoutParent->addWidget(txtTeacher, 1, 1);
-    layoutParent->addLayout(layoutBottom, 2,0, 1, 2);
+    layoutParent->addLayout(layoutWeightingPercentage, 2,0, 1, 2);
+    layoutParent->addLayout(layoutBottom, 3,0, 1, 2);
     
     setLayout(layoutParent);
     
@@ -126,6 +150,15 @@ void ksSubjectProperties::connectSlots()
 
 void ksSubjectProperties::initWidgets()
 {
+    spinWeightingOral->setMinimum(1);
+    spinWeightingOral->setMaximum(99);
+    spinWeightingWritten->setMinimum(1);
+    spinWeightingWritten->setMaximum(99);
+    
+    lblWeightingTo->setAlignment(Qt::AlignHCenter);
+    lblWeightingToExplanation->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
+    lblWeightingWritten->setAlignment(Qt::AlignHCenter);
+    lblWeightingOral->setAlignment(Qt::AlignHCenter);
     resize(320, 140);
 }
 
@@ -138,9 +171,12 @@ void ksSubjectProperties::setSubjectToEdit(xmlObject* newSubjectToEdit)
         setWindowTitle(errormsg);
         return;
     }
+    // write attributes to widgets
     ksPlattformSpec::addMissingSubjectAttributes(subjectToEdit);
     txtName->setText(ksPlattformSpec::szToUmlauts(subjectToEdit->cGetAttributeByName("name")->value()));
     txtTeacher->setText(ksPlattformSpec::szToUmlauts(subjectToEdit->cGetAttributeByName("teacher")->value()));
+    spinWeightingOral->setValue(subjectToEdit->cGetAttributeByName("weightingOral")->nValueToInt());
+    spinWeightingWritten->setValue(subjectToEdit->cGetAttributeByName("weightingWritten")->nValueToInt());
     
     QString newWindowTitle;
     newWindowTitle  = tr("Properties of subject \'");
@@ -161,6 +197,8 @@ void ksSubjectProperties::writeWidgetAttributesToSubject()
     }
     subjectToEdit->cGetAttributeByName("name")->SetValue(ksPlattformSpec::qstringToSz(txtName->text()));
     subjectToEdit->cGetAttributeByName("teacher")->SetValue(ksPlattformSpec::qstringToSz(txtTeacher->text()));
+    subjectToEdit->cGetAttributeByName("weightingOral")->SetValueToInt(spinWeightingOral->value());
+    subjectToEdit->cGetAttributeByName("weightingWritten")->SetValueToInt(spinWeightingWritten->value());
 }
 
 void ksSubjectProperties::setCathegoryOfSubject(xmlObject* newCathegory)

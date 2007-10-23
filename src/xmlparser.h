@@ -1,7 +1,8 @@
 /***************************************************************************
- *   Copyright (C) 2007 by Thorsten Wissmann   *
- *   towi89@web.de http://towi16.piranho.de   *
- *   http://www.kde-look.org/usermanager/search.php?username=twi           *
+ *   Copyright (C) 2007 by Thorsten Wissmann                               *
+ *   E-Mail: kollegstufe@thorsten-wissmann.de                              *
+ *   Homepage: www.thorsten-wissmann.de                                    *
+ *                                                                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
