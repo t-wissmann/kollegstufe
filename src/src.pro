@@ -15,7 +15,8 @@ SOURCES += main.cpp \
  ksstatisticswidget.cpp \
  ksstatisticsitem.cpp \
  ksconfigure.cpp \
- kscathegoryeditorwidget.cpp
+ kscathegoryeditorwidget.cpp \
+ kssubjectinformationwidget.cpp
 TEMPLATE = app
 CONFIG += warn_on \
 	  thread \
@@ -39,4 +40,5 @@ ksdebugoutput.h \
  ksstatisticswidget.h \
  ksstatisticsitem.h \
  ksconfigure.h \
- kscathegoryeditorwidget.h
+ kscathegoryeditorwidget.h \
+ kssubjectinformationwidget.h

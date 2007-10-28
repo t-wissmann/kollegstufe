@@ -27,6 +27,8 @@ class QLabel;
 class QFrame;
 class QTextEdit;
 class QGroupBox;
+class QTabWidget;
+class QWidget;
 
 // layouts
 class QHBoxLayout;
@@ -60,14 +62,20 @@ private:
     QLabel*         lblVersion;
     QLabel*         lblIcon;
     QPushButton*    btnClose;
-    QGroupBox*      frmContainer;
-    QTextEdit*      txtInfoText;
+    QTabWidget*     tabContainer;
+    //QGroupBox*      frmContainer;
+    QLabel*         lblInfoAbout;
+    QLabel*         lblInfoAuthor;
+    QTextEdit*      txtInfoLicense;
+    QWidget*        wdgInfoAbout;
+    
+    //layout for tabs
+    QHBoxLayout*    layoutInfoAbout;
     
     //layouts
-    QHBoxLayout*    layoutTop;
+    QGridLayout*    layoutTop;
     QVBoxLayout*    layoutParent;
     QHBoxLayout*    layoutBottom;
-    QHBoxLayout*    layoutFrame;
     
 
 };

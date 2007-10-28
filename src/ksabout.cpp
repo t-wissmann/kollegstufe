@@ -28,6 +28,7 @@
 #include <QFrame>
 #include <QTextEdit>
 #include <QGroupBox>
+#include <QTabWidget>
 
 // layouts
 #include <QHBoxLayout>
@@ -44,7 +45,7 @@
 ksAbout::ksAbout(QWidget *parent)
  : QDialog(parent)
 {
-    setModal(TRUE);
+    setModal(FALSE);
     createGui();
     initGui();
     retranslateUi();
@@ -71,51 +72,46 @@ void ksAbout::changeEvent(QEvent* event)
     }
 }
 
-
-void ksAbout::retranslateUi()
-{
-    lblHeader->setText(tr("Kollegstufe"));
-    lblVersion->setText(tr("version") + " " + ksPlattformSpec::versionAsString());
-    btnClose->setText(tr("close"));
-    QString infoText;
-    infoText  = tr("Kollegstufe is a small Programe, that allows you to manage your marks in the bavarian Kollegstufe.") + " ";
-    infoText += tr("It is released under the GPL - GNU General Public License.") + " ";
-    infoText += tr("So it's free Software. You are allowed to copy, modify and distribute it for non-comercial use.") + " \n ";
-    infoText += tr("You should have recieved a copy of the GPL with this.") + " ";
-    infoText += tr("If not, see <i>http://www.gnu.org/licenses/gpl-3.0.html</i> for more details");
-    txtInfoText->setHtml(infoText);
-    setWindowTitle(tr("About Kollegstufe"));
-}
-
 void ksAbout::createGui()
 {
     // widgets
     lblHeader = new QLabel;
     lblVersion = new QLabel;
     lblIcon = new QLabel;
-    frmContainer = new QGroupBox;
-    txtInfoText = new QTextEdit;
+    tabContainer = new QTabWidget;
+    lblInfoAbout = new QLabel;
+    lblInfoAuthor = new QLabel;
+    txtInfoLicense = new QTextEdit;
     btnClose = new QPushButton;
+    wdgInfoAbout = new QWidget;
+    
+    
+    //layout for tabs
+    layoutInfoAbout = new QHBoxLayout;
+    wdgInfoAbout->setLayout(layoutInfoAbout);
+    
+    layoutInfoAbout->addWidget(lblIcon);
+    layoutInfoAbout->addWidget(lblInfoAbout);
     
     // layouts
-    layoutTop = new QHBoxLayout;
+    layoutTop = new QGridLayout;
     layoutTop->setMargin(0);
-    layoutTop->addWidget(lblHeader);
-    layoutTop->addWidget(lblVersion);
+    //layoutTop->addWidget(lblIcon, 0, 0, 2, 1);
+    layoutTop->addWidget(lblHeader, 0, 0);
+    layoutTop->addWidget(lblVersion, 0, 1);
     
     layoutBottom = new QHBoxLayout;
     layoutBottom->addStretch(1);
     layoutBottom->addWidget(btnClose);
     layoutBottom->setMargin(0);
     
-    layoutFrame = new QHBoxLayout;
-    layoutFrame->addWidget(lblIcon);
-    layoutFrame->addWidget(txtInfoText);
-    frmContainer->setLayout(layoutFrame);
+    tabContainer->addTab(wdgInfoAbout, "About");
+    tabContainer->addTab(lblInfoAuthor, "Author");
+    tabContainer->addTab(txtInfoLicense, "License");
     
     layoutParent = new QVBoxLayout;
     layoutParent->addLayout(layoutTop);
-    layoutParent->addWidget(frmContainer);
+    layoutParent->addWidget(tabContainer);
     layoutParent->addLayout(layoutBottom);
     
     setLayout(layoutParent);
@@ -127,21 +123,28 @@ void ksAbout::createGui()
 
 void ksAbout::initGui()
 {
-    // info text
-    txtInfoText->setReadOnly(TRUE);
-    txtInfoText->setFrameStyle(QFrame::NoFrame);
-    txtInfoText->setContentsMargins(0, 2, 22, 22);
+    txtInfoLicense->setLineWrapMode(QTextEdit::WidgetWidth);
+    txtInfoLicense->setWordWrapMode(QTextOption::WordWrap);
+    QPalette pal = palette();
+    pal.setBrush(QPalette::Base, pal.brush(QPalette::Window));
+    txtInfoLicense->setPalette(pal);
+    txtInfoLicense->setReadOnly(TRUE);
+    
+    txtInfoLicense->setFrameStyle(QFrame::NoFrame);
+    txtInfoLicense->setAutoFillBackground(FALSE);
+    
+    lblInfoAuthor->setContentsMargins(10, 10, 10, 10);
+    
+    lblInfoAbout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    
+    lblIcon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     // Header
-    lblHeader->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    lblHeader->setFont(QFont("sdfsdf", 30, QFont::Bold));
-    lblHeader->setAlignment(Qt::AlignHCenter);
+    lblHeader->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    lblHeader->setFont(QFont("sdfsdf", 20, QFont::Bold));
+    lblHeader->setAlignment(Qt::AlignRight | Qt::AlignBottom);
     // Version
-    lblVersion->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
-    lblVersion->setAlignment(Qt::AlignBottom);
-    // Frame
-    frmContainer->setBackgroundRole(QPalette::Base);
-    frmContainer->setAutoFillBackground(TRUE);
-    layoutFrame->setAlignment(lblIcon, Qt::AlignBottom);
+    lblVersion->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    lblVersion->setAlignment(Qt::AlignBottom | Qt::AlignLeft);
     
     // get application path
     QString szApplicationPath = QApplication::applicationDirPath();
@@ -157,10 +160,40 @@ void ksAbout::initGui()
     
     
     resize(400, 250);
-    
     update();
+    
+    resize((int)(width() * 1.1), height());
 }
 
+
+
+void ksAbout::retranslateUi()
+{
+    lblHeader->setText(tr("Kollegstufe"));
+    lblVersion->setText(tr("version") + " " + ksPlattformSpec::versionAsString());
+    btnClose->setText(tr("close"));
+    //rename tabs
+    tabContainer->setTabText(0, tr("About"));
+    tabContainer->setTabText(1, tr("Author"));
+    tabContainer->setTabText(2, tr("License"));
+    
+    QString infoText;
+    infoText += "<br>" + tr("The manager for your marks during the <i>Kollegstufe</i>.") + "<br>";
+    infoText += "<p>(c) Thorsten Wi&szlig;mann<br></p>";
+    lblInfoAbout->setText(infoText);
+    
+    infoText = "";
+    infoText += "Thorsten Wi&szlig;mann";
+    infoText += "<br>&nbsp;&nbsp;&nbsp;";
+    infoText += "<a href=\"kollegstufe@thorsten-wissmann.de\">kollegstufe@thorsten-wissmann.de</a>";
+    lblInfoAuthor->setText(infoText);
+    
+    infoText = "<font face=\"Courier New\" size=\"3\"><br>" + tr("This software was released under the GPL.") + "<br></font>";
+    //infoText = tr("This software was released under the GPL.");
+    txtInfoLicense->setText(infoText);
+    
+    setWindowTitle(tr("About Kollegstufe"));
+}
 
 
 

@@ -9,7 +9,6 @@ make
 
 if this doesn't work, try:
 
-qmake-qt4 -project
 qmake-qt4 kollegstufe.pro
 make
 

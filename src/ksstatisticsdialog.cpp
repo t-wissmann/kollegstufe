@@ -22,6 +22,7 @@
 #include "ksstatisticswidget.h"
 #include "ksstatisticsitem.h"
 #include "ksplattformspec.h"
+#include "kssubjectinformationwidget.h"
 
 #include "xmlparser.h"
 #include "dateConverter.h"
@@ -31,6 +32,8 @@
 #include <QGridLayout>
 
 #include <QMessageBox>
+#include <QComboBox>
+#include <QLabel>
 #include <QPushButton>
 
 #include <QEvent>
@@ -69,10 +72,35 @@ void ksStatisticsDialog::initMembers()
 {
     subject = NULL;
     properties = NULL;
+    semesterListCode.clear();
+    semesterListCode.append("all");
+    semesterListCode.append("12/1");
+    semesterListCode.append("12/2");
+    semesterListCode.append("13/1");
+    semesterListCode.append("13/2");
 }
 
 void ksStatisticsDialog::retranslateUi()
 {
+    int oldSemesterSelection = cmbSemesterSelection->currentIndex();
+    if(oldSemesterSelection < 0)
+    {
+        oldSemesterSelection = 0;
+    }
+    semesterListUi.clear();
+    semesterListUi.append(tr("All"));
+    semesterListUi.append("12 / 1");
+    semesterListUi.append("12 / 2");
+    semesterListUi.append("13 / 1");
+    semesterListUi.append("13 / 2");
+    
+    cmbSemesterSelection->clear();
+    cmbSemesterSelection->addItems(semesterListUi);
+    // restore old selection
+    cmbSemesterSelection->setCurrentIndex(oldSemesterSelection);
+    
+    
+    lblSemesterSelection->setText(tr("Semester:"));
     
     btnClose->setText(tr("Close"));
     
@@ -93,7 +121,10 @@ void ksStatisticsDialog::retranslateUi()
 void ksStatisticsDialog::allocateWidgets()
 {
     btnClose = new QPushButton;
+    cmbSemesterSelection = new QComboBox;
     statistics = new ksStatisticsWidget;
+    information = new ksSubjectInformationWidget;
+    lblSemesterSelection = new QLabel;
 }
 
 
@@ -104,8 +135,11 @@ void ksStatisticsDialog::createLayouts()
     layoutBottom->addWidget(btnClose);
     
     layoutParent = new QGridLayout;
-    layoutParent->addWidget(statistics,   0, 0);
-    layoutParent->addLayout(layoutBottom, 1, 0);
+    layoutParent->addWidget(statistics,   0, 0, 2, 1);
+    layoutParent->addWidget(lblSemesterSelection,   0, 1);
+    layoutParent->addWidget(cmbSemesterSelection,   0, 2);
+    layoutParent->addWidget(information,   1, 1, 1, 2);
+    layoutParent->addLayout(layoutBottom, 2, 0, 1, 3);
     layoutParent->setMargin(3);
     layoutParent->setSpacing(3);
     
@@ -115,11 +149,12 @@ void ksStatisticsDialog::createLayouts()
 void ksStatisticsDialog::connectSlots()
 {
     connect(btnClose, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(cmbSemesterSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(currentSemesterChanged(int)));
 }
 
 void ksStatisticsDialog::initWidgets()
 {
-    
+    lblSemesterSelection->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 }
 
 void ksStatisticsDialog::setSubject(xmlObject* newSubject)
@@ -135,8 +170,8 @@ void ksStatisticsDialog::setSubject(xmlObject* newSubject)
     else
     {
         setWindowTitle(tr("Statistics"));
+        refreshUiAndChildren();
     }
-    refreshExamListFromXmlSubject();
 }
 
 void ksStatisticsDialog::setProperties(xmlObject* newProperties)
@@ -151,8 +186,22 @@ void ksStatisticsDialog::setProperties(xmlObject* newProperties)
     int worst = properties->cGetObjectByName("rating")->cGetAttributeByName("worst")->nValueToInt();
     
     statistics->setMinMaxY(worst, best);
-    //statistics->setMinMaxY(6, 1);
+    information->setProperties(properties);
     
+}
+
+void ksStatisticsDialog::currentSemesterChanged(int newSelection)
+{
+    if(newSelection >= 0 && newSelection < semesterListCode.count())
+    {
+        information->setSemesterToShow(semesterListCode[newSelection]);
+    }
+}
+
+void ksStatisticsDialog::refreshUiAndChildren()
+{
+    //QMessageBox::information(this, "ksStatisticsDialog", "ksStatisticsDialog::refreshUiAndChildren()");
+    information->setSubjectToShow(subject);
     refreshExamListFromXmlSubject();
 }
 

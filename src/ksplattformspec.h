@@ -49,6 +49,10 @@ public:
     static QString getLanguageString();
     static QStringList getAvailibleLanguages();
     
+    // average computing functions
+    static double computeAverageOfSubject(xmlObject* subject, QString weightingType);
+    static double computeAverageOfSubject(xmlObject* subject, QString weightingType, QString semester, xmlObject* pSemesterList);
+    
     // xmlObject - Functions
     static void   addMissingCathegoryAttributes(xmlObject*  CathegoryToComplete);
     static void   addMissingExamAttributes(xmlObject*  ExamToComplete);

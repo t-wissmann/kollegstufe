@@ -148,7 +148,7 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="650"/>
+        <location filename="../src/kollegstufeparent.cpp" line="654"/>
         <source>Save</source>
         <translation>saveFile()</translation>
     </message>
@@ -203,78 +203,78 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1175"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1178"/>
         <source>Points</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="651"/>
+        <location filename="../src/kollegstufeparent.cpp" line="655"/>
         <source>Discard</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="652"/>
+        <location filename="../src/kollegstufeparent.cpp" line="656"/>
         <source>Don&apos;t Close</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="654"/>
+        <location filename="../src/kollegstufeparent.cpp" line="658"/>
         <source>Seit dem letzten Speichern haben sich Daten verandert!
 Moechten Sie diese vor dem Schliessen speichern oder verwerfen ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="655"/>
+        <location filename="../src/kollegstufeparent.cpp" line="659"/>
         <source>Closing Database - Kollegstufe</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="803"/>
+        <location filename="../src/kollegstufeparent.cpp" line="807"/>
         <source>Do you really want to delete the subject&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="805"/>
+        <location filename="../src/kollegstufeparent.cpp" line="809"/>
         <source>&apos; ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="806"/>
+        <location filename="../src/kollegstufeparent.cpp" line="810"/>
         <source>Deleting a subject</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="953"/>
+        <location filename="../src/kollegstufeparent.cpp" line="957"/>
         <source>Do you really want to delete </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="961"/>
+        <location filename="../src/kollegstufeparent.cpp" line="965"/>
         <source> from </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="965"/>
+        <location filename="../src/kollegstufeparent.cpp" line="969"/>
         <source> ? Really Delete this exam ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="966"/>
+        <location filename="../src/kollegstufeparent.cpp" line="970"/>
         <source>Deleting of an Exam</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1025"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1029"/>
         <source>Properties of subject </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1032"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1036"/>
         <source>No Subject Selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1180"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1183"/>
         <source>Mark</source>
         <translation type="unfinished"></translation>
     </message>
@@ -282,49 +282,49 @@ Moechten Sie diese vor dem Schliessen speichern oder verwerfen ?</source>
 <context>
     <name>ksAbout</name>
     <message>
-        <location filename="../src/ksabout.cpp" line="77"/>
+        <location filename="../src/ksabout.cpp" line="78"/>
         <source>Kollegstufe</source>
         <translation type="unfinished">Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/ksabout.cpp" line="78"/>
+        <location filename="../src/ksabout.cpp" line="79"/>
         <source>version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ksabout.cpp" line="79"/>
+        <location filename="../src/ksabout.cpp" line="80"/>
         <source>close</source>
         <translation>close()</translation>
     </message>
     <message>
-        <location filename="../src/ksabout.cpp" line="81"/>
-        <source>Kollegstufe is a small Programe, that allows you to manage your marks in the bavarian Kollegstufe.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/ksabout.cpp" line="100"/>
+        <source>About Kollegstufe</source>
+        <translation type="unfinished">showAboutDialog()</translation>
     </message>
     <message>
         <location filename="../src/ksabout.cpp" line="82"/>
-        <source>It is released under the GPL - GNU General Public License.</source>
+        <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ksabout.cpp" line="83"/>
-        <source>So it&apos;s free Software. You are allowed to copy, modify and distribute it for non-comercial use.</source>
+        <source>Author</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ksabout.cpp" line="84"/>
-        <source>You should have recieved a copy of the GPL with this.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ksabout.cpp" line="85"/>
-        <source>If not, see &lt;i&gt;http://www.gnu.org/licenses/gpl-3.0.html&lt;/i&gt; for more details</source>
+        <source>License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ksabout.cpp" line="87"/>
-        <source>About Kollegstufe</source>
-        <translation type="unfinished">showAboutDialog()</translation>
+        <source>The manager for your marks during the &lt;i&gt;Kollegstufe&lt;/i&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ksabout.cpp" line="97"/>
+        <source>This software was released under the GPL.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -727,7 +727,7 @@ Moechten Sie diese vor dem Schliessen speichern oder verwerfen ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="382"/>
+        <location filename="../src/ksplattformspec.cpp" line="445"/>
         <source>New Subject</source>
         <translation type="unfinished"></translation>
     </message>
@@ -735,19 +735,47 @@ Moechten Sie diese vor dem Schliessen speichern oder verwerfen ?</source>
 <context>
     <name>ksStatisticsDialog</name>
     <message>
-        <location filename="../src/ksstatisticsdialog.cpp" line="77"/>
+        <location filename="../src/ksstatisticsdialog.cpp" line="105"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ksstatisticsdialog.cpp" line="133"/>
+        <location filename="../src/ksstatisticsdialog.cpp" line="168"/>
         <source>Statistics of subject </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ksstatisticsdialog.cpp" line="137"/>
+        <location filename="../src/ksstatisticsdialog.cpp" line="172"/>
         <source>Statistics</source>
         <translation type="unfinished">diaStatistics.setVisible(bool)</translation>
+    </message>
+    <message>
+        <location filename="../src/ksstatisticsdialog.cpp" line="91"/>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ksstatisticsdialog.cpp" line="103"/>
+        <source>Semester:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ksSubjectInformationWidget</name>
+    <message>
+        <location filename="../src/kssubjectinformationwidget.cpp" line="94"/>
+        <source>Oral average:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/kssubjectinformationwidget.cpp" line="95"/>
+        <source>Written average:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/kssubjectinformationwidget.cpp" line="96"/>
+        <source>Entire average:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

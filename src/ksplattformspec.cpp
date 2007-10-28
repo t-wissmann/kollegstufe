@@ -27,7 +27,7 @@
 #include <QLocale>
 #include "xmlparser.h"
 #include "dateConverter.h"
-
+#include <QMessageBox>
 
 #if defined(Q_WS_WIN)
 #include <windows.h>
@@ -306,7 +306,70 @@ QString  ksPlattformSpec::getArticleForNoun(QString noun, kasus kasusOfNoun)
     return article;
 }
 
+// average computing functions
 
+double ksPlattformSpec::computeAverageOfSubject(xmlObject* subject, QString weightingType)
+{
+    return computeAverageOfSubject(subject, weightingType, "all", NULL);
+}
+
+
+double ksPlattformSpec::computeAverageOfSubject(xmlObject* subject, QString weightingType, QString semester, xmlObject* pSemesterList)
+{
+    double average = -1;
+    int    sumn = 0;
+    int    examCounter = 0;
+    xmlObject* currentExam = NULL;
+    xmlObject* currentAttribute = NULL;
+    if (subject == NULL)
+    {
+        return average;
+    }
+    for (int i = 0; (currentExam = subject->cGetObjectByIdentifier(i)) != NULL; i++)
+    {
+        addMissingExamAttributes(currentExam);
+        // check if is right weighting type
+        currentAttribute = currentExam->cGetObjectByAttributeValue("name", "weighting");
+        if(currentAttribute->cGetAttributeByName("value")->value() != weightingType)
+        {
+            continue;
+        }
+        // check if is right semester
+        if((semester != "all") && (pSemesterList != NULL))
+        {
+            currentAttribute = currentExam->cGetObjectByAttributeValue("name", "semester");
+            QString currentSemester = currentAttribute->cGetAttributeByName("value")->value();
+            if(currentSemester == "auto")
+            {
+                if (semester != getSemesterContainigDate(pSemesterList,
+                    currentExam->cGetObjectByAttributeValue("name", "date")->cGetAttributeByName("value")->value()))
+                {
+                    continue;
+                }
+            }else
+            {
+                if(currentSemester != semester)
+                {
+                    continue;
+                }
+            }
+        }
+        
+        // get points
+        currentAttribute = currentExam->cGetObjectByAttributeValue("name", "points");
+        sumn += currentAttribute->cGetAttributeByName("value")->nValueToInt();
+        examCounter++;
+    }
+    // compute average
+    if(examCounter <= 0)
+    {
+        return average;
+    }
+    average  = sumn;
+    average /= examCounter;
+    
+    return average;
+}
 
 /*  THE WAY, THE CONFIG FILE SHOULD LOOK LIKE:
 

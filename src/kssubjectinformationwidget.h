@@ -18,72 +18,63 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSSTATISTICSDIALOG_H
-#define KSSTATISTICSDIALOG_H
+#ifndef KSSUBJECTINFORMATIONWIDGET_H
+#define KSSUBJECTINFORMATIONWIDGET_H
 
-#include <QDialog>
+#include <QWidget>
+#include <QString>
 
 class xmlObject;
-class ksStatisticsWidget;
-class ksSubjectInformationWidget;
 
-class QVBoxLayout;
-class QHBoxLayout;
 class QGridLayout;
-class QPushButton;
-class QComboBox;
-class QLabel;
+class QHBoxLayout;
+class QVBoxLayout;
 
-class QPushButton;
 class QEvent;
-#include <QStringList>
-
+class QLabel;
 /**
-	@author Thorsten Wissmann <towi89@web.de>
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
-class ksStatisticsDialog : public QDialog
+class ksSubjectInformationWidget : public QWidget
 {
 Q_OBJECT
 public:
-    ksStatisticsDialog(QWidget *parent = 0);
+    ksSubjectInformationWidget(QWidget *parent = 0);
 
-    ~ksStatisticsDialog();
+    ~ksSubjectInformationWidget();
     
-    void setSubject(xmlObject* newSubject);
-    void setProperties(xmlObject* newProperties);
-    
+    void setSubjectToShow(xmlObject* subject);
     void retranslateUi();
-public slots:
-    void refreshUiAndChildren();
-    void refreshExamListFromXmlSubject();
-    void currentSemesterChanged(int newSelection);
-    
+    void computeAverages();
+    void printDataToWidgets();
+    void setSemesterToShow(QString semester);
+    void setProperties(xmlObject* newProperties);
 protected:
     virtual void changeEvent(QEvent* event);
 private:
-    void initMembers();
-    void allocateWidgets();
+    void createWidgets();
     void createLayouts();
-    void connectSlots();
     void initWidgets();
     
     //widgets
-    ksStatisticsWidget* statistics;
-    ksSubjectInformationWidget* information;
-    QPushButton*        btnClose;
-    QComboBox*          cmbSemesterSelection;
-    QLabel*             lblSemesterSelection;
+    QLabel*         lblOralLabel;
+    QLabel*         lblWrittenLabel;
+    QLabel*         lblEntireLabel;
+    QLabel*         lblOralAverage;
+    QLabel*         lblWrittenAverage;
+    QLabel*         lblEntireAverage;
+    
     
     //layouts
-    QGridLayout*        layoutParent;
-    QHBoxLayout*        layoutBottom;
+    QGridLayout*    layoutParent;
     
-    //members
-    QStringList semesterListUi; // list , that user can see
-    QStringList semesterListCode; // internal list
-    xmlObject*  subject;
+    //member
+    double      averageOral;
+    double      averageWritten;
+    double      averageEntire;
+    QString     semesterToShow;
+    xmlObject*  subjectToShow;
     xmlObject*  properties;
-
 };
 
 #endif

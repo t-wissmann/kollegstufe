@@ -89,6 +89,9 @@ kollegstufeParent::kollegstufeParent(QWidget* parentWidget)
     retranslateUi(); // ensure, that there are texts
     loadConfigFile();
     debugOutput->putDebugOutput("MainWindow created");
+    
+    //update window's pixels
+    update();
 }
 
 
@@ -616,6 +619,10 @@ void kollegstufeParent::closeEvent(QCloseEvent* event)
         saveConfigFile();
         event->accept();
         diaStatistics->close();
+        if (diaAbout)
+        {
+            diaAbout->close();
+        }
     }
     else
     {
@@ -703,7 +710,7 @@ void kollegstufeParent::showAboutDialog()
     {
         diaAbout = new ksAbout(this);
     }
-    diaAbout->exec();
+    diaAbout->show();
 }
 
 void kollegstufeParent::showConfigureDialog()
@@ -1063,7 +1070,6 @@ void kollegstufeParent::selectedExamChanged()
     {
         currentExam = currentSubject->cGetObjectByAttributeValue("id", ksPlattformSpec::qstringToSz(selectedID));
     }
-    diaStatistics->refreshExamListFromXmlSubject();
     
 }
 
@@ -1249,6 +1255,7 @@ void kollegstufeParent::refreshExamList()
     else
         lstExamList->setCurrentItem(lstExamList->itemAt(0,0));
     
+    diaStatistics->refreshUiAndChildren();
 }
 
 

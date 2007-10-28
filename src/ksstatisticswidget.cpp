@@ -24,6 +24,7 @@
 #include <QPalette>
 #include <QApplication>
 #include <QSize>
+#include <QSizePolicy>
 
 #include <QRect>
 #include <QPoint>
@@ -44,10 +45,11 @@ ksStatisticsWidget::ksStatisticsWidget(QWidget *parent)
 {
     setFrameStyle(QFrame::Box);
     setMinimumWidth(100);
-    setMinimumHeight(50);
+    setMinimumHeight(140);
     updateGridAndGraphProperties();
     nPointDiameter = 16;
     
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     // set to 'white' background brush
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(TRUE);
@@ -556,6 +558,7 @@ void ksStatisticsWidget::addItem(ksStatisticsItem newItem)
 {
     itemList.append(newItem);
     bItemListSorted = FALSE;
+    setMinimumWidth(marginLeft + marginRight + (itemList.count()+1) * 45);
 }
 
 
