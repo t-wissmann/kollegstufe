@@ -121,31 +121,11 @@ void ksSubjectInformationWidget::computeAverages()
     averageOral = ksPlattformSpec::computeAverageOfSubject(subjectToShow, "oral", semesterToShow, properties->cGetObjectByName("time"));
     averageWritten = ksPlattformSpec::computeAverageOfSubject(subjectToShow, "written", semesterToShow, properties->cGetObjectByName("time"));
     
+    averageEntire = ksPlattformSpec::computeEntireAverageFromPartAverages(averageOral, averageWritten, weightingOral, weightingWritten);
     
-    int    divisor = 0;
-    double sumn = 0;
-    
-    if(averageOral >= 0)
-    {
-        sumn += averageOral*((double) weightingOral);
-        divisor += weightingOral;
-    }
-   
-    // only use written average if there are written exams
-    if(averageWritten >= 0)
-    {
-        sumn += averageWritten*((double) weightingWritten);
-        divisor += weightingWritten;
-    }
-    
-    if(divisor > 0)
-    {
-        averageEntire = sumn / ((double) divisor);
-    }
-    else
-    {
-        averageEntire = -1;
-    }
+    averageOral = (double)((int)(averageOral*100))/100; // only show two decimals
+    averageWritten = (double)((int)(averageWritten*100))/100;
+    //averageEntire = (double)((int)(averageEntire*100))/100;
     
 }
 

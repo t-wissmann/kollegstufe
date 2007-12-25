@@ -33,6 +33,9 @@
 #include "ksexamproperties.h"
 #include "ksabout.h"
 
+// own widgets
+#include <kssubjectstatusbar.h>
+
 // normal widgets
 #include <QComboBox>
 #include <QWidget>
@@ -64,6 +67,7 @@
 #include <QSizePolicy>
 #include <QCloseEvent>
 #include <QEvent>
+#include <QFileOpenEvent>
 #include <QModelIndex>
 
 kollegstufeParent::kollegstufeParent(QWidget* parentWidget)
@@ -164,14 +168,15 @@ void kollegstufeParent::allocateWidgets()
     // subject tools:
     /*btnSubjectAdd       = new QPushButton(tr("Hinzufuegen"));
     btnSubjectDelete    = new QPushButton("Entfernen");*/
-    btnSubjectAdd       = new QPushButton("");
-    btnSubjectDelete    = new QPushButton("");
+    btnSubjectAdd       = new QPushButton;
+    btnSubjectDelete    = new QPushButton;
     btnSubjectEdit      = new QPushButton;
-    btnSubjectMoveUp    = new QPushButton("");
-    btnSubjectMoveDown  = new QPushButton("");
+    btnSubjectMoveUp    = new QPushButton;
+    btnSubjectMoveDown  = new QPushButton;
     
     //exam selection
     grpExamList     = new QGroupBox;
+    wdgSubjectStatusbar = new ksSubjectStatusbar;
     lstExamList     = new QTreeWidget;
     btnExamAdd      = new QPushButton;
     btnExamDelete   = new QPushButton;
@@ -198,7 +203,10 @@ void kollegstufeParent::createMenuBar()
     mnbMenuBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     //add menus to menubar
     mnmFile     = mnbMenuBar->addMenu("&File");
+    mnmEdit     = mnbMenuBar->addMenu("&Edit");
     mnmExtras   = mnbMenuBar->addMenu("&Extras");
+    mnmWindow   = mnbMenuBar->addMenu("&Window");
+    mnmHelp     = mnbMenuBar->addMenu("&Help");
     
     //add actions to menus
     // 1. File - menu
@@ -208,16 +216,36 @@ void kollegstufeParent::createMenuBar()
     mnmFile->addSeparator();
     mnaQuit              = mnmFile->addAction("");
     
-    // 2. Extras - menu
-    mnaStatistics = mnmExtras->addAction("statistics");
-    mnmExtras->addSeparator();
+    // 2. Edit - menu
+    mnmEditSubject      = mnmEdit->addMenu("");
+    mnaEditSubjectAdd   = mnmEditSubject->addAction("");
+    mnaEditSubjectDelete= mnmEditSubject->addAction("");
+    mnaEditSubjectEdit  = mnmEditSubject->addAction("");
+    mnaEditSubjectMoveUp= mnmEditSubject->addAction("");
+    mnaEditSubjectMoveDown= mnmEditSubject->addAction("");
+    
+    mnmEditExam         = mnmEdit->addMenu("");
+    mnaEditExamAdd      = mnmEditExam->addAction("");
+    mnaEditExamDelete   = mnmEditExam->addAction("");
+    mnaEditExamEdit     = mnmEditExam->addAction("");
+    
+    
+    // 3. Window - menu
+    mnaStatistics = mnmWindow->addAction("statistics");
+    mnaStatistics->setCheckable(TRUE);
+    
+    // 4. Extras - menu
     mnaConfigureKs= mnmExtras->addAction("");
-    mnmExtras->addSeparator();
-    mnaAboutQt    = mnmExtras->addAction("");
-    mnaAboutKs    = mnmExtras->addAction("");
+    
+    // 5. Help - menu
+    mnaShowHelp   = mnmHelp->addAction("");
+                    mnmHelp->addSeparator();
+    mnaAboutQt    = mnmHelp->addAction("");
+    mnaAboutKs    = mnmHelp->addAction("");
     mnaStatistics->setCheckable(TRUE);
     
     // INFO: icons will be set at initWidgets
+    // INFO: texts will be set at retranslateUi;
     
 }
 
@@ -237,11 +265,12 @@ void kollegstufeParent::createLayouts()
     //exam List layout
     layoutExamList = new QGridLayout;
     layoutExamList->setMargin(2);
-    layoutExamList->addWidget(lstExamList, 0, 0,1, 4);
-    layoutExamList->addWidget(btnSubjectEdit, 1, 0, 1, 1);
-    layoutExamList->addWidget(btnExamAdd, 1, 1, 1, 1);
-    layoutExamList->addWidget(btnExamEdit, 1, 2, 1, 1);
-    layoutExamList->addWidget(btnExamDelete, 1, 3, 1, 1);
+    layoutExamList->addWidget(wdgSubjectStatusbar, 0, 0, 1, 4);
+    layoutExamList->addWidget(lstExamList, 1, 0,1, 4);
+    layoutExamList->addWidget(btnSubjectEdit, 2, 0, 1, 1);
+    layoutExamList->addWidget(btnExamAdd, 2, 1, 1, 1);
+    layoutExamList->addWidget(btnExamEdit, 2, 2, 1, 1);
+    layoutExamList->addWidget(btnExamDelete, 2, 3, 1, 1);
     
     grpExamList->setLayout(layoutExamList);
     
@@ -286,11 +315,27 @@ void kollegstufeParent::connectSlots()
     connect(mnaSave, SIGNAL(triggered()), this, SLOT(saveFile()));
     connect(mnaLoadDatabase, SIGNAL(triggered()), this, SLOT(showDatabaseSelection()));
     connect(mnaDatabaseProperties, SIGNAL(triggered()), this, SLOT(showDatabaseProperties()));
+    // mnmEdit
+    connect(mnaEditSubjectAdd, SIGNAL(triggered()), this, SLOT(subjectAdd()));
+    connect(mnaEditSubjectDelete, SIGNAL(triggered()), this, SLOT(subjectDelete()));
+    connect(mnaEditSubjectEdit, SIGNAL(triggered()), this, SLOT(subjectEdit()));
+    connect(mnaEditSubjectMoveUp, SIGNAL(triggered()), this, SLOT(subjectMoveUp()));
+    connect(mnaEditSubjectMoveDown, SIGNAL(triggered()), this, SLOT(subjectMoveDown()));
+    
+    connect(mnaEditExamAdd, SIGNAL(triggered()), this, SLOT(examAdd()));
+    connect(mnaEditExamDelete, SIGNAL(triggered()), this, SLOT(examDelete()));
+    connect(mnaEditExamEdit, SIGNAL(triggered()), this, SLOT(examEdit()));
+    
     // mnmExtras
+    connect(mnaConfigureKs, SIGNAL(triggered()), this, SLOT(showConfigureDialog()));
+    // mnmWindow
     connect(mnaStatistics, SIGNAL(toggled(bool)), diaStatistics, SLOT(setVisible(bool)));
+    connect(mnaStatistics, SIGNAL(toggled(bool)), wdgSubjectStatusbar, SLOT(toggleStatisticsButton(bool)));
+    connect(wdgSubjectStatusbar, SIGNAL(statisticsButtonToggled(bool)), mnaStatistics, SLOT(setChecked(bool)));
     connect(diaStatistics, SIGNAL(rejected()), this, SLOT(refreshMnaStatisticsChecked()));
     connect(diaStatistics, SIGNAL(accepted()), this, SLOT(refreshMnaStatisticsChecked()));
-    connect(mnaConfigureKs, SIGNAL(triggered()), this, SLOT(showConfigureDialog()));
+    // mnmHelp
+    connect(mnaShowHelp, SIGNAL(triggered()), this, SLOT(showHelpDialog()));
     connect(mnaAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(mnaAboutKs, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
     
@@ -325,23 +370,33 @@ void kollegstufeParent::initWidgets()
     // init main window / this
     splitterParent->setChildrenCollapsible(FALSE);
     
-    QDir iconDir(szApplicationPath);
-    iconDir.cdUp();
-    iconDir.cd("pic");
-    setWindowIcon(QPixmap(iconDir.filePath("kollegstufe.png")));
-    setWindowTitle(tr("Kollegstufe"));
+    
+    setWindowIcon(ksPlattformSpec::getIcon("kollegstufe"));
     
     // set Icons for MenuBar:
-    mnaLoadDatabase->setIcon(QIcon(QPixmap(iconDir.filePath("fileopen.png"))));
-    mnaSave->setIcon(QIcon(QPixmap(iconDir.filePath("filesave.png"))));
-    mnaQuit->setIcon(QIcon(QPixmap(iconDir.filePath("exit.png"))));
-    mnaAboutKs->setIcon(QIcon(QPixmap(iconDir.filePath("kollegstufe16.png"))));
-    // set Icons for Subject-control-buttons
-    btnSubjectAdd->setIcon(QIcon(QPixmap(iconDir.filePath("add.png"))));
-    btnSubjectDelete->setIcon(QIcon(QPixmap(iconDir.filePath("remove.png"))));
-    btnSubjectMoveUp->setIcon(QIcon(QPixmap(iconDir.filePath("up.png"))));
-    btnSubjectMoveDown->setIcon(QIcon(QPixmap(iconDir.filePath("down.png"))));
+    mnaLoadDatabase->setIcon(ksPlattformSpec::getIcon("fileopen"));
+    mnaSave->setIcon(ksPlattformSpec::getIcon("filesave"));
+    mnaQuit->setIcon(ksPlattformSpec::getIcon("exit"));
+    mnaAboutKs->setIcon(ksPlattformSpec::getIcon("kollegstufe16"));
     
+    mnaEditSubjectAdd->setIcon(ksPlattformSpec::getIcon("add"));
+    mnaEditSubjectDelete->setIcon(ksPlattformSpec::getIcon("remove"));
+    mnaEditSubjectMoveUp->setIcon(ksPlattformSpec::getIcon("up"));
+    mnaEditSubjectMoveDown->setIcon(ksPlattformSpec::getIcon("down"));
+    
+    mnaEditExamAdd->setIcon(ksPlattformSpec::getIcon("add"));
+    mnaEditExamDelete->setIcon(ksPlattformSpec::getIcon("remove"));
+    
+    // set Icons for Subject-control-buttons
+    btnSubjectAdd->setIcon(ksPlattformSpec::getIcon("add"));
+    btnSubjectDelete->setIcon(ksPlattformSpec::getIcon("remove"));
+    btnSubjectMoveUp->setIcon(ksPlattformSpec::getIcon("up"));
+    btnSubjectMoveDown->setIcon(ksPlattformSpec::getIcon("down"));
+    //set icons for dialogs
+    if(diaStatistics)
+    {
+        diaStatistics->setWindowIcon(this->windowIcon());
+    }
     
     //set alternatingrowcolors
     lstSubjectList->setAlternatingRowColors(TRUE);
@@ -386,6 +441,9 @@ void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
     currentPropertyPart = currentDatabase.cGetObjectByName("properties");
     ksPlattformSpec::addMissingPropertiesAttributes(currentPropertyPart);
     
+    // set window title to new author name
+    currentWindowTitle = ksPlattformSpec::szToUmlauts(currentPropertyPart->cGetObjectByName("author")->szGetContent());
+    resetWindowTitle();
     // reset Database change state:
     setDatabaseChanged(FALSE);
     //refresh GUI
@@ -538,34 +596,50 @@ void kollegstufeParent::saveConfigFile()
 
 void kollegstufeParent::retranslateUi()
 {
-    //subject selection
-        btnSubjectEdit->setText(tr("Edit Subject"));
-        btnSubjectAdd->setToolTip(tr("Add Subject"));
-        btnSubjectDelete->setToolTip(tr("Delete Subject"));
-        btnSubjectMoveUp->setToolTip(tr("Move Subject Up"));
-        btnSubjectMoveDown->setToolTip(tr("Move Subject Down"));
+    // subjects
+    btnSubjectEdit->setText(tr("Edit Subject"));
     // exam selection
-        grpExamList->setTitle(tr("Subject Properties"));
-        btnExamAdd->setText(tr("New Exam"));
-        btnExamDelete->setText(tr("Delete"));
-        btnExamEdit->setText(tr("Edit"));
-    
+    grpExamList->setTitle(tr("Subject Properties"));
+    btnExamAdd->setText(tr("New Exam"));
+    btnExamDelete->setText(tr("Delete"));
+    btnExamEdit->setText(tr("Edit"));
+
     // menubar - menus
-        mnmFile->setTitle(tr("&File"));
-        mnmExtras->setTitle(tr("&Extras"));
+    mnmFile->setTitle(tr("&File"));
+    mnmEdit->setTitle(tr("&Edit"));
+    mnmWindow->setTitle(tr("&Window"));
+    mnmExtras->setTitle(tr("&Extras"));
+    mnmHelp->setTitle(tr("&Help"));
     //file menu
-        mnaLoadDatabase->setText(tr("Load archiv"));
-        mnaLoadDatabase->setShortcut(tr("Ctrl+O"));
-        mnaSave->setShortcut(tr("Ctrl+S"));
-        mnaQuit->setShortcut(tr("Ctrl+Q"));
-        mnaSave->setText(tr("Save"));
-        mnaDatabaseProperties->setText(tr("Eigenschaften"));
-        mnaQuit->setText(tr("Quit"));
+    mnaLoadDatabase->setText(tr("Load archiv"));
+    mnaLoadDatabase->setShortcut(tr("Ctrl+O"));
+    mnaSave->setShortcut(tr("Ctrl+S"));
+    mnaQuit->setShortcut(tr("Ctrl+Q"));
+    mnaSave->setText(tr("Save"));
+    mnaDatabaseProperties->setText(tr("Properties"));
+    mnaQuit->setText(tr("Quit"));
+    // edit menu
+    
+    mnmEditSubject->setTitle(tr("Subject"));
+    mnaEditSubjectAdd->setText(tr("Add"));
+    mnaEditSubjectDelete->setText(tr("Delete"));
+    mnaEditSubjectEdit->setText(tr("Edit"));
+    mnaEditSubjectMoveUp->setText(tr("Move Up"));
+    mnaEditSubjectMoveDown->setText(tr("Move Down"));
+    
+    mnmEditExam->setTitle(tr("Exam"));
+    mnaEditExamAdd->setText(tr("Add"));
+    mnaEditExamDelete->setText(tr("Delete"));
+    mnaEditExamEdit->setText(tr("Edit"));
+    
     // extras menu
-        mnaStatistics->setText(tr("Statistics"));
-        mnaConfigureKs->setText(tr("Configure Kollegstufe"));
-        mnaAboutQt->setText(tr("About Qt"));
-        mnaAboutKs->setText(tr("About Kollegstufe"));
+    mnaConfigureKs->setText(tr("Configure Kollegstufe"));
+    // window menu
+    mnaStatistics->setText(tr("Statistics"));
+    // help menu
+    mnaShowHelp->setText(tr("User Manual"));
+    mnaAboutQt->setText(tr("About Qt"));
+    mnaAboutKs->setText(tr("About Kollegstufe"));
     
     // exam list table
     QTreeWidgetItem* examListHeader = lstExamList->headerItem();
@@ -575,16 +649,48 @@ void kollegstufeParent::retranslateUi()
     examListHeader->setText(4, tr("Type"));
     examListHeader->setText(5, tr("Points"));
     
+    retranslateTooltips();
+    resetWindowTitle();
     selectedCathegoryChanged();
+}
+
+void kollegstufeParent::retranslateTooltips()
+{
+    //subject selection
+    btnSubjectEdit->setToolTip(tr("Click to edit the properties of currently selected subject"));
+    btnSubjectAdd->setToolTip(tr("Add Subject"));
+    btnSubjectDelete->setToolTip(tr("Delete Subject"));
+    btnSubjectMoveUp->setToolTip(tr("Move Subject Up"));
+    btnSubjectMoveDown->setToolTip(tr("Move Subject Down"));
+    //exam selection
+    btnExamAdd->setToolTip(tr("Adds a new exam to currently selected subject"));
+    btnExamEdit->setToolTip(tr("Click to edit the properties of currently selected exam"));
+    btnExamDelete->setToolTip(tr("Removes the currently selected exam"));
     
+}
+
+void kollegstufeParent::resetWindowTitle()
+{
+    QString newWindowTitle = currentWindowTitle;
+    if (!newWindowTitle.isEmpty())
+    {
+        newWindowTitle += " - ";
+    }
+    newWindowTitle += tr("Kollegstufe");
+    setWindowTitle(newWindowTitle);
 }
 
 void kollegstufeParent::reloadTranslator()
 {
-    if(xmlConfig.cGetObjectByName("language")->szGetContent())
+    if(!xmlConfig.cGetObjectByName("language")->szGetContent())
     {
-        ksPlattformSpec::setLanguage(xmlConfig.cGetObjectByName("language")->szGetContent(), &appTranslator);
+        // if there is no language choose english
+        xmlConfig.cGetObjectByName("language")->nSetContent("english");
     }
+    QString language = xmlConfig.cGetObjectByName("language")->szGetContent();
+    ksPlattformSpec::setLanguage(language, &appTranslator);
+    // ensure that there are example archivs in current language
+    ksPlattformSpec::catchKsDatabaseTemplates(language);
 }
 
 void kollegstufeParent::showDatabaseSelection()
@@ -593,6 +699,7 @@ void kollegstufeParent::showDatabaseSelection()
     {
         diaDatabaseSelection = new ksDatabaseSelection(this);
     }
+    debugOutput->putDebugOutput(QString("showDatabaseSelection()") + szFilename);
     diaDatabaseSelection->setCurrentFile(szFilename);
     diaDatabaseSelection->exec();
     switch(diaDatabaseSelection->result())
@@ -677,10 +784,8 @@ bool kollegstufeParent::askForSavingChangedDatabase()
                 break;
         }
     }
-    else
-    {
-        return TRUE;
-    }
+    // else
+    return TRUE;
 }
 
 void kollegstufeParent::showDatabaseProperties()
@@ -711,6 +816,14 @@ void kollegstufeParent::showAboutDialog()
         diaAbout = new ksAbout(this);
     }
     diaAbout->show();
+}
+
+void kollegstufeParent::showHelpDialog()
+{
+    QString helpPath = szApplicationPath + ".." + QDir::separator() + "doc" + QDir::separator() + "help.html";
+    
+    QFileOpenEvent event(helpPath);
+    QApplication::sendEvent(this, &event);
 }
 
 void kollegstufeParent::showConfigureDialog()
@@ -751,6 +864,7 @@ void kollegstufeParent::subjectAdd()
     
     int        nNewSubjectId;
     xmlObject* newSubject;
+    debugOutput->putDebugOutput("Adding Subject...");
     if ((nNewSubjectId = currentCathegory->nAddObject("subject")) < 0)
         return;
     
@@ -791,6 +905,7 @@ void kollegstufeParent::subjectAdd()
             {
                 lstSubjectList->setCurrentItem(lstSubjectList->findItems(szNewSubjectName, Qt::MatchExactly).first());
             }
+            debugOutput->putDebugOutput("Subject \'" + szNewSubjectName + "\' successfully added");
             break;
         case QDialog::Rejected:
             currentCathegory->nDeleteObject(newSubject);
@@ -807,16 +922,22 @@ void kollegstufeParent::subjectDelete()
     if(!lstSubjectList->currentItem())
         return;
     
+    QString subjectNameToDelete = lstSubjectList->currentItem()->text();
+    
+    debugOutput->putDebugOutput("Deleting Subject \'" + subjectNameToDelete + "\' ...");
     QString message = tr("Do you really want to delete the subject\'");
-    message += lstSubjectList->currentItem()->text();
+    message += subjectNameToDelete;
     message += tr("\' ?");
     if(QMessageBox::question ( this, tr("Deleting a subject"), message , QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
     {
-        currentCathegory->nDeleteObject(currentCathegory->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(lstSubjectList->currentItem()->text())));
+        currentCathegory->nDeleteObject(currentCathegory->cGetObjectByAttributeValue("name",
+                                        ksPlattformSpec::qstringToSz(subjectNameToDelete)));
 
         
         refreshSubjectList();
         setDatabaseChanged();
+        
+        debugOutput->putDebugOutput("Subject \'" + subjectNameToDelete + "\' successfully deleted");
     }
 }
 
@@ -884,6 +1005,7 @@ void kollegstufeParent::subjectMoveDown()
 
 void kollegstufeParent::examAdd()
 {
+    
     if(currentSubject == NULL)
     {
         // return if there is no subject selected
@@ -1044,6 +1166,7 @@ void kollegstufeParent::selectedSubjectChanged()
         diaStatistics->setSubject(currentSubject);
         diaStatistics->setProperties(currentPropertyPart);
     }
+    wdgSubjectStatusbar->setSubject(currentSubject);
     refreshExamList();
 }
 
@@ -1069,6 +1192,10 @@ void kollegstufeParent::selectedExamChanged()
     else
     {
         currentExam = currentSubject->cGetObjectByAttributeValue("id", ksPlattformSpec::qstringToSz(selectedID));
+    }
+    if(diaStatistics)
+    {
+        diaStatistics->setSelectedExam(currentExam);
     }
     
 }
@@ -1254,8 +1381,13 @@ void kollegstufeParent::refreshExamList()
         lstExamList->setCurrentItem(itemList.first());
     else
         lstExamList->setCurrentItem(lstExamList->itemAt(0,0));
-    
+    // refresh average computing components
     diaStatistics->refreshUiAndChildren();
+    wdgSubjectStatusbar->calculateAverage();
+    //simulate selection change
+    selectedExamChanged();
+    
+    
 }
 
 

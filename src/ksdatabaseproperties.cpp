@@ -30,6 +30,7 @@
 #include <QLabel>
 #include <QRadioButton>
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QGroupBox>
 #include <QSpinBox>
 #include <QListWidget>
@@ -49,7 +50,6 @@
 #include <QStringList>
 #include <QList>
 
-
 ksDatabaseProperties::ksDatabaseProperties(QWidget *parent)
  : QDialog(parent)
 {
@@ -60,12 +60,6 @@ ksDatabaseProperties::ksDatabaseProperties(QWidget *parent)
     
     databaseToEdit = NULL;
     propertiesToEdit = NULL;
-    
-    testDatabase = new xmlObject;
-    testDatabase->cGetObjectByIdentifier(testDatabase->nAddObject("cathegory"))->nAddAttribute("name", "c eins");
-    testDatabase->cGetObjectByIdentifier(testDatabase->nAddObject("cathegory"))->nAddAttribute("name", "c zwei");
-    testDatabase->cGetObjectByIdentifier(testDatabase->nAddObject("cathegory"))->nAddAttribute("name", "c drei");
-    
     
     btnOk->setDefault(TRUE);
     if(parent)
@@ -78,7 +72,6 @@ ksDatabaseProperties::ksDatabaseProperties(QWidget *parent)
 
 ksDatabaseProperties::~ksDatabaseProperties()
 {
-    delete testDatabase;
 }
 
 void ksDatabaseProperties::changeEvent(QEvent* event)
@@ -106,6 +99,8 @@ void ksDatabaseProperties::retranslateUi()
     grpSemesterList->setTitle(tr("Beginning and End of semesters"));
     lblStart->setText(tr("Beginning:"));
     lblEnd->setText(tr("End:"));
+    lblSemesterListInformation->setText("<i>" + tr("Note:") + "</i> " + tr("If you aren't in a grade containing"
+            " of several semesters, you can ignore this and all semester specific options."));
     grpCathegories->setTitle(tr("Edit Subject Cathegories"));
     
     setWindowTitle(tr("Edit properties of Mark-Database"));
@@ -133,6 +128,9 @@ void ksDatabaseProperties::allocateWidgets()
     lblEnd   = new QLabel;
     lblStart->setAlignment(Qt::AlignHCenter);
     lblEnd->setAlignment(Qt::AlignHCenter);
+    
+    lblSemesterListInformation = new QTextEdit;
+    lblSemesterListInformation->setReadOnly(TRUE);
     
     lbl121 = new QLabel("12 / 1:");
     lbl122 = new QLabel("12 / 2:");
@@ -181,6 +179,7 @@ void ksDatabaseProperties::createLayouts()
     layoutSemesterList->addWidget(lbl132,              4, 0);
     layoutSemesterList->addWidget(dteSemester132Start, 4, 1);
     layoutSemesterList->addWidget(dteSemester132End,   4, 2);
+    layoutSemesterList->addWidget(lblSemesterListInformation, 5, 0, 1,3);
     
     grpSemesterList->setLayout(layoutSemesterList);
     
@@ -359,8 +358,8 @@ void ksDatabaseProperties::writeWidgetAttributesToProperties()
     propertiesToEdit->cGetObjectByName( "author" )->nSetContent(txtName->text().toLocal8Bit().data());
     
     // rating mode
-    int best;
-    int worst;
+    int best = 0;
+    int worst = 0;
     
     if(optRatingMarks->isChecked())
     {
@@ -372,7 +371,7 @@ void ksDatabaseProperties::writeWidgetAttributesToProperties()
         best = 15;
         worst = 0;
     }
-    if(optRatingOther->isChecked())
+    else // so: optRatingOther must be checked
     {
         best = spinRatingBest->value();
         worst = spinRatingWorst->value();

@@ -37,6 +37,7 @@ class QLabel;
 class QSpinBox;
 class QStackedWidget;
 class QListWidget;
+class QTextEdit;
 
 // layouts
 class QHBoxLayout;
@@ -91,6 +92,7 @@ private:
     
     // semester List
     QGroupBox*      grpSemesterList;
+    QTextEdit*      lblSemesterListInformation;
     QLabel*         lblStart;
     QLabel*         lblEnd;
     
@@ -122,7 +124,6 @@ private:
     xmlObject*      propertiesToEdit;
     xmlObject*      databaseToEdit;
     
-    xmlObject*      testDatabase;
 };
 
 #endif

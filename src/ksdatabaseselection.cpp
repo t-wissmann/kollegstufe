@@ -44,6 +44,7 @@
 #include <QPalette>
 #include <QFileDialog>
 #include <QListWidgetItem>
+#include <QApplication>
 
 ksDatabaseSelection::ksDatabaseSelection(QWidget *parent)
  : QDialog(parent)
@@ -154,7 +155,6 @@ void    ksDatabaseSelection::connectSlots()
 }
 
 
-
 void    ksDatabaseSelection::setCurrentFile(QString szNewFile)
 {
     szCurrentFile = szNewFile;
@@ -175,12 +175,12 @@ void ksDatabaseSelection::refreshFileList()
     disconnect(lstFileList, SIGNAL(currentRowChanged(int)), this, SLOT(selectedFileChanged(int)));
     for (int i = 0; i < szFileList.size(); i++)
     {
-        //lstFileList->addItem(getFileListLineForPath(szFileList.at(i)));
+        
         new QListWidgetItem(getFileListLineForPath(szFileList.at(i)), lstFileList);
+        //new QListWidgetItem(szFileList.at(i), lstFileList);
     }
     // restore connection
     connect(lstFileList, SIGNAL(currentRowChanged(int)), this, SLOT(selectedFileChanged(int)));
-    
     
     // refresh button state
     if(szFileList.size() < 1)
@@ -196,7 +196,12 @@ void ksDatabaseSelection::refreshFileList()
             selectedFileChanged(i);
         }
     }
+    if(lstFileList->currentRow() == -1)
+    {
+        lstFileList->setCurrentRow(0);
+    }
 }
+
 void ksDatabaseSelection::createNewDatabase()
 {
     // create new File
@@ -372,7 +377,10 @@ QString ksDatabaseSelection::getFileListLineForPath(QString path)
         return onError;
     }
     
+    qDebug("author of %s is '%s'", onError.toAscii().data(), file.cGetObjectByName("properties")->cGetObjectByName("author")->szGetContent());
+    return onError;
     onSuccess += ksPlattformSpec::szToUmlauts(file.cGetObjectByName("properties")->cGetObjectByName("author")->szGetContent());
+    
     
     
     return onSuccess;

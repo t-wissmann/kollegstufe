@@ -22,6 +22,7 @@
 #include <QString>
 #include <QHeaderView>
 #include <QTreeWidget>
+#include <QObject>
 
 #include "dateConverter.h"
 
@@ -34,11 +35,11 @@ bool ExamItem::operator< ( const QTreeWidgetItem & other ) const
     
     int sortCol = treeWidget()->sortColumn();
     
-    if(treeWidget()->headerItem()->text(sortCol) == "Datum")
+    if(treeWidget()->headerItem()->text(sortCol) == QObject::tr("Date"))
     {
         return thisIsEarlierDate(other);
     }
-    if(treeWidget()->headerItem()->text(sortCol) == "Punkte")
+    if(treeWidget()->headerItem()->text(sortCol) == QObject::tr("Points"))
     {
         int ownValue = this->text(sortCol).toInt();
         int otherValue = other.text(sortCol).toInt();

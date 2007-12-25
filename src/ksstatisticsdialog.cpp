@@ -39,7 +39,6 @@
 #include <QEvent>
 #include <QDate>
 
-
 ksStatisticsDialog::ksStatisticsDialog(QWidget *parent)
  : QDialog(parent)
 {
@@ -115,6 +114,10 @@ void ksStatisticsDialog::retranslateUi()
     {
         setWindowTitle(tr("Statistics"));
     }
+    
+    
+    btnIncreaseSelection->setText(tr("Next Exam >>"));
+    btnDecreaseSelection->setText(tr("<< Exam before"));
 }
 
 
@@ -125,12 +128,17 @@ void ksStatisticsDialog::allocateWidgets()
     statistics = new ksStatisticsWidget;
     information = new ksSubjectInformationWidget;
     lblSemesterSelection = new QLabel;
+    
+    btnIncreaseSelection = new QPushButton;
+    btnDecreaseSelection = new QPushButton;
 }
 
 
 void ksStatisticsDialog::createLayouts()
 {
     layoutBottom = new QHBoxLayout;
+    layoutBottom->addWidget(btnDecreaseSelection);
+    layoutBottom->addWidget(btnIncreaseSelection);
     layoutBottom->addStretch(1);
     layoutBottom->addWidget(btnClose);
     
@@ -150,11 +158,16 @@ void ksStatisticsDialog::connectSlots()
 {
     connect(btnClose, SIGNAL(clicked()), this, SLOT(reject()));
     connect(cmbSemesterSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(currentSemesterChanged(int)));
+    
+    connect(btnIncreaseSelection, SIGNAL(clicked()), this, SLOT(increaseSelection()));
+    connect(btnDecreaseSelection, SIGNAL(clicked()), this, SLOT(decreaseSelection()));
 }
 
 void ksStatisticsDialog::initWidgets()
 {
     lblSemesterSelection->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+    btnDecreaseSelection->setVisible(FALSE);
+    btnIncreaseSelection->setVisible(FALSE);
 }
 
 void ksStatisticsDialog::setSubject(xmlObject* newSubject)
@@ -217,7 +230,7 @@ void ksStatisticsDialog::refreshExamListFromXmlSubject()
     
     xmlObject* currentExam;
     
-    for (int i = 0; currentExam = subject->cGetObjectByIdentifier(i); i++)
+    for (int i = 0; (currentExam = subject->cGetObjectByIdentifier(i))  != NULL; i++)
     {
         //only use "real" exams
         if(ksPlattformSpec::szToUmlauts(currentExam->name()) != "exam")
@@ -256,6 +269,7 @@ void ksStatisticsDialog::refreshExamListFromXmlSubject()
         itemToAdd.setX(currentDate);
         itemToAdd.setY(currentPoints);
         itemToAdd.setCaption(currentCaption);
+        itemToAdd.setSourceItem(currentExam);
         
         // add itemToAdd to statistics widget
         statistics->addItem(itemToAdd);
@@ -263,6 +277,27 @@ void ksStatisticsDialog::refreshExamListFromXmlSubject()
     }
     
     statistics->update();
+}
+
+
+
+void ksStatisticsDialog::increaseSelection()
+{
+    statistics->setSelectedItem(statistics->selectedItemIndex()+1);
+}
+
+
+void ksStatisticsDialog::decreaseSelection()
+{
+    
+    statistics->setSelectedItem(statistics->selectedItemIndex()-1);
+}
+
+
+void ksStatisticsDialog::setSelectedExam(xmlObject* exam)
+{
+    int index = statistics->indexOfItem(exam);
+    statistics->setSelectedItem(index);
 }
 
 

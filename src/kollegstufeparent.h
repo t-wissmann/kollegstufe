@@ -40,6 +40,10 @@
 
 // own qobjects
 class ksDebugOutput;
+
+// own widgets
+class ksSubjectStatusbar;
+
 // own dialogs
 class ksExamProperties;
 class ksSubjectProperties;
@@ -91,6 +95,7 @@ class kollegstufeParent
 signals:
     //void languageChanged();
 public slots:
+    void showHelpDialog();
     void showAboutDialog();
     void showConfigureDialog();
     // Save/load
@@ -140,6 +145,7 @@ public:
     
     QString getFilename(){ return szFilename; };
     void reloadTranslator();
+    void resetWindowTitle();
 protected:
     virtual void closeEvent(QCloseEvent* event);
     virtual void changeEvent(QEvent* event);
@@ -154,6 +160,8 @@ private:
     void    connectSlots();
     void    initWidgets();
     
+    void    retranslateTooltips();
+    
     // parentWidgets
     QSplitter*      splitterParent;
     QVBoxLayout*    layoutParent;
@@ -161,12 +169,28 @@ private:
     QMenuBar*       mnbMenuBar;
     // menus
     QMenu*          mnmFile;
+    QMenu*          mnmEdit;
     QMenu*          mnmExtras;
+    QMenu*          mnmWindow;
+    QMenu*          mnmHelp;
     //actions
     // extras - menu
-    QAction*        mnaStatistics;
-    
     QAction*        mnaConfigureKs;
+    
+    // edit - menu
+    QMenu*          mnmEditSubject;
+    QAction*        mnaEditSubjectAdd;
+    QAction*        mnaEditSubjectDelete;
+    QAction*        mnaEditSubjectEdit;
+    QAction*        mnaEditSubjectMoveUp;
+    QAction*        mnaEditSubjectMoveDown;
+    QMenu*          mnmEditExam;
+    QAction*        mnaEditExamAdd;
+    QAction*        mnaEditExamEdit;
+    QAction*        mnaEditExamDelete;
+    
+    // help - menu
+    QAction*        mnaShowHelp;
     QAction*        mnaAboutKs;
     QAction*        mnaAboutQt;
     // file - menu
@@ -174,6 +198,9 @@ private:
     QAction*        mnaDatabaseProperties;
     QAction*        mnaSave;
     QAction*        mnaQuit;
+    //window - menu
+    QAction*        mnaStatistics;
+    
     
     
     // widgets for subject selection
@@ -190,6 +217,7 @@ private:
     // widgets for exam selection;
     QGridLayout*    layoutExamList;
     QGroupBox*      grpExamList;
+    ksSubjectStatusbar* wdgSubjectStatusbar;
     QTreeWidget*    lstExamList;
     QPushButton*    btnExamAdd;
     QPushButton*    btnExamDelete;
@@ -222,6 +250,9 @@ private:
     xmlObject*  currentCathegory;
     xmlObject*  currentSubject;
     xmlObject*  currentExam;
+    
+    
+    QString     currentWindowTitle;
     
     xmlObject   xmlConfig;
     

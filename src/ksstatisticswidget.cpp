@@ -39,6 +39,7 @@
 #include <QLinearGradient>
 #include <QTextOption>
 #include <QMessageBox>
+#include <stdio.h>
 
 ksStatisticsWidget::ksStatisticsWidget(QWidget *parent)
  : QFrame(parent)
@@ -54,6 +55,8 @@ ksStatisticsWidget::ksStatisticsWidget(QWidget *parent)
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(TRUE);
     bItemListSorted = FALSE;
+    nSelectedItemIndex = 0;
+    
 }
 
 ksStatisticsWidget::~ksStatisticsWidget()
@@ -85,6 +88,7 @@ void ksStatisticsWidget::paintEvent(QPaintEvent *event)
     drawGrid();
     drawGraph();
     drawItems();
+    //drawSelectionRectangle(10, 10, 160, 90);
     QFrame::paintEvent(event);
 }
 
@@ -127,50 +131,26 @@ void ksStatisticsWidget::drawYScaleLinesAndLabels(QPainter* painter)
         sign = -1;
     }
     
-    for (int i = nMinimumY; 1; i+= sign)
+    for (int i = nMinimumY; i != nMaximumY + sign; i+= sign)
     {
-        if(sign == 1)
-        {
-            if(i > nMaximumY)
-            {
-                break;
-            }
-        }
-        else
-        {
-            if(i < nMaximumY)
-            {
-                break;
-            }
-        }
-        
         int currentY = getScreenYForWorldY(i);
-        int yBefore = getScreenYForWorldY(i-1);
-        int yAfter = getScreenYForWorldY(i+1);
+        int yBefore = getScreenYForWorldY(i-sign);
+        int yAfter = getScreenYForWorldY(i+sign);
         //draw scale line
+        
+        /*printf("%d: currentY = %d\n", i, currentY);
+        printf("%d: yBefore = %d\n", i, yBefore);
+        printf("%d: yAfter = %d\n", i, yAfter);*/
         
         painter->drawLine( YAxisLeft - scaleLineLength, currentY, YAxisLeft + scaleLineLength, currentY);
         
         QString label = QString::number(i);
-        QRect labelSpace(QPoint(marginLeft, (currentY+yBefore)/2), QPoint(YAxisLeft-scaleLineLength, (currentY+yAfter)/2));
-        // if there is not enough space
-        
-        int labelHeight = labelSpace.height();
-        if( labelHeight < 0)
+        QRect labelSpace(marginLeft, yAfter, YAxisLeft - scaleLineLength - marginLeft, yBefore-yAfter);
+        // TODO if there is not enough space
+        if(yBefore-yAfter > 25 || i%2)
         {
-            labelHeight *= -1;
+            painter->drawText(labelSpace, Qt::AlignHCenter|Qt::AlignVCenter, label);
         }
-        if (labelHeight < 13)
-        {
-            //label = QString::number(labelSpace.height());
-            labelSpace.setHeight(labelSpace.height()*2);
-            labelSpace.setY(labelSpace.y() - (currentY-yBefore)/2);
-            if(i%2)
-            {
-                continue;
-            }
-        }
-        painter->drawText(labelSpace, Qt::AlignHCenter|Qt::AlignVCenter, label);
     }
 }
 
@@ -286,9 +266,9 @@ void ksStatisticsWidget::drawItems()
         int y1 = getScreenYForWorldY(itemList[i].y());
         int aboveOrBelow = 1; // 1 = below , -1 = above
         Qt::AlignmentFlag alignment = Qt::AlignHCenter;
-        drawCircleAt(x1, y1);
         
         // find optimal space for placing label
+        /*
         if (i == 0) // if is first item
         {
             if (itemList.size() > 1)
@@ -409,14 +389,20 @@ void ksStatisticsWidget::drawItems()
                 }
             }
         }
-        // place label
-        drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, itemList[i].caption(), alignment, aboveOrBelow == -1);
+        */
         
+        
+        // place circle and label
+        drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, itemList[i].caption(),
+                      alignment, aboveOrBelow == -1, i == nSelectedItemIndex);
+        
+        int circlealpha = 255;
+        drawCircleAt(x1, y1, circlealpha);
     }
     
     
 }
-void ksStatisticsWidget::drawCircleAt(int circleX, int circleY)
+void ksStatisticsWidget::drawCircleAt(int circleX, int circleY, int alpha)
 {
     QLinearGradient bgGradient( circleX, circleY-nPointDiameter/2, circleX, circleY+nPointDiameter/2);
     QColor  bgColorTop = palette().highlight().color();
@@ -424,8 +410,8 @@ void ksStatisticsWidget::drawCircleAt(int circleX, int circleY)
     int newValueTop = rangeValue(bgColorTop.value() < 3 ? 100 : bgColorTop.value(), 0, 255);
     int newValueBottom = rangeValue(bgColorTop.value()/2, 0, 255);
     
-    bgColorTop.setHsv( bgColorTop.hue(), bgColorTop.saturation(), newValueTop);
-    bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueBottom);
+    bgColorTop.setHsv( bgColorTop.hue(), bgColorTop.saturation(), newValueTop, alpha );
+    bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueBottom, alpha);
     bgGradient.setColorAt(0, bgColorTop);
     bgGradient.setColorAt(1, bgColorBottom);
     
@@ -450,7 +436,7 @@ int ksStatisticsWidget::rangeValue(int value, int minValue, int maxValue)
     return returnValue;
 }
 
-void ksStatisticsWidget::drawCaptionAt(int captionX, int captionY, QString caption, Qt::AlignmentFlag alignment, bool above)
+void ksStatisticsWidget::drawCaptionAt(int captionX, int captionY, QString caption, Qt::AlignmentFlag alignment, bool above, bool selected)
 {
     int captionLength = caption.length();
     int lineNumber = 1;
@@ -488,18 +474,24 @@ void ksStatisticsWidget::drawCaptionAt(int captionX, int captionY, QString capti
     int newValueTop = rangeValue(bgColorTop.value() < 3 ? 100 : bgColorTop.value(), 0, 255);
     int newValueBottom = rangeValue(bgColorTop.value()/2, 0, 255);
     
-    bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueBottom);
-    bgColorTop.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueTop);
+    bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueBottom, 255);
+    bgColorTop.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueTop, 255);
     bgGradient.setColorAt(0, bgColorTop);
     bgGradient.setColorAt(1, bgColorBottom);
+    
+    if(selected) // draw selection
+    {
+        drawSelectionRectangle(captionX-10, captionY-nPointDiameter-2-10, captionWidth+2*10, captionHeight+nPointDiameter+2+2*10);
+    }
     
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     
-    //draw background
+    //draw background if is not selected
     painter.setBrush(bgGradient);
     painter.setPen(Qt::NoPen);
     painter.drawRoundRect(captionX, captionY, captionWidth, captionHeight, 10, 60);
+    
     
     //draw text
     painter.setBrush(Qt::NoBrush);
@@ -507,6 +499,72 @@ void ksStatisticsWidget::drawCaptionAt(int captionX, int captionY, QString capti
     painter.setPen(palette().highlightedText().color());
     QRect captionSpace(captionX, captionY, captionWidth, captionHeight);
     painter.drawText(captionSpace, Qt::AlignHCenter|Qt::AlignVCenter, caption);
+    
+    painter.end();
+    
+    
+}
+
+void ksStatisticsWidget::drawSelectionRectangle(int nX, int nY, int nWidth, int nHeight)
+{
+    QLinearGradient bgGradient(QPointF(nX, nY), QPointF(nX, nY + nHeight));
+    QColor mainColor = palette().highlight().color();
+    mainColor.setAlpha(200);
+    QColor colortop = mainColor;
+    colortop.setHsv(mainColor.hue(), mainColor.saturation(), rangeValue(mainColor.value()+30, 0, 255));
+    QColor colorbottom = mainColor;
+    colorbottom.setHsv(mainColor.hue(), mainColor.saturation(), rangeValue(mainColor.value()-40, 0, 255));
+    bgGradient.setColorAt(0, colortop);
+    bgGradient.setColorAt(0.3, mainColor);
+    bgGradient.setColorAt(0.85, mainColor);
+    bgGradient.setColorAt(1, colorbottom);
+    QBrush bgBrush(bgGradient); // background brush
+    
+    // setting pen
+    QPen pen;
+    pen.setWidthF(0.5);
+    pen.setBrush(palette().text());
+    
+    // creating glaze
+    QPainterPath gloss;
+    gloss.moveTo(nX+1, nY+1);
+    gloss.lineTo(nX+1, nY+nHeight);
+    gloss.quadTo(QPointF(nX + 0.3 * nWidth, nY + 0.3 * nHeight), QPointF(nX + nWidth, nY + 4));
+    gloss.lineTo(nX+nWidth-2, nY+1);
+    
+    QRadialGradient glossGradient(nX+nWidth/2, nY+nHeight/2, nWidth/2, nX+nWidth, nY+nHeight );
+    glossGradient.setColorAt(1, QColor(255, 255, 255, 0));
+    glossGradient.setColorAt(0, QColor(255, 255, 255, 130));
+    glossGradient.setSpread(QGradient::PadSpread);
+    
+    // creating shadow of gloss
+    QPainterPath glossshadow;
+    glossshadow.moveTo(nX+1, nY+nHeight);
+    glossshadow.quadTo(QPointF(nX + 0.3 * nWidth, nY + 0.3 * nHeight), QPointF(nX + nWidth, nY + 4));
+    glossshadow.lineTo(nX-1+nWidth, nY+nHeight);
+    glossshadow.lineTo(nX+3, nY+nHeight);
+    
+    QRadialGradient glossshadowGradient(nX+nWidth/2, nY+nHeight/2, nWidth/2, nX, nY );
+    glossshadowGradient.setColorAt(1, QColor(0, 0, 0, 0));
+    glossshadowGradient.setColorAt(0, QColor(0, 0, 0, 130));
+    glossshadowGradient.setSpread(QGradient::PadSpread);
+    
+    
+    //painting all to widget
+    QPainter painter(this);
+    painter.setPen(pen);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setBrush(bgBrush);
+    painter.drawRoundRect(nX, nY, nWidth, nHeight, 8, 13);
+    
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(glossshadowGradient);
+    painter.drawPath(glossshadow);
+    
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(glossGradient);
+    painter.drawPath(gloss);
+    
     
 }
 
@@ -536,6 +594,19 @@ void ksStatisticsWidget::setMinMaxY(int newMinimumY, int newMaximumY)
 {
     nMinimumY = newMinimumY;
     nMaximumY = newMaximumY;
+    
+    int newMinimumHeight;
+    newMinimumHeight = nMinimumY - nMaximumY;
+    if(newMinimumHeight  < 0)
+    {// make newMinimumHeight positive
+        newMinimumHeight *= -1;
+    }
+    newMinimumHeight++; // add one scale line space: n scale lines -> n+1 scale line spaces (on top and on bottom)
+    newMinimumHeight *= 10; // adjust height of one scale line
+    newMinimumHeight += marginTop;
+    newMinimumHeight += marginBottom;
+    
+    setMinimumHeight(newMinimumHeight);
 }
 
 int ksStatisticsWidget::pointDiameter() const
@@ -558,7 +629,38 @@ void ksStatisticsWidget::addItem(ksStatisticsItem newItem)
 {
     itemList.append(newItem);
     bItemListSorted = FALSE;
-    setMinimumWidth(marginLeft + marginRight + (itemList.count()+1) * 45);
+    setMinimumWidth(marginLeft + 10 + marginRight + (itemList.count()+1) * 45);
+}
+
+void ksStatisticsWidget::setSelectedItem(int index)
+{
+    nSelectedItemIndex = index;
+    if(nSelectedItemIndex >= itemListSize())
+    {
+        nSelectedItemIndex = -1;
+    }
+    if(nSelectedItemIndex < -1)
+    {
+        nSelectedItemIndex = itemListSize()-1;
+    }
+    update();
+}
+
+
+int ksStatisticsWidget::indexOfItem(xmlObject* item)
+{
+    if(item == NULL)
+    {
+        return -1;
+    }
+    for(int i = 0; i < itemList.size(); i++)
+    {
+        if(itemList[i].sourceItem() == item)
+        {
+            return i;
+        }
+    }
+    return -1;
 }
 
 

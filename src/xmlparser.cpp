@@ -22,6 +22,7 @@
 
 
 #include "xmlparser.h"
+#include "xmlloader.h"
 
 int nLayer; //nLayer shows the depth of the current object
 
@@ -73,6 +74,7 @@ void    xmlAttribute::SetValue(char* szNewValue)
 
 xmlObject::xmlObject()
 {
+    setName("");
     nAttributeCounter = 0;
     nObjectCounter = 0;
     nContentLength = 0;
@@ -196,7 +198,7 @@ xmlAttribute*   xmlObject::cGetAttributeByIdentifier (int nIdentifier)
 {
     if (nIdentifier >= nAttributeCounter || nIdentifier < 0 )
         return NULL;
-    return &cAttributeList[nIdentifier];
+    return &(cAttributeList[nIdentifier]);
 }
 
 long            xmlObject::nSetAttributeByIdentifier (int nIdentifier, char* szAttributeName, char* szAttributeValue)
@@ -221,7 +223,7 @@ long            xmlObject::nAddAttribute (char* szAttributeName, char* szAttribu
     strcpy(cAttributeList[nNewAttributeId].szValue, szAttributeValue);
     
     
-    return 0;
+    return nNewAttributeId;
 }
 int             xmlObject::nDeleteAttribute(int nIdentifier)
 {
@@ -520,7 +522,7 @@ int xmlObject::nGetObjectCounter()
 
 
 /* END OF OBJECT FUNCTIONS */
-
+  
 /* START OF CONTENT FUNCTIONS */
 char*          xmlObject::szGetContent ()
 {
@@ -531,17 +533,68 @@ char*          xmlObject::szGetContent ()
 
 long           xmlObject::nSetContent ( char* szNewContent )
 {
+    if(szNewContent == NULL)
+    {
+        return 0;
+    }
     if (nContentLength != (strlen(szNewContent) + 1))
     {
-        nContentLength = (strlen(szNewContent) + 1);
         if(nContentLength)
             free(szContent);
+        nContentLength = (strlen(szNewContent) + 1);
         szContent = (char*) malloc(nContentLength * sizeof(char));
         if (szContent == NULL)
+        {
+            nContentLength = 0;
             return ErrorNoMemory;
+        }
     }
     strcpy(szContent, szNewContent);
     return 0;
+}
+
+void           xmlObject::appendToContent(char* szStringToAppend, bool createSpaceBetween)
+{
+    if(szStringToAppend == NULL || szStringToAppend[0] == '\0')
+    {// then there is nothing to do
+        return;
+    }
+    if(nContentLength < 1)
+    {
+        createSpaceBetween = 0;
+    }
+    char* oldContent = szContent; // backup old content
+    nContentLength += strlen(szStringToAppend); // increase content length
+                                                // strlen()+1 isn't needed here, because '\0' is already contained in nContentLength
+    if(createSpaceBetween) // //if old contend is empty, then there is no need for a space
+    {
+        nContentLength++; // one byte for " " between old and new content
+    }
+    szContent = (char*) malloc(nContentLength * sizeof(char));
+    if (szContent == NULL)
+    {
+        nContentLength = 0;
+        return;
+    }
+    szContent[0] = '\0';
+    //append old content:
+    if(oldContent != NULL)
+    {
+        strcat(szContent, oldContent);
+    }
+    if(createSpaceBetween) // create space if wanted
+    {
+        strcat(szContent, " "); // one byte for " " between old and new content
+    }
+    strncat(szContent, szStringToAppend, strlen(szStringToAppend)+1); // append new string
+    
+    // if oldContent exists, delete it
+    if(oldContent != NULL)
+    {
+        free(oldContent);
+    }
+    
+    
 }
 /* END OF CONTENT FUNCTIONS */
         
@@ -694,7 +747,17 @@ int SeekToChar (char* szBuf, unsigned long nBufLength, unsigned long* nBufPositi
     return 0;
 }
 
-int ReadFileToClass (char* szFilename, xmlObject* TargetObject)
+int ReadFileToClass(char* szFilename, xmlObject* TargetObject)
+{
+    xmlLoader loader;
+    if(!loader.loadFileToClass(szFilename, TargetObject))
+    {
+        return 1;
+    }
+    return 0;
+}
+
+int ReadFileToClassOLD (char* szFilename, xmlObject* TargetObject)
 {
     FILE*   pXmlFile;
     unsigned long    nFileLength;
@@ -744,6 +807,9 @@ int ReadFileToClass (char* szFilename, xmlObject* TargetObject)
     free(szFileBuf);
     return 0;
 }
+
+
+
 
 /* END OF INPUT FUNCTIONS */
 /* START OF OUTPUT FUNCTIONS */

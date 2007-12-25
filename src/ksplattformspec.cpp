@@ -37,7 +37,7 @@
 
 QString ksPlattformSpec::versionAsString()
 {
-    return "1.0 Beta 1";
+    return "1.0 Beta 2 Dev20071201";
 }
 
 bool ksPlattformSpec::createKsDir()
@@ -74,9 +74,9 @@ QString ksPlattformSpec::getKsDir()
         pathToReturn += slash;
     }
 #ifdef Q_WS_WIN
-    pathToReturn += slash + "kollegstufe";
+    pathToReturn += "kollegstufe";
 #else
-    pathToReturn += slash + ".kollegstufe";
+    pathToReturn += ".kollegstufe";
 #endif
     pathToReturn += slash;
     return pathToReturn;
@@ -168,7 +168,46 @@ QStringList ksPlattformSpec::getAvailibleLanguages()
     return list;
 }
 
+// database tamplates
+void  ksPlattformSpec::catchKsDatabaseTemplates(QString language)
+{
+    QDir templateDir(QApplication::applicationDirPath());
+    templateDir.cdUp();
+    templateDir.cd("templates");
+    ksPlattformSpec::addDatabaseTemplates(ksPlattformSpec::getKsDir(), templateDir.path(), language);
+    
+    // Ensure that there is at least the english example archiv
+    QStringList files;
+    catchFileList(&files);
+    if(files.count() < 1)
+    {
+        ksPlattformSpec::addDatabaseTemplates(ksPlattformSpec::getKsDir(), templateDir.path(), "english");
+    }
+}
 
+void  ksPlattformSpec::addDatabaseTemplates(QString targetdir, QString sourcedir, QString language)
+{
+    if(!createKsDir())
+    {
+        return;
+    }
+    if(!targetdir.endsWith(QDir::separator()))
+    {
+        targetdir += QDir::separator();
+    }
+    if(!sourcedir.endsWith(QDir::separator()))
+    {
+        sourcedir += QDir::separator();
+    }
+    QDir srcdir(sourcedir);
+    QStringList filenames = srcdir.entryList(QStringList(language + "*.xml"));
+    for(int i = 0; i < filenames.count(); i++)
+    {
+        QFile file(sourcedir + filenames[i]);
+        file.copy(targetdir + filenames[i]);
+    }
+    
+}
 
 void ksPlattformSpec::catchFileList(QStringList* targetList)
 {
@@ -191,6 +230,7 @@ void ksPlattformSpec::catchFileList(QStringList* targetList)
             i--;
             continue;
         }
+        
         (*targetList)[i] = ksPath + (*targetList)[i];
     }
     
@@ -261,52 +301,111 @@ bool ksPlattformSpec::deleteFile(QString fileToDelete)
 
 QString  ksPlattformSpec::getArticleForNoun(QString noun, kasus kasusOfNoun)
 {
-    QString article = "der/die/das";
+    QString article = tr("der/die/das");
     switch(kasusOfNoun)
     {
         case kasusNominativ:
-            article = "der/die/das";
+            article = tr("der/die/das");
             break;
         case kasusGenitiv:
-            article = "des/der/des";
+            article = tr("des/der/des");
             break;
         case kasusDativ:
-            article = "dem/die/dem";
+            article = tr("dem/die/dem");
             break;
         case kasusAkkusativ:
-            article = "der/die/das";
+            article = tr("der/die/das");
             if(noun == "Schulaufgabe")
-                article = "die ";
+                article = tr("die ");
             if(noun == "Stegreifaufgabe")
-                article = "die ";
+                article = tr("die ");
             if(noun == "Ex")
-                article = "die ";
+                article = tr("die ");
             if(noun == "Mitarbeit")
-                article = "die ";
+                article = tr("die ");
             if(noun == "Referat")
-                article = "das ";
+                article = tr("das ");
             if(noun == "Abfrage")
-                article = "die ";
+                article = tr("die ");
             if(noun == "Arbeit")
-                article = "die ";
+                article = tr("die ");
             if(noun == "Unterrichtsbeitrag")
-                article = "den ";
+                article = tr("den ");
             if(noun == "Abfrage")
-                article = "die ";
+                article = tr("die ");
             if(noun == "Facharbeit")
-                article = "die ";
+                article = tr("die ");
             if(noun == "Kurzarbeit")
-                article = "die ";
+                article = tr("die ");
             if(noun == "Jahrgangsstufentest")
-                article = "den ";
+                article = tr("den ");
             if(noun == "Arbeit")
-                article = "die ";
+                article = tr("die ");
             break;
     }
     return article;
 }
 
-// average computing functions
+
+    // icon catcher
+QIcon ksPlattformSpec::getIcon(QString name, QString extension)
+{
+    return QIcon(getIconPixmap(name, extension));
+}
+
+
+QPixmap ksPlattformSpec::getIconPixmap(QString name, QString extension)
+{
+    return getIconPixmapFromApplicationTheme(name, extension);
+}
+
+QPixmap ksPlattformSpec::getIconPixmapFromApplicationTheme(QString name, QString extension)
+{
+    QDir iconDir(QApplication::applicationDirPath());
+    iconDir.cdUp();
+    iconDir.cd("pic");
+    
+    return QPixmap(iconDir.filePath(name + "." + extension));
+}
+
+// average computing functions // return -1 if average is invalid
+
+double ksPlattformSpec::computeEntireAverageOfSubject(xmlObject* subject, QString semester, xmlObject* pSemesterList)
+{
+    if(!subject)
+    {
+        return -1;
+    }
+    addMissingSubjectAttributes(subject);
+    double averageOral = computeAverageOfSubject(subject, "oral", semester, pSemesterList);
+    double averageWritten = computeAverageOfSubject(subject, "written", semester, pSemesterList);
+    
+    int weightingOral = subject->cGetAttributeByName("weightingOral")->nValueToInt();
+    int weightingWritten = subject->cGetAttributeByName("weightingWritten")->nValueToInt();
+    
+    return computeEntireAverageFromPartAverages(averageOral, averageWritten, weightingOral, weightingWritten);
+}
+
+double ksPlattformSpec::computeEntireAverageFromPartAverages(double averageOral, double averageWritten,
+                                                                            int weightingOral, int weightingWritten)
+{
+    if(weightingOral + weightingWritten == 0)
+    {
+        return -1;
+    }
+    if(averageOral == -1.0)
+    {
+        return averageWritten;
+    }
+    if(averageWritten == -1.0)
+    {
+        return averageOral;
+    }
+    double average = averageOral * weightingOral;
+    average += averageWritten * weightingWritten;
+    average /=  weightingWritten + weightingOral;
+    return average;
+}
 
 double ksPlattformSpec::computeAverageOfSubject(xmlObject* subject, QString weightingType)
 {
@@ -458,7 +557,7 @@ void    ksPlattformSpec::addMissingSubjectAttributes(xmlObject*  SubjectToComple
     }
     if(! SubjectToComplete->cGetAttributeByName("name"))
     {
-        SubjectToComplete->nAddAttribute("name", "neues Fach");
+        SubjectToComplete->nAddAttribute("name", qstringToSz(tr("new Subject")));
     }
     if(! SubjectToComplete->cGetAttributeByName("teacher"))
     {
@@ -497,7 +596,7 @@ void    ksPlattformSpec::addMissingExamAttributes(xmlObject*  ExamToComplete)
         newObject->nAddAttribute("name", "type");
     }
     if(!ExamToComplete->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value"))
-        ExamToComplete->cGetObjectByAttributeValue("name", "type")->nAddAttribute("value", "Arbeit");
+        ExamToComplete->cGetObjectByAttributeValue("name", "type")->nAddAttribute("value", qstringToSz(tr("Exam")));
     
     if(!ExamToComplete->cGetObjectByAttributeValue("name", "points"))
     {

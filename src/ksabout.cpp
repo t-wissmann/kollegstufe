@@ -153,10 +153,7 @@ void ksAbout::initGui()
         szApplicationPath += QDir::separator();
     }
     
-    QDir iconDir(szApplicationPath);
-    iconDir.cdUp();
-    iconDir.cd("pic");
-    lblIcon->setPixmap(QPixmap(iconDir.filePath("kollegstufe.png")));
+    lblIcon->setPixmap(ksPlattformSpec::getIconPixmap("kollegstufe"));
     
     
     resize(400, 250);

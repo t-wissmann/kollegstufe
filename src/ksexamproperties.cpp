@@ -99,11 +99,10 @@ void ksExamProperties::retranslateUi()
     optWeightingOral->setText(tr("oral"));
     grpSemester->setTitle(tr("Semester:"));
     optSemesterAuto->setText(tr("Automatische Zuordnung"));
-    
+    spinNumber->setSpecialValueText(tr("no number"));
+    resetWindowTitle();
     
 }
-
-
 void ksExamProperties::allocateWidgets()
 {
     // bottom buttons
@@ -185,8 +184,42 @@ void ksExamProperties::initWidgets()
 {
     spinNumber->setMinimum(0);
     spinNumber->setMaximum(999);
-    spinNumber->setSpecialValueText(tr("no number"));
     btnOk->setDefault(TRUE);
+}
+
+void ksExamProperties::resetWindowTitle()
+{
+    if (!examToEdit)
+    {
+        return;
+    }
+    
+    ksPlattformSpec::addMissingExamAttributes(examToEdit);
+    
+    cDateConverter dateFile;
+    dateFile.setDateString(examToEdit->cGetObjectByAttributeValue("name", "date")->
+            cGetAttributeByName("value")->value());
+    
+    
+    QString newTitle;
+    
+    newTitle += tr("Editing");
+    if(!newTitle.isEmpty())
+    {
+        newTitle += " ";
+    }
+    if(spinNumber->value() > 0)
+    {
+        newTitle += QString::number(spinNumber->value());
+        newTitle += ". ";
+    }
+    newTitle += txtType->text();
+    newTitle += " " + tr("from") + " ";
+    newTitle += dateFile.humanDate();
+    QString suffix = tr(" ");
+    newTitle += suffix.isEmpty() ? "" : " "; // if suffix isn't empy, then add some space
+    newTitle += suffix; 
+    setWindowTitle(newTitle);
 }
 
 void ksExamProperties::setProperties(xmlObject* newProperties)
@@ -267,17 +300,7 @@ void ksExamProperties::setExamToEdit(xmlObject* newExamToEdit)
         optWeightingOral->setChecked(TRUE);
     
     // set window title
-    QString newTitle;
-    if(spinNumber->value() > 0)
-    {
-        newTitle += QString::number(spinNumber->value());
-        newTitle += ". ";
-    }
-    newTitle += txtType->text();
-    newTitle += " vom ";
-    newTitle += dateFile.humanDate();
-    newTitle += " bearbeiten";
-    setWindowTitle(newTitle);
+    resetWindowTitle();
 }
 
 

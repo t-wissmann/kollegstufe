@@ -18,60 +18,52 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef XMLLOADER_H
+#define XMLLOADER_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+class xmlObject;
 
-#include <QString>
-#include "xmlloader.h"
-#include "xmlparser.h"
-#include <string.h>
-
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
-{
-    //return runStdKs(argc, argv);
-    return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
+class xmlLoader{
+public:
+    xmlLoader();
+    ~xmlLoader();
     
-    xmlObject myObject;
-    xmlLoader loader;
-    if(!loader.loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", &myObject))
-    {
-        printf("Error during parsing at position %d\n", loader.parsingPosition());
-    }
-    PutObjectToScreen(&myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    return 0;
-}
-
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
+    bool loadFileToClass(char* path, xmlObject* targetClass);
+    bool loadFileToBuf(char* path);
     
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+    char* buf() { return m_szBuf; };
+    unsigned int bufSize() const { return m_nBufSize; };
+    
+    unsigned int parsingPosition() const { return m_nParsingPosition; };
+    
+    
+    
+private: 
+    bool parseBufToObject(xmlObject* target);
+    bool parseNextTag(xmlObject* target);
+    bool parseTagName(xmlObject* target);
+    bool parseAttributes(xmlObject* target);
+    bool parseNextAttribute(xmlObject* target);
+    bool parseContent(xmlObject* target);
+    
+    //member about parsing buf
+    bool goToNextRelevantPosition();
+    bool seekInBufTo(char  character,   bool equalOrUnequal = 1); // TRUE search for string equal,, FALSE : search for string unequal string
+    bool seekInBufTo(char c1, char c2, char c3, char c4 = '\0',
+                     char c5 = '\0', char c6 = '\0', char c7 = '\0', char c8 = '\0', char c9 = '\0');
+    bool seekInBufTo(char* string);
+    
+    //memberfunctions about buf
+    bool resizeBuf(unsigned int newBufSize);
+    
+    // members
+    unsigned int m_nParsingPosition;
+    char*        m_szBuf;
+    unsigned int m_nBufSize;
 
+};
 
-
-
-
-
-
-
-
-
+#endif

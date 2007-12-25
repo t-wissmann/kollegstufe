@@ -25,7 +25,7 @@
 
 #include "ksstatisticsitem.h"
 #include <QList>
-
+#include <QPainter>
 class QMouseEvent;
 class QPaintEvent;
 
@@ -42,6 +42,7 @@ public:
     
     void clearItemList();
     void addItem(ksStatisticsItem newItem);
+    int indexOfItem(xmlObject* item);
     
     int minimumY() const;
     int maximumY() const;
@@ -58,6 +59,9 @@ public:
     
     static int rangeValue(int value, int minValue, int maxValue);
     
+    int selectedItemIndex() const { return nSelectedItemIndex; };
+    void setSelectedItem(int index);
+    
 protected: // events
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -68,9 +72,10 @@ protected: // events
     void drawGrid();
     void drawGraph();
     void drawItems();
-    void drawCircleAt(int circleX, int circleY);
-    void drawCaptionAt(int captionX, int captionY, QString caption, Qt::AlignmentFlag alignment = Qt::AlignHCenter, bool above = FALSE);
+    void drawCircleAt(int circleX, int circleY, int alpha = 255);
+    void drawCaptionAt(int captionX, int captionY, QString caption, Qt::AlignmentFlag alignment = Qt::AlignHCenter, bool above = FALSE, bool selected = FALSE);
     void updateGridAndGraphProperties();
+    void drawSelectionRectangle(int nX, int nY, int nWidth, int nHeight);
     
     int  getScreenYForWorldY(int item) const;
     
@@ -86,6 +91,7 @@ private:
     QDate nXMaximum;
     int nMinimumY;
     int nMaximumY;
+    int nSelectedItemIndex;
     
 // grid and graph properities
     

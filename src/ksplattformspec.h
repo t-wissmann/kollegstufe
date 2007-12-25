@@ -23,12 +23,16 @@
 
 #include <QString>
 #include <QObject>
+#include <QIcon>
+#include <QPixmap>
+
 /**
 	@author Thorsten Wissmann <towi89@web.de>
 */
 class xmlObject;
 class QStringList;
 class QTranslator;
+
 
 class ksPlattformSpec : public QObject {
             
@@ -48,10 +52,20 @@ public:
     static bool  setLanguage(QString language, QTranslator* translator);
     static QString getLanguageString();
     static QStringList getAvailibleLanguages();
+    // database tamplates
+    static void  catchKsDatabaseTemplates(QString language);
+    static void  addDatabaseTemplates(QString targetdir, QString sourcedir, QString language);
     
-    // average computing functions
+    // average computing functions // return -1 if average is invalid
+    static double computeEntireAverageOfSubject(xmlObject* subject, QString semester, xmlObject* pSemesterList);
+    static double computeEntireAverageFromPartAverages(double averageOral, double averageWritten, int weightingOral, int weightingWritten);
     static double computeAverageOfSubject(xmlObject* subject, QString weightingType);
     static double computeAverageOfSubject(xmlObject* subject, QString weightingType, QString semester, xmlObject* pSemesterList);
+    
+    // icon catcher
+    static QIcon  getIcon(QString name, QString extension = "png");
+    static QPixmap  getIconPixmap(QString name, QString extension = "png");
+    static QPixmap  getIconPixmapFromApplicationTheme(QString name, QString extension = "png");
     
     // xmlObject - Functions
     static void   addMissingCathegoryAttributes(xmlObject*  CathegoryToComplete);

@@ -23,6 +23,7 @@
 ksStatisticsItem::ksStatisticsItem()
 {
     nY = 0;
+    pSourceItem = NULL;
 }
 
 ksStatisticsItem::ksStatisticsItem(const ksStatisticsItem &other)
@@ -33,14 +34,16 @@ ksStatisticsItem::ksStatisticsItem(const ksStatisticsItem &other)
 
     setY ( other.y() );
     setInformation ( other.information() );
+    setSourceItem(other.sourceItem());
 }
 
 ksStatisticsItem::ksStatisticsItem ( QString newCaption, QDate newX, int newY, QString newInformation )
 {
-	szCaption = newCaption;
-	dateX = newX;
-	nY = newY;
-	szInformation = newInformation;
+    pSourceItem = NULL;
+    szCaption = newCaption;
+    dateX = newX;
+    nY = newY;
+    szInformation = newInformation;
 }
 
 
@@ -54,6 +57,7 @@ void ksStatisticsItem::operator= (const ksStatisticsItem& newItem )
     setX ( newItem.x() );
     setY ( newItem.y() );
     setInformation ( newItem.information() );
+    setSourceItem(newItem.sourceItem());
 }
 
 

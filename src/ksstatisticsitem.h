@@ -24,6 +24,8 @@
 #include <QString>
 #include <QDate>
 
+class xmlObject;
+
 /**
 	@author Thorsten Wissmann <towi89@web.de>
 */
@@ -56,6 +58,9 @@ public:
     QString information() const { return szInformation; };
     void setInformation(QString newInformation){ szInformation = newInformation; };
     
+    xmlObject* sourceItem() const { return pSourceItem; };
+    void setSourceItem(xmlObject* newSourceItem) { pSourceItem = newSourceItem; };
+    
     
 private:
     QString  szCaption;
@@ -63,7 +68,7 @@ private:
     int      nY;
     
     QString  szInformation;
-
+    xmlObject* pSourceItem;
 };
 
 

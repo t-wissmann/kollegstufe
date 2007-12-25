@@ -4,11 +4,6 @@ thank you for downloading kollegstufe.
 
 Do the following steps in your kollegstufe directory (not the src directory!) :
 
-make clean
-make
-
-if this doesn't work, try:
-
 qmake-qt4 kollegstufe.pro
 make
 

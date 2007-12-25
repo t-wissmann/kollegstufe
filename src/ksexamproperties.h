@@ -57,6 +57,7 @@ public slots:
     void writeWidgetAttributesToExam();
 protected:
     virtual void changeEvent(QEvent* event);
+    void    resetWindowTitle();
 private:
     
     void    initMembers();

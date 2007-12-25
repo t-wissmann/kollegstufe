@@ -30,6 +30,10 @@
 
 class xmlAttribute
 {
+    xmlAttribute(){
+        SetName("");
+        SetValue("");
+    };
     public:
         char    szName[80];
         char    szValue[80];
@@ -85,6 +89,7 @@ class xmlObject
         int             nGetIdentifierOf(xmlObject* objectToFind) const;
         //about content
         char*          szGetContent ( void );
+        void            appendToContent(char* szStringToAppend, bool createSpaceBetween = 1);
         long            nSetContent ( char* szNewContent );
         long            nGetContentLength(){return nContentLength;};
         //about name
@@ -105,6 +110,8 @@ class xmlObject
 };
 
 
+
+int ReadFileToClassOLD (char* szFilename, xmlObject* TargetObject);
 int ReadFileToClass (char* szFilename, xmlObject* TargetObject);
 int ReadObjectFromBuf (xmlObject* TargetObject, char* szBuf, unsigned long nBufLength, unsigned long* nBufPosition);
 int WriteObjectToBuf (xmlObject* TargetObject, char** szBuf, unsigned  long* nBufLength);

@@ -16,7 +16,9 @@ SOURCES += main.cpp \
  ksstatisticsitem.cpp \
  ksconfigure.cpp \
  kscathegoryeditorwidget.cpp \
- kssubjectinformationwidget.cpp
+ kssubjectinformationwidget.cpp \
+ kssubjectstatusbar.cpp \
+ xmlloader.cpp
 TEMPLATE = app
 CONFIG += warn_on \
 	  thread \
@@ -41,4 +43,10 @@ ksdebugoutput.h \
  ksstatisticsitem.h \
  ksconfigure.h \
  kscathegoryeditorwidget.h \
- kssubjectinformationwidget.h
+ kssubjectinformationwidget.h \
+ kssubjectstatusbar.h \
+ xmlloader.h
+DISTFILES += ../doc/help.htm
+
+TRANSLATIONS += ../translations/german.ts \
+../translations/english.ts

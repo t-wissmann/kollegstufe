@@ -45,7 +45,7 @@ class ksStatisticsDialog : public QDialog
 {
 Q_OBJECT
 public:
-    ksStatisticsDialog(QWidget *parent = 0);
+    ksStatisticsDialog(QWidget* parent = 0);
 
     ~ksStatisticsDialog();
     
@@ -53,10 +53,15 @@ public:
     void setProperties(xmlObject* newProperties);
     
     void retranslateUi();
+    void setSelectedExam(xmlObject* exam);
+    
 public slots:
     void refreshUiAndChildren();
     void refreshExamListFromXmlSubject();
     void currentSemesterChanged(int newSelection);
+    
+    void increaseSelection();
+    void decreaseSelection();
     
 protected:
     virtual void changeEvent(QEvent* event);
@@ -73,6 +78,9 @@ private:
     QPushButton*        btnClose;
     QComboBox*          cmbSemesterSelection;
     QLabel*             lblSemesterSelection;
+    
+    QPushButton*        btnIncreaseSelection;
+    QPushButton*        btnDecreaseSelection;
     
     //layouts
     QGridLayout*        layoutParent;

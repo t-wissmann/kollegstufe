@@ -1,0 +1,75 @@
+<archiv>
+ <properties>
+  <author>Examplearchiv</author>
+  <rating best="1" worst="6"></rating>
+  <time>
+   <semester name="12/1" start="20070903" end="20080229"></semester>
+   <semester name="12/2" start="20080301" end="20080731"></semester>
+   <semester name="13/1" start="20080801" end="20090228"></semester>
+   <semester name="13/2" start="20090301" end="20090731"></semester>
+  </time>
+ </properties>
+ <data>
+  <cathegory name="Major Subjects">
+   <subject name="English" teacher="" weightingOral="1" weightingWritten="2">
+    <exam id="0">
+     <attribute name="type" value="Exam"></attribute>
+     <attribute name="points" value="4"></attribute>
+     <attribute name="number" value="0"></attribute>
+     <attribute name="date" value="20071103"></attribute>
+     <attribute name="semester" value="auto"></attribute>
+     <attribute name="weighting" value="oral"></attribute>
+    </exam>
+   </subject>
+  </cathegory>
+  <cathegory name="Minor Subjects">
+   <subject name="Mathematics" teacher="" weightingOral="1" weightingWritten="2">
+    <exam id="0">
+     <attribute name="type" value="Presentation"></attribute>
+     <attribute name="points" value="6"></attribute>
+     <attribute name="number" value="0"></attribute>
+     <attribute name="date" value="20070928"></attribute>
+     <attribute name="semester" value="auto"></attribute>
+     <attribute name="weighting" value="oral"></attribute>
+    </exam>
+    <exam id="1">
+     <attribute name="type" value="G.C.S.E."></attribute>
+     <attribute name="points" value="1"></attribute>
+     <attribute name="number" value="0"></attribute>
+     <attribute name="date" value="20071103"></attribute>
+     <attribute name="semester" value="auto"></attribute>
+     <attribute name="weighting" value="oral"></attribute>
+    </exam>
+    <exam id="2">
+     <attribute name="type" value="Major  Exam"></attribute>
+     <attribute name="points" value="5"></attribute>
+     <attribute name="number" value="1"></attribute>
+     <attribute name="date" value="20071006"></attribute>
+     <attribute name="semester" value="auto"></attribute>
+     <attribute name="weighting" value="written"></attribute>
+    </exam>
+    <exam id="3">
+     <attribute name="type" value="Major  Exam"></attribute>
+     <attribute name="points" value="6"></attribute>
+     <attribute name="number" value="2"></attribute>
+     <attribute name="date" value="20060104"></attribute>
+     <attribute name="semester" value="auto"></attribute>
+     <attribute name="weighting" value="oral"></attribute>
+    </exam>
+    <exam id="4">
+     <attribute name="type" value="Project"></attribute>
+     <attribute name="points" value="3"></attribute>
+     <attribute name="number" value="0"></attribute>
+     <attribute name="date" value="20080418"></attribute>
+     <attribute name="semester" value="auto"></attribute>
+     <attribute name="weighting" value="oral"></attribute>
+    </exam>
+   </subject>
+   <subject name="Religion" teacher="" weightingOral="1" weightingWritten="2"></subject>
+   <subject name="Physik" teacher="" weightingOral="1" weightingWritten="2"></subject>
+   <subject name="Chemie" teacher="" weightingOral="1" weightingWritten="2"></subject>
+   <subject name="Musik" teacher="" weightingOral="1" weightingWritten="2"></subject>
+   <subject name="Sport" teacher="" weightingOral="1" weightingWritten="2"></subject>
+  </cathegory>
+ </data>
+</archiv>

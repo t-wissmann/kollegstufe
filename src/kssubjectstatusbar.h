@@ -18,60 +18,77 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef KSSUBJECTSTATUSBAR_H
+#define KSSUBJECTSTATUSBAR_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+#include <QWidget>
 
-#include <QString>
-#include "xmlloader.h"
-#include "xmlparser.h"
-#include <string.h>
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
+//widgets
+class QPushButton;
+class QLabel;
 
-int main(int argc, char *argv[])
+//layouts
+class QHBoxLayout;
+// classes
+class QEvent;
+class xmlObject;
+
+
+class ksSubjectStatusbar : public QWidget
 {
-    //return runStdKs(argc, argv);
-    return testNewXmlLoader();
-}
+Q_OBJECT
+signals:
+    void statisticsButtonToggled(bool pressed);
+public:
+    ksSubjectStatusbar(QWidget *parent = 0);
 
-int testNewXmlLoader()
-{
+    ~ksSubjectStatusbar();
+    //getter and setter functions
+    void setAlignment(Qt::Alignment nNewAlignment); // alignment is only horizontal
+    Qt::Alignment alignment();
     
-    xmlObject myObject;
-    xmlLoader loader;
-    if(!loader.loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", &myObject))
-    {
-        printf("Error during parsing at position %d\n", loader.parsingPosition());
-    }
-    PutObjectToScreen(&myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    return 0;
-}
-
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
+    void setSubject(xmlObject* newSubject);
+    xmlObject* subject();
     
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+    void calculateAverage();
+    void setEntireAverageTitle(double average);
+    
+public slots:
+    void retranslateUi();
+    void toggleStatisticsButton(bool pressed);
+private slots:
+    void btnStatisticsToggled(bool pressed){ emit statisticsButtonToggled(pressed); };
+protected:
+    virtual void changeEvent(QEvent* event);
+    
+protected:
+    // init - functions
+    void resetLayout();
+private:
+    void initMembers();
+    void allocateWidgets();
+    void initWidgets();
+    void createLayouts();
+    void connectSlots();
+    
+    
+    // widgets
+    QPushButton*    btnStatistics;
 
+    
+    // layouts
+    QHBoxLayout*    layoutParent;
+    
+    
+    
+    // member
+    Qt::Alignment m_nAlignment;
+    xmlObject*    m_cSubjectToShow;
+    
+};
 
-
-
-
-
-
-
-
-
+#endif
