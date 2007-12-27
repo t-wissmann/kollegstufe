@@ -49,6 +49,7 @@ private:
     bool parseNextAttribute(xmlObject* target);
     bool parseContent(xmlObject* target);
     
+    
     //member about parsing buf
     bool goToNextRelevantPosition();
     bool seekInBufTo(char  character,   bool equalOrUnequal = 1); // TRUE search for string equal,, FALSE : search for string unequal string

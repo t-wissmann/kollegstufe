@@ -25,8 +25,6 @@
 #include "string.h"
 
 
-#include <QApplication>
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -192,10 +190,7 @@ bool xmlLoader::parseNextTag(xmlObject* target)
         // CHILD TAGS
         // if next tag isn't an end tag
         // there is a child tag:
-        qDebug("going to recieve a new tagid");
-        int newTagId = target->nAddObject();// 1. create child tag
-        qDebug("new id is %d\n", newTagId);
-        xmlObject* newTag = target->cGetObjectByIdentifier(newTagId);
+        xmlObject* newTag = target->cAddObject();
         // 2. Parse it:
         if(!parseNextTag(newTag))
         {

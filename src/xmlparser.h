@@ -30,6 +30,7 @@
 
 class xmlAttribute
 {
+    public:
     xmlAttribute(){
         SetName("");
         SetValue("");
@@ -74,7 +75,9 @@ class xmlObject
         //about objects
         long            nSetObjectCounter (int nNewObjectCounter);
         int             nGetObjectCounter ();
+        int             nGetObjectBufSize();
         int             nAddObject(void);
+        xmlObject*      cAddObject(char* szNewName = "");
         int             nAddObject(char* szNewName);
         int             nDeleteObject(int nIdentifier);
         int             nDeleteObject(xmlObject* objectToDelete);
@@ -100,9 +103,15 @@ class xmlObject
 //        xmlAttribute*  cGetAttribute(int n AttributeCounter);
         
     private:
+        
+        void           hardAppendToContent(char* szStringToAppend);
+        
+        int            m_nObjectCounterIncrement;
+        
         int            nAttributeCounter;
-        xmlAttribute*  cAttributeList;
+        xmlAttribute** cAttributeList;
         int            nObjectCounter;
+        int            nObjectListSize;
         xmlObject**    cObjectList; //the list is an array, constisting of pointers to other objects
         int            nContentLength; //Content contains the characters between start- and end-tag
         char*          szContent;     //a tag should have either objects or content, not both!

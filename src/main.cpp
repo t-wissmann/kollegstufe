@@ -34,21 +34,26 @@ int runStdKs(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
-    //return runStdKs(argc, argv);
-    return testNewXmlLoader();
+    
+    
+    return runStdKs(argc, argv);
+    //return testNewXmlLoader();
 }
 
 int testNewXmlLoader()
 {
     
-    xmlObject myObject;
-    xmlLoader loader;
-    if(!loader.loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", &myObject))
+    xmlObject* myObject = new xmlObject;
+    xmlLoader* loader = new xmlLoader;
+    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
     {
-        printf("Error during parsing at position %d\n", loader.parsingPosition());
+        printf("Error during parsing at position %d\n", loader->parsingPosition());
     }
-    PutObjectToScreen(&myObject);
+    //qDebug("content is: %s", myObject->szGetContent());
+    PutObjectToScreen(myObject);
     //printf("strlen of %s is %d\n", "test", strlen("test"));
+    delete myObject;
+    delete loader;
     return 0;
 }
 

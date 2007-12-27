@@ -699,7 +699,7 @@ void kollegstufeParent::showDatabaseSelection()
     {
         diaDatabaseSelection = new ksDatabaseSelection(this);
     }
-    debugOutput->putDebugOutput(QString("showDatabaseSelection()") + szFilename);
+    
     diaDatabaseSelection->setCurrentFile(szFilename);
     diaDatabaseSelection->exec();
     switch(diaDatabaseSelection->result())

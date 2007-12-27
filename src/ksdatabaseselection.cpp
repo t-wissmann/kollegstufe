@@ -377,8 +377,7 @@ QString ksDatabaseSelection::getFileListLineForPath(QString path)
         return onError;
     }
     
-    qDebug("author of %s is '%s'", onError.toAscii().data(), file.cGetObjectByName("properties")->cGetObjectByName("author")->szGetContent());
-    return onError;
+    
     onSuccess += ksPlattformSpec::szToUmlauts(file.cGetObjectByName("properties")->cGetObjectByName("author")->szGetContent());
     
     

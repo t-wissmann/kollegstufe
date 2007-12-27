@@ -24,6 +24,7 @@
 #include "xmlparser.h"
 #include "xmlloader.h"
 
+
 int nLayer; //nLayer shows the depth of the current object
 
 int xmlAttribute::nValueToInt()
@@ -79,6 +80,9 @@ xmlObject::xmlObject()
     nObjectCounter = 0;
     nContentLength = 0;
     
+    m_nObjectCounterIncrement = 5;
+    nObjectListSize = 0;
+    
     cAttributeList = NULL;
     cObjectList = NULL;
     szContent = NULL;
@@ -86,16 +90,11 @@ xmlObject::xmlObject()
 
 xmlObject::~xmlObject()
 {
-    free(cAttributeList);
+    nSetAttributeCounter(0);
     if (nContentLength)
         free(szContent);
     
-    int i;
-    for (i = 0; i < nObjectCounter; i++)
-    {
-        delete cObjectList[i];
-    }
-    delete cObjectList;
+    nSetObjectCounter(0);
 }
 
 
@@ -115,35 +114,52 @@ void           xmlObject::setName(char* szNewName)
 long           xmlObject::nSetAttributeCounter(int nNewAttributeCounter)
 {
     if (nNewAttributeCounter < 0)
-        return ErrorInvalidParameters;
+    {
+        nNewAttributeCounter = 0;
+    }
     if(nNewAttributeCounter == nAttributeCounter)
         return 0;
     
-    xmlAttribute* cOldAttributeList = cAttributeList;
+    xmlAttribute** cOldAttributeList = cAttributeList;
     int nOldAttributeCounter = nAttributeCounter;
-    int nCurrentAttributeItem = 0;
     
-    if (nNewAttributeCounter > 0)
+    nAttributeCounter = nNewAttributeCounter;
+    if(nAttributeCounter > 0)
     {
-        cAttributeList = (xmlAttribute*) malloc(nNewAttributeCounter * sizeof(xmlAttribute));
-        if (cAttributeList == NULL)
+        cAttributeList = new xmlAttribute*[nAttributeCounter];
+        if(cAttributeList == NULL)
+        {
+            nAttributeCounter = 0;
             return ErrorNoMemory;
-    }
-    else
+        }
+    }else
     {
+        // if list has 0 items, then we don't need a list
         cAttributeList = NULL;
     }
     
-    while ((nCurrentAttributeItem < nOldAttributeCounter) && (nCurrentAttributeItem < nNewAttributeCounter))
+    // apply changes to list items
+    for(int i = 0; i < nAttributeCounter || i < nOldAttributeCounter; i++)
     {
-        cAttributeList[nCurrentAttributeItem] = cOldAttributeList[nCurrentAttributeItem];
-        nCurrentAttributeItem++;
+        if( i < nAttributeCounter && i < nOldAttributeCounter)
+        {
+            // if item is in both list then, copy it
+            cAttributeList[i] = cOldAttributeList[i];
+        }
+        else if(i < nAttributeCounter && i >= nOldAttributeCounter)
+        {// if item is only in the new list, then create it
+            cAttributeList[i] = new xmlAttribute;
+        }
+        else if(i >= nAttributeCounter && i < nOldAttributeCounter)
+        {// if item is only in old list, then delete it
+            delete cOldAttributeList[i];
+        }
     }
-    if(cOldAttributeList)
+    if(cOldAttributeList != NULL)
     {
-        free(cOldAttributeList);
+        delete cOldAttributeList;
     }
-    nAttributeCounter = nNewAttributeCounter;
+    
     
     return 0;
 }
@@ -153,9 +169,9 @@ long            xmlObject::nSetAttributeValueByName (char* szAttributeName, char
     int i;
     for ( i = 0; i < nAttributeCounter; i++)
     {
-        if(!strcmp(szAttributeName, cAttributeList[i].szName))
+        if(!strcmp(szAttributeName, cAttributeList[i]->name()))
         {
-            strcpy(cAttributeList[i].szValue, szAttributeValue);
+            cAttributeList[i]->SetValue(szAttributeValue);
         }
     }
     return ErrorInvalidParameters;
@@ -166,8 +182,8 @@ xmlAttribute*   xmlObject::cGetAttributeByName (char* szAttributeName)
     int i;
     for ( i = 0; i < nAttributeCounter; i++)
     {
-        if(!strcmp(szAttributeName, cAttributeList[i].szName))
-            return &cAttributeList[i];
+        if(!strcmp(szAttributeName, cAttributeList[i]->name()))
+            return cAttributeList[i];
     }
     return NULL;
 }
@@ -177,7 +193,7 @@ int             xmlObject::nGetAttributeIdentifierByName (char* szAttributeName)
     int i;
     for ( i = 0; i < nAttributeCounter; i++)
     {
-        if(!strcmp(szAttributeName, cAttributeList[i].szName))
+        if(!strcmp(szAttributeName, cAttributeList[i]->name()))
             return i;
     }
     return -1;
@@ -188,7 +204,7 @@ int             xmlObject::nGetAttributeIdentifierByValue (char* szAttributeValu
     int i;
     for ( i = 0; i < nAttributeCounter; i++)
     {
-        if(!strcmp(szAttributeValue, cAttributeList[i].szValue))
+        if(!strcmp(szAttributeValue, cAttributeList[i]->value()))
             return i;
     }
     return -1;
@@ -198,15 +214,15 @@ xmlAttribute*   xmlObject::cGetAttributeByIdentifier (int nIdentifier)
 {
     if (nIdentifier >= nAttributeCounter || nIdentifier < 0 )
         return NULL;
-    return &(cAttributeList[nIdentifier]);
+    return cAttributeList[nIdentifier];
 }
 
 long            xmlObject::nSetAttributeByIdentifier (int nIdentifier, char* szAttributeName, char* szAttributeValue)
 {
     if (nIdentifier >= nAttributeCounter || nIdentifier < 0 )
         return ErrorInvalidParameters;
-    strcpy(cAttributeList[nIdentifier].szName, szAttributeName);
-    strcpy(cAttributeList[nIdentifier].szValue, szAttributeValue);
+    cAttributeList[nIdentifier]->SetName (szAttributeName);
+    cAttributeList[nIdentifier]->SetValue(szAttributeValue);
     return 0;
 }
 
@@ -214,48 +230,40 @@ long            xmlObject::nSetAttributeByIdentifier (int nIdentifier, char* szA
 long            xmlObject::nAddAttribute (char* szAttributeName, char* szAttributeValue)
 {
     int nNewAttributeId;
-    int nReturnValue = 0;
     
-    if ((nReturnValue = nSetAttributeCounter(nAttributeCounter + 1)) != 0)
-        return nReturnValue;
+    if (nSetAttributeCounter(nAttributeCounter + 1) != 0)
+        return -1;
     nNewAttributeId = nAttributeCounter - 1; //new attribute is the last one in the list
-    strcpy(cAttributeList[nNewAttributeId].szName, szAttributeName);
-    strcpy(cAttributeList[nNewAttributeId].szValue, szAttributeValue);
+    cAttributeList[nNewAttributeId]->SetName(szAttributeName);
+    cAttributeList[nNewAttributeId]->SetValue(szAttributeValue);
     
     
     return nNewAttributeId;
 }
 int             xmlObject::nDeleteAttribute(int nIdentifier)
 {
-    if (!(nIdentifier < nAttributeCounter && nIdentifier >= 0))
+    if (nIdentifier >= nAttributeCounter || nIdentifier < 0)
         return ErrorInvalidParameters;
     if (nAttributeCounter <= 0)
         return ErrorInvalidParameters;
     
-    xmlAttribute* cOldAttributeList = cAttributeList;
-    int nOldAttributeCounter = nAttributeCounter;
-    int nNewAttributeCounter = nAttributeCounter -1;
-    int nCurrentAttributeItem = 0;
+    // delete: swap position of attribute, that shall be deleted, with the position of last attribute
+    //         and then decrease attribute counter by 1
     
-    cAttributeList = (xmlAttribute*) malloc(nNewAttributeCounter * sizeof(xmlAttribute));
-    if (cAttributeList == NULL)
-        return ErrorNoMemory;
     
-    while (nCurrentAttributeItem < nOldAttributeCounter)
-    {
-        if ( nCurrentAttributeItem == nIdentifier )
-            break;
-        cAttributeList[nCurrentAttributeItem] = cOldAttributeList[nCurrentAttributeItem];
-        nCurrentAttributeItem++;
-    }
-    nCurrentAttributeItem++;
-    while (nCurrentAttributeItem < nOldAttributeCounter)
-    {
-        cAttributeList[nCurrentAttributeItem-1] = cOldAttributeList[nCurrentAttributeItem];
-        nCurrentAttributeItem++;
-    }
-    free(cOldAttributeList);
-    nAttributeCounter = nNewAttributeCounter;
+    //1. swap attributes
+    // backup last attribute
+    xmlAttribute* lastAttribute = cAttributeList[nAttributeCounter-1];
+    
+    // put wanted attribute to end of list
+    cAttributeList[nAttributeCounter-1] = cAttributeList[nIdentifier];
+    
+    // write last to position of attribute, that shall be deleted
+    cAttributeList[nIdentifier] = lastAttribute;
+    
+    //2. decrease attribute counter by 1
+    nSetAttributeCounter(nAttributeCounter-1);
+    
     
     return 0;
 }
@@ -272,54 +280,90 @@ int            xmlObject::nGetAttributeCounter()
 
 long           xmlObject::nSetObjectCounter(int nNewObjectCounter)
 {
-    if (nNewObjectCounter < 0)
-        return ErrorInvalidParameters;
-    if(nNewObjectCounter == nObjectCounter)
-        return 0;
-    
-    xmlObject** cOldObjectList = cObjectList;
-    int nOldObjectCounter = nObjectCounter;
-    int nCurrentObjectItem = 0;
-    
-    if( nNewObjectCounter > 0)
+    if(nNewObjectCounter < 0)
     {
-        cObjectList = (xmlObject**) malloc(nNewObjectCounter * sizeof(xmlObject*));
-        if (cObjectList == NULL)
-            return ErrorNoMemory;
+        nNewObjectCounter = 0;
     }
-    else
+    // backup old values
+    xmlObject** oldObjectList    = cObjectList;
+    int         oldObjectCounter = nObjectCounter;
+    int         oldObjectListSize = nObjectListSize;
+    
+    nObjectCounter  = nNewObjectCounter;
+    
+    nObjectListSize = nNewObjectCounter;
+    if(nObjectListSize > 0)
     {
-        cObjectList = NULL;
+        nObjectListSize += m_nObjectCounterIncrement - (nObjectListSize % m_nObjectCounterIncrement);
     }
     
-    while ((nCurrentObjectItem < nOldObjectCounter) && (nCurrentObjectItem < nNewObjectCounter))
+    // apply changes
+    if(oldObjectListSize != nObjectListSize) // if List Has to be Changed
     {
-        cObjectList[nCurrentObjectItem] = cOldObjectList[nCurrentObjectItem];
-        nCurrentObjectItem++;
+        if(nObjectListSize > 0)
+        {
+            cObjectList = new xmlObject*[nObjectListSize];
+            if(cObjectList == NULL)
+            {
+                nObjectListSize = 0;
+                nObjectCounter  = 0;
+                return -1;
+            }
+        }
+        else
+        {
+            cObjectList = NULL;
+        }
+        int i = 0;
+        for(; i < nObjectListSize || i < oldObjectCounter ; i++) // copy old values and delete not-needed objects
+        {
+            if(i < nObjectListSize && i < oldObjectCounter)
+            {
+                cObjectList[i] = oldObjectList[i];
+            }
+            else if(i < nObjectListSize && i >= oldObjectCounter)
+            {
+                cObjectList[i] = NULL;
+            }
+            else if(i >= nObjectListSize && i < oldObjectCounter)
+            {
+                delete oldObjectList[i];
+            }
+        }
+        if(oldObjectList != NULL)
+        {
+            delete oldObjectList;
+        }
     }
-    while (nCurrentObjectItem < nOldObjectCounter)        //free/delete not copied and so not used items from the Old List
+    
+    // create objects if needed
+    for(int i = oldObjectCounter; i < nObjectCounter; i++)
     {
-        delete cOldObjectList[nCurrentObjectItem];
-        nCurrentObjectItem++;
+        cObjectList[i] = new xmlObject;
     }
-    while (nCurrentObjectItem < nNewObjectCounter)        //initialize new pointers in our new list
-    {
-        cObjectList[nCurrentObjectItem] = new xmlObject;
-        nCurrentObjectItem++;
-    }
-    if (cOldObjectList)
-    {
-        free(cOldObjectList);
-    }
-    nObjectCounter = nNewObjectCounter;
+    
+    
     
     return 0;
 }
 
+int             xmlObject::nGetObjectBufSize()
+{
+    return nObjectListSize;
+}
+
+
+xmlObject*      xmlObject::cAddObject(char* szNewName)
+{
+    nSetObjectCounter(nObjectCounter+1);
+    xmlObject* newObject = cObjectList[nObjectCounter-1];
+    newObject->setName(szNewName);
+    return newObject;
+}
+
 int             xmlObject::nAddObject()
 {
-    if(nSetObjectCounter(nObjectCounter+1) != 0)
-        return (-1);
+    nSetObjectCounter(nObjectCounter+1);
     return (nObjectCounter-1);
     
 }
@@ -409,6 +453,8 @@ int      xmlObject::nGetObjectIdentifierByAttributeValue (char szAttributeName[8
     int nCurrentObject;
     for ( nCurrentObject = 0; nCurrentObject < nObjectCounter; nCurrentObject++)
     {
+        if (cObjectList[nCurrentObject]->cGetAttributeByName(szAttributeName) == NULL)
+            continue;
         if(!strcmp(cObjectList[nCurrentObject]->cGetAttributeByName(szAttributeName)->szValue, szAttributeValue))
             return nCurrentObject;
     }
@@ -421,8 +467,8 @@ xmlObject*      xmlObject::cGetObjectByAttributeValue (char szAttributeName[80],
     for ( nCurrentObject = 0; nCurrentObject < nObjectCounter; nCurrentObject++)
     {
         if (cObjectList[nCurrentObject]->cGetAttributeByName(szAttributeName) == NULL)
-            break;
-        if(!strcmp(cObjectList[nCurrentObject]->cGetAttributeByName(szAttributeName)->szValue, szAttributeValue))
+            continue;
+        if(!strcmp(cObjectList[nCurrentObject]->cGetAttributeByName(szAttributeName)->value(), szAttributeValue))
             return cObjectList[nCurrentObject];
     }
     return NULL;
@@ -555,47 +601,47 @@ long           xmlObject::nSetContent ( char* szNewContent )
 
 void           xmlObject::appendToContent(char* szStringToAppend, bool createSpaceBetween)
 {
+    if(nGetContentLength() > 0 && createSpaceBetween)
+    {
+        hardAppendToContent(" ");
+    }
+    hardAppendToContent(szStringToAppend);
+}
+
+void           xmlObject::hardAppendToContent(char* szStringToAppend)
+{
     if(szStringToAppend == NULL || szStringToAppend[0] == '\0')
-    {// then there is nothing to do
+    {
+        // if there is nothing to append, then we don't need to do anything
         return;
     }
-    if(nContentLength < 1)
-    {
-        createSpaceBetween = 0;
-    }
-    char* oldContent = szContent; // backup old content
-    nContentLength += strlen(szStringToAppend); // increase content length
-                                                // strlen()+1 isn't needed here, because '\0' is already contained in nContentLength
-    if(createSpaceBetween) // //if old contend is empty, then there is no need for a space
-    {
-        nContentLength++; // one byte for " " between old and new content
-    }
-    szContent = (char*) malloc(nContentLength * sizeof(char));
-    if (szContent == NULL)
-    {
-        nContentLength = 0;
-        return;
-    }
-    szContent[0] = '\0';
-    //append old content:
-    if(oldContent != NULL)
-    {
-        strcat(szContent, oldContent);
-    }
-    if(createSpaceBetween) // create space if wanted
-    {
-        strcat(szContent, " "); // one byte for " " between old and new content
-    }
-    strncat(szContent, szStringToAppend, strlen(szStringToAppend)+1); // append new string
+    int            oldContentLength = nContentLength;
+    char*          oldContent = szContent;
     
-    // if oldContent exists, delete it
-    if(oldContent != NULL)
+    if(oldContentLength <= 0)
     {
-        free(oldContent);
+            nContentLength++; // if previous length is 0 , then wie need one byte for '\0'
     }
+    
+    nContentLength += strlen(szStringToAppend);
+    szContent = new char[nContentLength];
+    
+    if(oldContentLength > 0)
+    {
+        strcpy(szContent, oldContent);
+        delete oldContent;
+    }
+    else
+    {
+        szContent[0] = '\0';
+    }
+    strcat(szContent, szStringToAppend);
+    
     
     
 }
+
+
 /* END OF CONTENT FUNCTIONS */
         
         
