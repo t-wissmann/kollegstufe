@@ -18,65 +18,69 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#include "kspexporttohtml.h"
+#include "ksplugininformation.h"
+#include "configdialog.h"
+#include <QMessageBox>
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
-
-
-#include <QString>
-#include "xmlloader.h"
-#include "xmlparser.h"
-#include <string.h>
-
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
+kspExportToHtml::kspExportToHtml()
+ : ksPlugin()
 {
-    
-    
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
+    setIdentifier("kspExportToHtml");
+    setIsHavingAnAboutDialog(TRUE);
+    setIsConfigurable(TRUE);
+    retranslateUi();
 }
 
-int testNewXmlLoader()
+
+kspExportToHtml::~kspExportToHtml()
+{
+}
+
+
+void kspExportToHtml::retranslate()
+{
+    setName(tr("To Html Exporter"));
+    setAuthor("Thorsten Wissmann");
+    setDescription(tr("Exports database to an HTML-File"));
+}
+
+
+void kspExportToHtml::load()
+{
+    qDebug("%s:%s gets loaded", identifier().toAscii().data(), name().toAscii().data());
+}
+
+void kspExportToHtml::refresh()
 {
     
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
+}
+
+void kspExportToHtml::unload()
+{
+    //QMessageBox::information(NULL, "kollegstufe", name() + " gets unloaded");
+    qDebug("%s:%s gets unloaded", identifier().toAscii().data(), name().toAscii().data());
+}
+
+void kspExportToHtml::createConfiguration(ksConfigContainer* config)
+{
+    if(!config)
     {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
+        return;
     }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
+    
+    config->setInGuiOptionPart(TRUE); // start of gui-options
+    ksConfigOption* option;
+    option = config->createOption(ksConfigOption("desktop size", 4));
+    option->setDescription("Size of your Desktop");
+    option->setMinMax(1, 10);
+    option = config->createOption(ksConfigOption("name", QString("thorsten")));
+    option->setDescription("Your name");
+    option = config->createOption(ksConfigOption("size", 1.70));
+    option->setDescription("Your size");
+    option->setMinMax(0.40, 3.00);
+    
+    config->setInGuiOptionPart(FALSE); // end of gui - options
 }
-
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
-
-
-
-
-
-
-
-
 
 

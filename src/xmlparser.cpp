@@ -23,6 +23,7 @@
 
 #include "xmlparser.h"
 #include "xmlloader.h"
+#include "xmlencoder.h"
 
 
 int nLayer; //nLayer shows the depth of the current object
@@ -73,6 +74,29 @@ void    xmlAttribute::SetValue(char* szNewValue)
     szValue[79] = '\0';
 }
 
+
+char*   xmlAttribute::nameToXmlCode()
+{
+    return xmlEncoder::stringToXmlCode(szName);
+}
+
+char*   xmlAttribute::valueToXmlCode()
+{
+    return xmlEncoder::stringToXmlCode(szValue);
+}
+
+void    xmlAttribute::setNameFromXmlCode(char* xmlcodestring)
+{
+    SetName(xmlEncoder::xmlCodeToString(xmlcodestring));
+}
+
+void    xmlAttribute::setValueFromXmlCode(char* xmlcodestring)
+{
+    SetValue(xmlEncoder::xmlCodeToString(xmlcodestring));
+}
+
+
+
 xmlObject::xmlObject()
 {
     setName("");
@@ -108,6 +132,18 @@ void           xmlObject::setName(char* szNewName)
     strncpy(szName, szNewName, 79);
     szName[79] = '\0';
 }
+
+
+void           xmlObject::setNameFromXmlCode(char* xmlcodestring)
+{
+    setName(xmlEncoder::xmlCodeToString(xmlcodestring));
+}
+
+char*          xmlObject::nameToXmlCode()
+{
+    return xmlEncoder::stringToXmlCode(szName);
+}
+
 
 /* START OF ATTRIBUTE FUNCTIONS */
 
@@ -240,6 +276,21 @@ long            xmlObject::nAddAttribute (char* szAttributeName, char* szAttribu
     
     return nNewAttributeId;
 }
+
+
+xmlAttribute*   xmlObject::cAddAttribute (char* szAttributeName, char* szAttributeValue)
+{
+    xmlAttribute* newAttribute = NULL;
+    
+    nSetAttributeCounter(nAttributeCounter + 1);
+    newAttribute = cAttributeList[nAttributeCounter - 1]; //new attribute is the last one in the list
+    newAttribute->SetName(szAttributeName);
+    newAttribute->SetValue(szAttributeValue);
+    
+    
+    return newAttribute;
+}
+
 int             xmlObject::nDeleteAttribute(int nIdentifier)
 {
     if (nIdentifier >= nAttributeCounter || nIdentifier < 0)
@@ -903,7 +954,7 @@ int WriteObjectToBuf (xmlObject* TargetObject, char** szBuf, unsigned long* nBuf
         for (nCurrentLayer = 1; nCurrentLayer < nLayer; nCurrentLayer++)
             strcat(*szBuf," ");
     }
-    //printf("%s has layer number: %d\n", TargetObject->szName, nLayer);
+    //printf("%s has layer number: %d\n", TargetObject->nameToXmlCode(), nLayer);
     if ( (*nBufLength) < (strlen(*szBuf) + 2))
     {
         if ((nResult = EditLengthOfBuf (szBuf, nBufLength, strlen(*szBuf) +2)) != 0)
@@ -911,17 +962,17 @@ int WriteObjectToBuf (xmlObject* TargetObject, char** szBuf, unsigned long* nBuf
     }
     strcat(*szBuf, "<");
     //write tag-name
-    if ( (*nBufLength) < (strlen(*szBuf) + strlen(TargetObject->szName) +1) )
+    if ( (*nBufLength) < (strlen(*szBuf) + strlen(TargetObject->nameToXmlCode()) +1) )
     {
-        if ((nResult = EditLengthOfBuf (szBuf, nBufLength, strlen(*szBuf)  + strlen(TargetObject->szName) +1)) != 0)
+        if ((nResult = EditLengthOfBuf (szBuf, nBufLength, strlen(*szBuf)  + strlen(TargetObject->nameToXmlCode()) +1)) != 0)
             return nResult;
     }
-    strcat( *szBuf, TargetObject->szName);
+    strcat( *szBuf, TargetObject->nameToXmlCode());
     //write Attributes
     
     for (nCurrentAttribute = 0; nCurrentAttribute < TargetObject->nGetAttributeCounter(); nCurrentAttribute++)
     {
-        nAttributeNameLength = strlen(TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->szName);
+        nAttributeNameLength = strlen(TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->nameToXmlCode());
         nAttributeValueLength = strlen(TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->szValue);
         
         if ( (*nBufLength) < (strlen(*szBuf) + nAttributeNameLength + nAttributeValueLength +5) )
@@ -930,7 +981,7 @@ int WriteObjectToBuf (xmlObject* TargetObject, char** szBuf, unsigned long* nBuf
                 return nResult;
         }
         strcat( *szBuf, " ");
-        strcat( *szBuf, TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->szName);
+        strcat( *szBuf, TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->nameToXmlCode());
         strcat( *szBuf, "=\"");
         strcat( *szBuf, TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->szValue);
         strcat( *szBuf, "\"");
@@ -986,21 +1037,21 @@ int WriteObjectToBuf (xmlObject* TargetObject, char** szBuf, unsigned long* nBuf
             for (nCurrentLayer = 1; nCurrentLayer < nLayer; nCurrentLayer++)
                 strcat(*szBuf," ");
         }
-        //printf("%s has layer number: %d\n", TargetObject->szName, nLayer);
+        //printf("%s has layer number: %d\n", TargetObject->nameToXmlCode(), nLayer);
     }
         
     
     
     //write END-TAG  
-    if ( (*nBufLength) < (strlen(*szBuf) + strlen(TargetObject->szName) +4) )
+    if ( (*nBufLength) < (strlen(*szBuf) + strlen(TargetObject->nameToXmlCode()) +4) )
     {
-        if ((nResult = EditLengthOfBuf (szBuf, nBufLength, strlen(*szBuf)  + strlen(TargetObject->szName)+4) ) != 0)
+        if ((nResult = EditLengthOfBuf (szBuf, nBufLength, strlen(*szBuf)  + strlen(TargetObject->nameToXmlCode())+4) ) != 0)
         {
             return nResult;
         }
     }
     strcat( *szBuf, "</");
-    strcat( *szBuf, TargetObject->szName);
+    strcat( *szBuf, TargetObject->nameToXmlCode());
     strcat( *szBuf, ">");
     
     nLayer--;

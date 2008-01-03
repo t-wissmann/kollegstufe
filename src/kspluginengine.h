@@ -18,65 +18,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef KSPLUGINENGINE_H
+#define KSPLUGINENGINE_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+#include <QObject>
+#include <QList>
 
+class ksPlugin;
+class ksPluginInformation;
+class xmlObject;
 
-#include <QString>
-#include "xmlloader.h"
-#include "xmlparser.h"
-#include <string.h>
-
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+class ksPluginEngine : public QObject
 {
+Q_OBJECT
+public:
+    ksPluginEngine(QObject *parent = 0);
+    ksPluginEngine(ksPluginInformation* newPluginInformation);
+
+    ~ksPluginEngine();
     
+    void setPluginInformation(ksPluginInformation* newPluginInformation);
+    void retranslateUi();
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
+    void applyPluginStateChanges();
     
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
+    void savePluginConfigurations(xmlObject* target, bool localOrGlobal); // TRUE: LOCAL; FALSE: GLOBAL
+    void loadPluginConfigurations(xmlObject* source, bool localOrGlobal); // TRUE: LOCAL; FALSE: GLOBAL
+    
+    void unloadAllPlugins();
+    
+    QList<ksPlugin*>  pluginList() const;
+    
+private:
+    void  createPluginList();
+    void  addPlugin(ksPlugin* newPlugin);
+    void  deletePluginList();
+    
+    ksPluginInformation* m_pPluginInformation;
+    
+    QList<ksPlugin*>     m_listPlugins;
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+};
 
-
-
-
-
-
-
-
-
-
+#endif

@@ -18,65 +18,66 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef KSPLUGINMANAGER_H
+#define KSPLUGINMANAGER_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+#include <QWidget>
+#include <QList>
+#include <QScrollArea>
+class ksPlugin;
+class ksPluginItemWidget;
+class ksPluginEngine;
+
+class QKeyEvent;
+class QVBoxLayout;
+class NoKeyScrollArea;
 
 
-#include <QString>
-#include "xmlloader.h"
-#include "xmlparser.h"
-#include <string.h>
-
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+class ksPluginManager : public QWidget
 {
+Q_OBJECT
+public:
+    ksPluginManager(QWidget *parent = 0);
+
+    ~ksPluginManager();
+    
+    void setPluginList(QList<ksPlugin*> newPluginList);
+    void setPluginEngine(ksPluginEngine* newPluginEngine);
+    
+    void pressKey(QKeyEvent* event){ keyPressEvent(event); };
+    void setBoxLook(bool frame, bool textboxbackground);
+    
+    void applyChanges();
+    
+protected:
+    virtual void keyPressEvent(QKeyEvent* event);
+public slots:
+    void itemSelected(ksPluginItemWidget* item);
+private:
+    
+    void createLayouts();
+    void connectSlots();
+    void resetPluginWidgetList();
     
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
+    ksPluginItemWidget* m_pSelectedItem;
+    // layouts
+    QVBoxLayout* layoutParent;
+    QVBoxLayout* layoutPluginList;
+    NoKeyScrollArea* scrollPlugins;
     
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
+    
+    //widgets
+    QWidget*                    m_wdgPluginListContainer;
+    QList<ksPluginItemWidget*>  m_wdgPluginWidgets;
+    
+    // members
+    QList<ksPlugin*>   m_pPluginList;
+    ksPluginEngine*    m_pPluginEngine;
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+};
 
-
-
-
-
-
-
-
-
-
+#endif

@@ -44,19 +44,30 @@ bool ksPlattformSpec::createKsDir()
 {
     QString directoryName = ".kollegstufe";
     QDir ksDir = QDir::home();
+    bool    returnValue = TRUE; 
 #if defined(Q_WS_WIN)
 
     directoryName =  "kollegstufe";
 #endif
-    if(ksDir.exists(directoryName))
+    if(!ksDir.exists(directoryName))
     {
-        return TRUE;
+        if(!ksDir.mkdir(directoryName))
+        {
+            returnValue = FALSE;
+        }
     }
-    else
+    if(!ksDir.cd(directoryName))
     {
-        return ksDir.mkdir(directoryName);
+        return FALSE;
     }
-    return FALSE;
+    /*if(!ksDir.exists("plugin-config"))
+    {
+        if(!ksDir.mkdir("plugin-config"))
+        {
+            returnValue = FALSE;
+        }
+    }*/
+    return returnValue;
 }
 
 QString ksPlattformSpec::getKsDir()
@@ -271,9 +282,9 @@ QString ksPlattformSpec::getNewFilename(QString prefix, QString suffix)
 QString ksPlattformSpec::getUserName()
 {
     QString userName;
-    //ON WINDOWS:
 #ifdef Q_WS_WIN
 
+    //ON WINDOWS:
     userName = tr("New Pupil");
 #else
     //ON UNIX/LINUX:
@@ -470,20 +481,22 @@ double ksPlattformSpec::computeAverageOfSubject(xmlObject* subject, QString weig
     return average;
 }
 
-/*  THE WAY, THE CONFIG FILE SHOULD LOOK LIKE:
+/**  THE WAY, THE CONFIG FILE SHOULD LOOK LIKE:
+
 
 <config>
- <window-settings width="739" height="376">
-  <splitterMain coord="198"></splitterMain>
+ <window-settings width="705" height="355">
+  <splitterMain coord="144"></splitterMain>
  </window-settings>
+ <language>german</language>
  <session>
-  <file>/home/thorsten/.kde/share/apps/kollegstufe/archiv_zwei.xml</file>
+  <file>/home/thorsten/.kollegstufe/archiv_zwei.xml</file>
  </session>
+ <plugins></plugins>
 </config>
 
 
-
-*/
+*/ 
 
 void ksPlattformSpec::addMissingConfigAttributes(xmlObject* configFileToComplete)
 {
@@ -517,6 +530,10 @@ void ksPlattformSpec::addMissingConfigAttributes(xmlObject* configFileToComplete
         QString language = getLanguageString();
         
         configFileToComplete->cGetObjectByName("language")->nSetContent(qstringToSz(language));
+    }
+    if (!configFileToComplete->cGetObjectByName("plugins"))
+    {
+        configFileToComplete->nAddObject("plugins");
     }
     if (!configFileToComplete->cGetObjectByName("session"))
     {
@@ -658,18 +675,14 @@ void ksPlattformSpec::addMissingDatabaseAttributes(xmlObject* databaseToComplete
     {
         databaseToComplete->nAddObject("properties");
     }
+    if(!databaseToComplete->cGetObjectByName("plugins"))
+    {
+        databaseToComplete->nAddObject("plugins");
+    }
     if(!databaseToComplete->cGetObjectByName("data"))
     {
         databaseToComplete->nAddObject("data");
     }
-    /*if(!databaseToComplete->cGetObjectByName("data")->cGetObjectByName("cathegory")) // if there is no cathegory
-    {
-    int newId = databaseToComplete->cGetObjectByName("data")->nAddObject("cathegory");
-    databaseToComplete->cGetObjectByName("data")->cGetObjectByIdentifier(newId)->nAddAttribute("name", "Leistungskurse");
-        
-    newId = databaseToComplete->cGetObjectByName("data")->nAddObject("cathegory");
-    databaseToComplete->cGetObjectByName("data")->cGetObjectByIdentifier(newId)->nAddAttribute("name", "Grundkurse");
-}*/
 }
 
 

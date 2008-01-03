@@ -18,65 +18,41 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef KSCONFIGCONTAINER_H
+#define KSCONFIGCONTAINER_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+#include "ksconfigoption.h"
 
+#include <QList>
 
-#include <QString>
-#include "xmlloader.h"
-#include "xmlparser.h"
-#include <string.h>
+class xmlObject;
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+class ksConfigContainer : public QList<ksConfigOption>
 {
     
+public:
+    ksConfigContainer();
+
+    ~ksConfigContainer();
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
+    int sizeOfUserChangableOptions();
+    void saveToXmlObject(xmlObject* target) const;
+    void loadFromXmlObject(xmlObject* source);
     
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
+    bool inGuiOptionPart() const { return m_bInGuiOptionPart; };
+    void setInGuiOptionPart(bool inGui) { m_bInGuiOptionPart = inGui; };
+    
+    ksConfigOption* getOption(QString name);
+    ksConfigOption* getOption(const ksConfigOption& option, bool createIfNotExists = TRUE);
+    ksConfigOption* setOption(const ksConfigOption& option);
+    ksConfigOption* createOption(const ksConfigOption& option);
+    
+private:
+    bool m_bInGuiOptionPart;
+    
+};
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
-
-
-
-
-
-
-
-
-
-
+#endif

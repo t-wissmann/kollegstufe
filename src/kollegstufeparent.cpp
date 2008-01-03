@@ -27,8 +27,11 @@
 #include "ksstatisticsdialog.h"
 #include "ksconfigure.h"
 #include "examitem.h"
+#include "kspluginengine.h"
+#include "ksplugininformation.h"
 
 // dialogs:
+#include "kspluginconfigurationdialog.h"
 #include "kssubjectproperties.h"
 #include "ksexamproperties.h"
 #include "ksabout.h"
@@ -87,7 +90,7 @@ kollegstufeParent::kollegstufeParent(QWidget* parentWidget)
     createLayouts();
     connectSlots();
     initWidgets();
-    
+    initPluginEngine();
     
     debugOutput->putDebugOutput("Loading configuration");
     retranslateUi(); // ensure, that there are texts
@@ -103,8 +106,9 @@ kollegstufeParent::~kollegstufeParent()
 {
     
     debugOutput->putDebugOutput("MainWindow destroyed");
-    if (diaExamProperties)
-        delete diaExamProperties;
+    
+    delete pPluginEngine;
+    delete pluginInformation;
     
     delete debugOutput;
 }
@@ -114,7 +118,9 @@ void kollegstufeParent::initMembers()
 {
     bWantsToBeShown = TRUE;
     
+    
     // init pointers
+    pPluginEngine       = NULL;
     currentDataPart     = NULL;
     currentPropertyPart = NULL;
     currentCathegory    = NULL;
@@ -192,6 +198,7 @@ void kollegstufeParent::allocateDialogs()
     diaDatabaseProperties= NULL;
     diaAbout             = NULL;
     diaConfigureKs       = NULL;
+    diaPluginConfig      = NULL;
     
     diaStatistics = new ksStatisticsDialog(this);
 }
@@ -235,7 +242,8 @@ void kollegstufeParent::createMenuBar()
     mnaStatistics->setCheckable(TRUE);
     
     // 4. Extras - menu
-    mnaConfigureKs= mnmExtras->addAction("");
+    mnaConfigurePlugins = mnmExtras->addAction("");
+    mnaConfigureKs      = mnmExtras->addAction("");
     
     // 5. Help - menu
     mnaShowHelp   = mnmHelp->addAction("");
@@ -328,6 +336,8 @@ void kollegstufeParent::connectSlots()
     
     // mnmExtras
     connect(mnaConfigureKs, SIGNAL(triggered()), this, SLOT(showConfigureDialog()));
+    connect(mnaConfigurePlugins, SIGNAL(triggered()), this, SLOT(showPluginConfigDialog()));
+    
     // mnmWindow
     connect(mnaStatistics, SIGNAL(toggled(bool)), diaStatistics, SLOT(setVisible(bool)));
     connect(mnaStatistics, SIGNAL(toggled(bool)), wdgSubjectStatusbar, SLOT(toggleStatisticsButton(bool)));
@@ -404,6 +414,14 @@ void kollegstufeParent::initWidgets()
     
 }
 
+void kollegstufeParent::initPluginEngine()
+{
+    pluginInformation = new ksPluginInformation;
+    pluginInformation->setMainWindow(this);
+    
+    pPluginEngine = new ksPluginEngine(pluginInformation);
+}
+
 void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
 {
     debugOutput->putDebugOutput("Loading file \'" + newFilename + "\'");
@@ -441,6 +459,9 @@ void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
     currentPropertyPart = currentDatabase.cGetObjectByName("properties");
     ksPlattformSpec::addMissingPropertiesAttributes(currentPropertyPart);
     
+    // load plugin configs to plugin engine
+    pPluginEngine->loadPluginConfigurations(currentDatabase.cGetObjectByName("plugins"), TRUE);  // local
+    
     // set window title to new author name
     currentWindowTitle = ksPlattformSpec::szToUmlauts(currentPropertyPart->cGetObjectByName("author")->szGetContent());
     resetWindowTitle();
@@ -457,6 +478,10 @@ void kollegstufeParent::saveFile(QString newFilename)
         newFilename = szFilename;
     }
     
+    ksPlattformSpec::addMissingDatabaseAttributes(&currentDatabase);
+    // write local plugin config
+    xmlObject* pluginConfig = currentDatabase.cGetObjectByName("plugins");
+    pPluginEngine->savePluginConfigurations(pluginConfig, TRUE); // save local configurations
     
     //create kollegstufe dir in home
     if(!ksPlattformSpec::createKsDir())
@@ -466,7 +491,7 @@ void kollegstufeParent::saveFile(QString newFilename)
                                       + tr("It seems, you haven't got the necessary Write-Rights!"));
         return;
     }
-    //create config File home/.kollegstufe
+    //create archive File home/.kollegstufe
     if(0 != WriteClassToFile( ksPlattformSpec::qstringToSz(newFilename), &currentDatabase))
     {
         QMessageBox::critical(this, tr("Error during saving file- Kollegstufe"),
@@ -474,11 +499,9 @@ void kollegstufeParent::saveFile(QString newFilename)
                                       + tr("It seems, you haven't got the necessary Write-Rights!"));
         return;
     }
-    else
-    {
-        //on success:
-        setDatabaseChanged(FALSE);
-    }
+    //on success:
+    setDatabaseChanged(FALSE);
+    
     return;
 }
 
@@ -633,6 +656,7 @@ void kollegstufeParent::retranslateUi()
     mnaEditExamEdit->setText(tr("Edit"));
     
     // extras menu
+    mnaConfigurePlugins->setText(tr("Configure Plugins"));
     mnaConfigureKs->setText(tr("Configure Kollegstufe"));
     // window menu
     mnaStatistics->setText(tr("Statistics"));
@@ -648,6 +672,9 @@ void kollegstufeParent::retranslateUi()
     examListHeader->setText(3, tr("Nr"));
     examListHeader->setText(4, tr("Type"));
     examListHeader->setText(5, tr("Points"));
+    
+    // retranslate plugin engine
+    pPluginEngine->retranslateUi();
     
     retranslateTooltips();
     resetWindowTitle();
@@ -725,11 +752,15 @@ void kollegstufeParent::closeEvent(QCloseEvent* event)
     {
         saveConfigFile();
         event->accept();
-        diaStatistics->close();
+        /*diaStatistics->close();
         if (diaAbout)
         {
             diaAbout->close();
         }
+        if (diaPluginConfig)
+        {
+            diaPluginConfig->close();
+        }*/
     }
     else
     {
@@ -840,6 +871,15 @@ void kollegstufeParent::showConfigureDialog()
     
 }
 
+void kollegstufeParent::showPluginConfigDialog()
+{
+    if(!diaPluginConfig)
+    {
+        diaPluginConfig = new ksPluginConfigurationDialog(this);
+    }
+    diaPluginConfig->setPluginEngine(pPluginEngine);
+    diaPluginConfig->show();
+}
 
 void kollegstufeParent::refreshMnaStatisticsChecked()
 {

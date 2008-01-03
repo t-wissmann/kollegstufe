@@ -18,7 +18,19 @@ SOURCES += main.cpp \
  kscathegoryeditorwidget.cpp \
  kssubjectinformationwidget.cpp \
  kssubjectstatusbar.cpp \
- xmlloader.cpp
+ xmlloader.cpp \
+ ksplugin.cpp \
+ ksplugininformation.cpp \
+ kspexporttohtml.cpp \
+ kspluginengine.cpp \
+ kspluginitemwidget.cpp \
+ kspluginmanager.cpp \
+ kspluginconfigurationdialog.cpp \
+ ksconfigcontainer.cpp \
+ ksconfigoption.cpp \
+ configdialog.cpp \
+ ksconfigoptionwidget.cpp \
+ xmlencoder.cpp
 TEMPLATE = app
 CONFIG += warn_on \
 	  thread \
@@ -45,7 +57,21 @@ ksdebugoutput.h \
  kscathegoryeditorwidget.h \
  kssubjectinformationwidget.h \
  kssubjectstatusbar.h \
- xmlloader.h
+ xmlloader.h \
+ ksplugin.h \
+ ksplugininformation.h \
+ kspexporttohtml.h \
+ kspluginengine.h \
+ kspluginitemwidget.h \
+ qclickablelabel.h \
+ kspluginmanager.h \
+ kspluginconfigurationdialog.h \
+ nokeyscrollarea.h \
+ ksconfigcontainer.h \
+ ksconfigoption.h \
+ configdialog.h \
+ ksconfigoptionwidget.h \
+ xmlencoder.h
 DISTFILES += ../doc/help.htm
 
 TRANSLATIONS += ../translations/german.ts \

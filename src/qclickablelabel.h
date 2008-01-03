@@ -18,65 +18,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+#ifndef QCLICKABLELABEL
+#define QCLICKABLELABEL
 
+#include <QMouseEvent>
+#include <QLabel>
 
-#include <QString>
-#include "xmlloader.h"
-#include "xmlparser.h"
-#include <string.h>
-
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
+class QClickableLabel : public QLabel
 {
-    
-    
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
+    Q_OBJECT
+    signals:
+        void clicked();
+    protected:
+        virtual void mousePressEvent(QMouseEvent * event)
+        {
+            if(event && event->button() == Qt::LeftButton)
+            {
+                emit clicked();
+            }
+        }
+};
 
-int testNewXmlLoader()
-{
-    
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
-
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
-
-
-
-
-
-
-
-
+#endif
 
 

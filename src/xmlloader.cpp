@@ -20,6 +20,7 @@
  ***************************************************************************/
 #include "xmlloader.h"
 #include "xmlparser.h"
+#include "xmlencoder.h"
 #include "stdlib.h"
 #include "stdio.h"
 #include "string.h"

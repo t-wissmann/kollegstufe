@@ -18,65 +18,40 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef KSPEXPORTTOHTML_H
+#define KSPEXPORTTOHTML_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+#include "ksplugin.h"
 
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
 
-#include <QString>
-#include "xmlloader.h"
-#include "xmlparser.h"
-#include <string.h>
+class ConfigDialog;
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
+class kspExportToHtml : public ksPlugin
 {
+Q_OBJECT
+public:
+    kspExportToHtml();
+
+    ~kspExportToHtml();
+
+    
+protected:
+    
+    // core functions
+    virtual void load();
+    virtual void unload();
+    virtual void retranslate();
+    virtual void createConfiguration(ksConfigContainer* config);
+    
+protected slots:
+    virtual void refresh();
+    
+private:
     
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
+};
 
-int testNewXmlLoader()
-{
-    
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
-
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
-
-
-
-
-
-
-
-
-
-
+#endif

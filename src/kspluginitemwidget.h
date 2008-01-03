@@ -18,65 +18,77 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef KSPLUGINITEMWIDGET_H
+#define KSPLUGINITEMWIDGET_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+#include <QWidget>
 
 
-#include <QString>
-#include "xmlloader.h"
-#include "xmlparser.h"
-#include <string.h>
+class ksPlugin;
+class QLabel;
+class QPushButton;
+class QCheckBox;
+class QClickableLabel;
+class QComboBox;
+class QMouseEvent;
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
+class QEvent;
+class QHBoxLayout;
+class QVBoxLayout;
+class QGridLayout;
 
-int main(int argc, char *argv[])
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+class ksPluginItemWidget : public QWidget
 {
+Q_OBJECT
+        
+signals:
+    void clicked();
+    void selected(ksPluginItemWidget* source);
+public slots:
+    void showConfigurationDialog();
+    void showAboutDialog();
+    void setSelected();
+    void setSelected(bool selected);
+    
+    void setPluginStateFromGui();
+    
+public:
+    ksPluginItemWidget(QWidget *parent = 0);
+
+    ~ksPluginItemWidget();
     
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
+    void setPlugin(ksPlugin*    newPlugin);
+    bool isSelected() const { return m_bIsSelected; };
+    void retranslateUi();
     
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
+    
+protected:
+    virtual void changeEvent(QEvent* event);
+    virtual void paintEvent ( QPaintEvent * event );
+    virtual void mousePressEvent(QMouseEvent * event);
+private:
+    
+    void allocateWidgets();
+    void createLayouts();
+    void connectSlots();
+    
+    // layouts
+    QHBoxLayout* layoutParent;
+    QVBoxLayout* layoutRightEnd;
+    
+    // widgets
+    QCheckBox*  chkIsLoaded;
+    QComboBox*  cmbScope;
+    QClickableLabel* lblNameAndDescription;
+    QPushButton* btnAbout;
+    QPushButton* btnConfigure;
+    
+    bool        m_bIsSelected;
+    ksPlugin*   m_pCurrentPlugin;
+};
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
-
-
-
-
-
-
-
-
-
-
+#endif

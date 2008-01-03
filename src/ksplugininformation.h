@@ -18,65 +18,48 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksdebugoutput.h"
+#ifndef KSPLUGININFORMATION_H
+#define KSPLUGININFORMATION_H
 
-#include <QApplication>
-#include "kollegstufeparent.h"
-#include <stdio.h>
+class xmlObject;
+class kollegstufeParent;
 
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+class ksPluginInformation{
+public:
+    ksPluginInformation();
 
-#include <QString>
-#include "xmlloader.h"
-#include "xmlparser.h"
-#include <string.h>
-
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
-{
+    ~ksPluginInformation();
+    
+    void setMainWindow(kollegstufeParent*  newMainWindow) { m_pMainWindow = newMainWindow; };
+    kollegstufeParent* mainWindow() const { return m_pMainWindow; };
+    
+    void setAllDatabasePointersToNull();
+    
+    void setCurrentDatabase(xmlObject*  newCurrentDatabase) { m_pCurrentDatabase = newCurrentDatabase; };
+    xmlObject* currentDatabase() const { return m_pCurrentDatabase; };
+    
+    void setCurrentCategory(xmlObject*  newCurrentCategory) { m_pCurrentCategory = newCurrentCategory; };
+    xmlObject* currentCategory() const { return m_pCurrentCategory; };
+    
+    void setCurrentSubject(xmlObject*  newCurrentSubject) { m_pCurrentSubject = newCurrentSubject; };
+    xmlObject* currentSubject() const { return m_pCurrentSubject; };
+    
+    void setCurrentExam(xmlObject*  newCurrentExam) { m_pCurrentExam = newCurrentExam; };
+    xmlObject* currentExam() const { return m_pCurrentExam; };
     
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
 
-int testNewXmlLoader()
-{
+private:
     
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
+    kollegstufeParent*  m_pMainWindow;
+    
+    xmlObject*  m_pCurrentDatabase;
+    xmlObject*  m_pCurrentCategory;
+    xmlObject*  m_pCurrentSubject;
+    xmlObject*  m_pCurrentExam;
+};
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
-
-
-
-
-
-
-
-
-
-
+#endif

@@ -45,7 +45,10 @@
 ksConfigure::ksConfigure(QWidget *parent)
  : QDialog(parent)
 {
-    
+    if(parent) // if has parent, then it can be closed automatically on main window close
+    {
+        setAttribute(Qt::WA_QuitOnClose, FALSE);
+    }
     config = NULL;
     
     allocateWidgets();
@@ -79,6 +82,8 @@ void ksConfigure::allocateWidgets()
     lstLanguageSelection = new QListWidget;
     grpLanguageSelection = new QGroupBox;
     
+    
+    
 }
 
 
@@ -95,8 +100,9 @@ void ksConfigure::createLayouts()
     grpLanguageSelection->setLayout(layoutLanguageSelection);
     
     layoutParent = new QGridLayout;
-    layoutParent->addWidget(grpLanguageSelection, 0, 0);
-    layoutParent->addLayout(layoutBottom, 1, 0);
+    
+    layoutParent->addWidget(grpLanguageSelection, 1, 0);
+    layoutParent->addLayout(layoutBottom, 2, 0);
     
     
     setLayout(layoutParent);
@@ -168,7 +174,4 @@ void ksConfigure::catchLanguageList()
     }
     
 }
-
-
-
 

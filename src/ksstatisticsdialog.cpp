@@ -42,6 +42,10 @@
 ksStatisticsDialog::ksStatisticsDialog(QWidget *parent)
  : QDialog(parent)
 {
+    if(parent) // if has parent, then it can be closed automatically on main window close
+    {
+        setAttribute(Qt::WA_QuitOnClose, FALSE);
+    }
     initMembers();
     allocateWidgets();
     createLayouts();

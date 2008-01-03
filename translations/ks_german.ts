@@ -17,47 +17,47 @@
 <context>
     <name>kollegstufeParent</name>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="600"/>
+        <location filename="../src/kollegstufeparent.cpp" line="617"/>
         <source>Edit Subject</source>
         <translation>Fach bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="602"/>
+        <location filename="../src/kollegstufeparent.cpp" line="619"/>
         <source>Subject Properties</source>
         <translation>Fach Eigenschaften</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="603"/>
+        <location filename="../src/kollegstufeparent.cpp" line="620"/>
         <source>New Exam</source>
         <translation>Neue Leistung</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="632"/>
+        <location filename="../src/kollegstufeparent.cpp" line="649"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="633"/>
+        <location filename="../src/kollegstufeparent.cpp" line="650"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="608"/>
+        <location filename="../src/kollegstufeparent.cpp" line="625"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="611"/>
+        <location filename="../src/kollegstufeparent.cpp" line="628"/>
         <source>&amp;Extras</source>
         <translation>&amp;Extras</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="614"/>
+        <location filename="../src/kollegstufeparent.cpp" line="631"/>
         <source>Load archiv</source>
         <translation>Archiv laden</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="763"/>
+        <location filename="../src/kollegstufeparent.cpp" line="785"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
@@ -67,301 +67,306 @@
         <translation type="obsolete">Eigenschaften</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="620"/>
+        <location filename="../src/kollegstufeparent.cpp" line="637"/>
         <source>Quit</source>
         <translation>Beenden</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="615"/>
+        <location filename="../src/kollegstufeparent.cpp" line="632"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="616"/>
+        <location filename="../src/kollegstufeparent.cpp" line="633"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="617"/>
+        <location filename="../src/kollegstufeparent.cpp" line="634"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="638"/>
+        <location filename="../src/kollegstufeparent.cpp" line="656"/>
         <source>Statistics</source>
         <translation>Statistik</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="641"/>
+        <location filename="../src/kollegstufeparent.cpp" line="659"/>
         <source>About Qt</source>
         <translation>Über Qt</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="642"/>
+        <location filename="../src/kollegstufeparent.cpp" line="660"/>
         <source>About Kollegstufe</source>
         <translation>Über Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="646"/>
+        <location filename="../src/kollegstufeparent.cpp" line="664"/>
         <source>Semester</source>
         <translation>Semester</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="647"/>
+        <location filename="../src/kollegstufeparent.cpp" line="665"/>
         <source>Date</source>
         <translation>Datum</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="648"/>
+        <location filename="../src/kollegstufeparent.cpp" line="666"/>
         <source>Nr</source>
         <translation>Nr</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="649"/>
+        <location filename="../src/kollegstufeparent.cpp" line="667"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1303"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1338"/>
         <source>Points</source>
         <translation>Punkte</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="679"/>
+        <location filename="../src/kollegstufeparent.cpp" line="700"/>
         <source>Kollegstufe</source>
         <translation>Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="423"/>
+        <location filename="../src/kollegstufeparent.cpp" line="440"/>
         <source>Error when loading File - Kollegstufe</source>
         <translation>Fehler beim Datei-laden - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="424"/>
+        <location filename="../src/kollegstufeparent.cpp" line="441"/>
         <source>Error when trying to load File &lt;i&gt;</source>
         <translation>Fehler beim laden der Datei &lt;i&gt;</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="425"/>
+        <location filename="../src/kollegstufeparent.cpp" line="442"/>
         <source>It seems, you haven&apos;t got enough Read-Rights</source>
         <translation>Wahrscheinlich haben Sie nicht die nötigen Leserechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="464"/>
+        <location filename="../src/kollegstufeparent.cpp" line="481"/>
         <source>Error when creating Folder - Kollegstufe</source>
         <translation>Fehler beim Ordner-Erstellen - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="492"/>
+        <location filename="../src/kollegstufeparent.cpp" line="509"/>
         <source>It seems, you haven&apos;t got the necessary Write-Rights!</source>
         <translation>Wahrscheinlich haben Sie nicht die nötigen Schreib-Rechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="472"/>
+        <location filename="../src/kollegstufeparent.cpp" line="489"/>
         <source>Error during saving file- Kollegstufe</source>
         <translation>Fehler beim Datei-Speicher - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="582"/>
+        <location filename="../src/kollegstufeparent.cpp" line="599"/>
         <source>Fehler beim Ordner-Erstellen - Kollegstufe</source>
         <translation>Fehler beim Ordner-Erstellen - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="498"/>
+        <location filename="../src/kollegstufeparent.cpp" line="515"/>
         <source>Fehler beim Datei-Laden/Erstellen - Kollegstufe</source>
         <translation>Fehler beim Datei-Laden/Erstellen - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="500"/>
+        <location filename="../src/kollegstufeparent.cpp" line="517"/>
         <source>It seems, you haven&apos;t got the necessary Write- or Read-Rights!</source>
         <translation>Wahrscheinlich haben Sie nicht die nötigen Schreib- und/oder Leserechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="509"/>
+        <location filename="../src/kollegstufeparent.cpp" line="526"/>
         <source>Fehler beim Datei-Laden - Kollegstufe</source>
         <translation>Fehler beim Datei-Laden - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="511"/>
+        <location filename="../src/kollegstufeparent.cpp" line="528"/>
         <source>It seems, you haven&apos;t got the necessary Read-Rights!</source>
         <translation>Wahrscheinlich haben Sie nicht die nötigen Leserechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="592"/>
+        <location filename="../src/kollegstufeparent.cpp" line="609"/>
         <source>Anscheinend haben sie nicht die noetigen Schreibrechte dazu!</source>
         <translation>Anscheinend haben sie nicht die nötigen Schreibrechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="590"/>
+        <location filename="../src/kollegstufeparent.cpp" line="607"/>
         <source>Fehler beim Datei-Schreiben - Kollegstufe</source>
         <translation>Fehler beim Datei-Schreiben - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="764"/>
+        <location filename="../src/kollegstufeparent.cpp" line="786"/>
         <source>Discard</source>
         <translation>Verwerfen</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="765"/>
+        <location filename="../src/kollegstufeparent.cpp" line="787"/>
         <source>Don&apos;t Close</source>
         <translation>Nicht Schließen</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="767"/>
+        <location filename="../src/kollegstufeparent.cpp" line="789"/>
         <source>Seit dem letzten Speichern haben sich Daten verandert!
 Moechten Sie diese vor dem Schliessen speichern oder verwerfen ?</source>
         <translation>Seit dem letzten Speichern haben sich Daten verändert!
 Möchten Sie diese vor dem Schließen speichern oder verwerfen ?</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="768"/>
+        <location filename="../src/kollegstufeparent.cpp" line="790"/>
         <source>Closing Database - Kollegstufe</source>
         <translation>Archiv schließen - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="927"/>
+        <location filename="../src/kollegstufeparent.cpp" line="958"/>
         <source>Do you really want to delete the subject&apos;</source>
         <translation>Möchten sie wirklich das Fach &apos;</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="929"/>
+        <location filename="../src/kollegstufeparent.cpp" line="960"/>
         <source>&apos; ?</source>
         <translation>&apos; löschen ?</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="930"/>
+        <location filename="../src/kollegstufeparent.cpp" line="961"/>
         <source>Deleting a subject</source>
         <translation>Fach Löschen</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1081"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1112"/>
         <source>Do you really want to delete </source>
         <translation>Möchten Sie wirklich </translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1089"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1120"/>
         <source> from </source>
         <translation> vom </translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1093"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1124"/>
         <source> ? Really Delete this exam ?</source>
         <translation> löschen ?</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1094"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1125"/>
         <source>Deleting of an Exam</source>
         <translation>Arbeit Löschen</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1153"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1184"/>
         <source>Properties of subject </source>
         <translation>Eigenschaften des Faches </translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1160"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1191"/>
         <source>No Subject Selected</source>
         <translation>Kein Fach ausgewählt</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="1308"/>
+        <location filename="../src/kollegstufeparent.cpp" line="1343"/>
         <source>Mark</source>
         <translation>Note</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="636"/>
+        <location filename="../src/kollegstufeparent.cpp" line="654"/>
         <source>Configure Kollegstufe</source>
         <translation>Kollegstufe einrichten</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="661"/>
+        <location filename="../src/kollegstufeparent.cpp" line="682"/>
         <source>Add Subject</source>
         <translation>Fach hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="662"/>
+        <location filename="../src/kollegstufeparent.cpp" line="683"/>
         <source>Delete Subject</source>
         <translation>Fach entfernen</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="663"/>
+        <location filename="../src/kollegstufeparent.cpp" line="684"/>
         <source>Move Subject Up</source>
         <translation>Fach nach oben verschieben</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="664"/>
+        <location filename="../src/kollegstufeparent.cpp" line="685"/>
         <source>Move Subject Down</source>
         <translation>Fach nach unten verschieben</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="610"/>
+        <location filename="../src/kollegstufeparent.cpp" line="627"/>
         <source>&amp;Window</source>
         <translation>&amp;Fenster</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="612"/>
+        <location filename="../src/kollegstufeparent.cpp" line="629"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="660"/>
+        <location filename="../src/kollegstufeparent.cpp" line="681"/>
         <source>Click to edit the properties of currently selected subject</source>
         <translation>Klicken Sie, um die Eigenschaften des aktuell ausgewählten Faches zu bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="666"/>
+        <location filename="../src/kollegstufeparent.cpp" line="687"/>
         <source>Adds a new exam to currently selected subject</source>
         <translation>Fügt eine neue Leistung zum aktuell ausgewählten Fach hinzu</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="667"/>
+        <location filename="../src/kollegstufeparent.cpp" line="688"/>
         <source>Click to edit the properties of currently selected exam</source>
         <translation>Klicken Sie um die Eigenschaften der aktuell ausgewählten Leistung zu bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="668"/>
+        <location filename="../src/kollegstufeparent.cpp" line="689"/>
         <source>Removes the currently selected exam</source>
         <translation>Löscht die aktuell ausgewählte Leistung</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="619"/>
+        <location filename="../src/kollegstufeparent.cpp" line="636"/>
         <source>Properties</source>
         <translation>Eigenschaften</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="640"/>
+        <location filename="../src/kollegstufeparent.cpp" line="658"/>
         <source>User Manual</source>
         <translation>Handbuch</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="609"/>
+        <location filename="../src/kollegstufeparent.cpp" line="626"/>
         <source>&amp;Edit</source>
         <translation>&amp;Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="623"/>
+        <location filename="../src/kollegstufeparent.cpp" line="640"/>
         <source>Subject</source>
         <translation>Fach</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="631"/>
+        <location filename="../src/kollegstufeparent.cpp" line="648"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="627"/>
+        <location filename="../src/kollegstufeparent.cpp" line="644"/>
         <source>Move Up</source>
         <translation>Nach Oben verschieben</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="628"/>
+        <location filename="../src/kollegstufeparent.cpp" line="645"/>
         <source>Move Down</source>
         <translation>Nach Unten verschieben</translation>
     </message>
     <message>
-        <location filename="../src/kollegstufeparent.cpp" line="630"/>
+        <location filename="../src/kollegstufeparent.cpp" line="647"/>
         <source>Exam</source>
         <translation>Examen</translation>
+    </message>
+    <message>
+        <location filename="../src/kollegstufeparent.cpp" line="653"/>
+        <source>Configure Plugins</source>
+        <translation>Plugins einrichten</translation>
     </message>
 </context>
 <context>
@@ -494,7 +499,7 @@ This program is distributed in the hope that it will be useful,       but WITHOU
 <context>
     <name>ksConfigure</name>
     <message>
-        <location filename="../src/ksconfigure.cpp" line="120"/>
+        <location filename="../src/ksconfigure.cpp" line="123"/>
         <source>&amp;Ok</source>
         <translation>&amp;Ok</translation>
     </message>
@@ -504,17 +509,17 @@ This program is distributed in the hope that it will be useful,       but WITHOU
         <translation type="obsolete">&amp;Anwenden</translation>
     </message>
     <message>
-        <location filename="../src/ksconfigure.cpp" line="121"/>
+        <location filename="../src/ksconfigure.cpp" line="124"/>
         <source>&amp;Cancel</source>
         <translation>Ab&amp;brechen</translation>
     </message>
     <message>
-        <location filename="../src/ksconfigure.cpp" line="125"/>
+        <location filename="../src/ksconfigure.cpp" line="128"/>
         <source>Configure Kollegstufe</source>
         <translation>Kollegstufe einrichten</translation>
     </message>
     <message>
-        <location filename="../src/ksconfigure.cpp" line="123"/>
+        <location filename="../src/ksconfigure.cpp" line="126"/>
         <source>Select your Language</source>
         <translation>Wählen Sie Ihre Sprache aus</translation>
     </message>
@@ -645,134 +650,134 @@ This program is distributed in the hope that it will be useful,       but WITHOU
         <translation>Exportieren</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="222"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="223"/>
         <source>Fehler beim Datei-Speichern - Kollegstufe</source>
         <translation>Fehler beim Datei-Speichern - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="223"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="224"/>
         <source>Fehler beim Speichern der Date &lt;i&gt;</source>
         <translation>Fehler beim Speichern der Date &lt;i&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="224"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="225"/>
         <source>Anscheinend haben sie nicht die noetigen Schreibrechte dazu!</source>
         <translation>Anscheinend haben sie nicht die nötigen Schreibrechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="238"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="239"/>
         <source>Moechten Sie Das Archiv &apos;</source>
         <translation>Möchten Sie Das Archiv &apos;</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="240"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="241"/>
         <source>&apos; wirklich loeschen?</source>
         <translation>&apos; wirklich löschen?</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="241"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="242"/>
         <source>Loeschen eines Notenarchivs - Kollegstufe</source>
         <translation>Löschen eines Notenarchivs - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="247"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="248"/>
         <source>Fehler - Kollegstufe</source>
         <translation>Fehler - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="248"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="249"/>
         <source>Die Datei &apos;</source>
         <translation>Die Datei &apos;</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="250"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="251"/>
         <source>&apos; konnte nicht geloescht werden.
 </source>
         <translation>&apos; konnte nicht gelöscht werden.</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="251"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="252"/>
         <source>Warscheinlich besitzen sie nicht die noetigen Schreibrechte dazu</source>
         <translation>Warscheinlich besitzen sie nicht die nötigen Schreibrechte dazu</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="310"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="311"/>
         <source>Xml - Dateien ( *.xml )</source>
         <translation>XML - Dateien ( *.xml )</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="269"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="270"/>
         <source>Notenarchiv exportieren nach ...</source>
         <translation>Notenarchiv exportieren nach ...</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="295"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="296"/>
         <source>Es geschah ein Fehler beim ueberschreiben von &apos;</source>
         <translation>Es geschah ein Fehler beim Überschreiben von &apos;</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="297"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="298"/>
         <source>&apos; mit &apos;</source>
         <translation>&apos; mit &apos;</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="289"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="290"/>
         <source>Warscheinlich besitzen Sie nicht die noetigen Schreibrechte dazu</source>
         <translation>Warscheinlich besitzen Sie nicht die nötigen Schreibrechte dazu</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="290"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="291"/>
         <source>Fehler beim Datei ueberschreiben - Kollegstufe</source>
         <translation>Fehler beim Datei überschreiben - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="346"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="347"/>
         <source>&apos;
 </source>
         <translation>&apos;</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="347"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="348"/>
         <source>Warscheinlich besitzen Sie nicht die notigen Schreibrechte dazu</source>
         <translation>Warscheinlich besitzen Sie nicht die nötigen Schreibrechte dazu</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="301"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="302"/>
         <source>Fehler beim Datei uberschreiben - Kollegstufe</source>
         <translation>Fehler beim Datei Überschreiben - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="312"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="313"/>
         <source>Notenarchiv importieren von ...</source>
         <translation>Notenarchiv importieren von ...</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="342"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="343"/>
         <source>Es geschah ein Fehler beim Erstellen der Datei &apos;</source>
         <translation>Es geschah ein Fehler beim Erstellen der Datei &apos;</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="344"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="345"/>
         <source>&apos; im Ordner &apos;</source>
         <translation>&apos; im Ordner &apos;</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="348"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="349"/>
         <source>Fehler beim Datei Erstellen - Kollegstufe</source>
         <translation>Fehler beim Datei Erstellen - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="386"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="389"/>
         <source>&lt;i&gt;konnte Archiv-Information nicht lesen, warscheinlich haben sie nicht die notigen Leserechte dazu.&lt;/i&gt;</source>
         <translation>&lt;i&gt;konnte Archiv-Information nicht lesen, warscheinlich haben sie nicht die nötigen Leserechte dazu.&lt;/i&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="402"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="405"/>
         <source>&lt;u&gt;Name des Schulers:&lt;/u&gt; &lt;b&gt;</source>
         <translation>&lt;u&gt;Name des Schülers:&lt;/u&gt; &lt;b&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ksdatabaseselection.cpp" line="404"/>
+        <location filename="../src/ksdatabaseselection.cpp" line="407"/>
         <source>&lt;/b&gt;&lt;br&gt;</source>
         <translation>&lt;/b&gt;&lt;br&gt;</translation>
     </message>
@@ -878,54 +883,168 @@ This program is distributed in the hope that it will be useful,       but WITHOU
         <translation type="obsolete">Anwendungsdaten</translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="543"/>
+        <location filename="../src/ksplattformspec.cpp" line="544"/>
         <source>New Subject</source>
         <translation>Neues Fach</translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="276"/>
+        <location filename="../src/ksplattformspec.cpp" line="277"/>
         <source>New Pupil</source>
         <translation>Neuer Schüler</translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="316"/>
+        <location filename="../src/ksplattformspec.cpp" line="317"/>
         <source>der/die/das</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="310"/>
+        <location filename="../src/ksplattformspec.cpp" line="311"/>
         <source>des/der/des</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="313"/>
+        <location filename="../src/ksplattformspec.cpp" line="314"/>
         <source>dem/die/dem</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="342"/>
+        <location filename="../src/ksplattformspec.cpp" line="343"/>
         <source>die </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="326"/>
+        <location filename="../src/ksplattformspec.cpp" line="327"/>
         <source>das </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="340"/>
+        <location filename="../src/ksplattformspec.cpp" line="341"/>
         <source>den </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="598"/>
+        <location filename="../src/ksplattformspec.cpp" line="599"/>
         <source>Exam</source>
         <translation>Arbeit</translation>
     </message>
     <message>
-        <location filename="../src/ksplattformspec.cpp" line="559"/>
+        <location filename="../src/ksplattformspec.cpp" line="560"/>
         <source>new Subject</source>
         <translation>neues Fach</translation>
+    </message>
+</context>
+<context>
+    <name>ksPlugin</name>
+    <message>
+        <location filename="../src/ksplugin.cpp" line="91"/>
+        <source>Kollegstufe - </source>
+        <translation type="obsolete">Kollegstufe - </translation>
+    </message>
+    <message>
+        <location filename="../src/ksplugin.cpp" line="102"/>
+        <source>Plugin</source>
+        <translation>Das Plugin</translation>
+    </message>
+    <message>
+        <location filename="../src/ksplugin.cpp" line="103"/>
+        <source>is not configurable.</source>
+        <translation>ist nicht konfigurierbar.</translation>
+    </message>
+    <message>
+        <location filename="../src/ksplugin.cpp" line="112"/>
+        <source>by</source>
+        <translation>von</translation>
+    </message>
+    <message>
+        <location filename="../src/ksplugin.cpp" line="141"/>
+        <source>Kollegstufe-Plugin</source>
+        <translation>Kollegstufe-Plugin</translation>
+    </message>
+    <message>
+        <location filename="../src/ksplugin.cpp" line="142"/>
+        <source>A simple plugin for Kollegstufe</source>
+        <translation>Ein einfaches Plugin für Kollegstufe</translation>
+    </message>
+    <message>
+        <location filename="../src/ksplugin.cpp" line="117"/>
+        <source>Kollegstufe</source>
+        <translation>Kollegstufe</translation>
+    </message>
+</context>
+<context>
+    <name>ksPluginConfigurationDialog</name>
+    <message>
+        <location filename="../src/kspluginconfigurationdialog.cpp" line="106"/>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginconfigurationdialog.cpp" line="108"/>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginconfigurationdialog.cpp" line="107"/>
+        <source>Apply</source>
+        <translation>Anwenden</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginconfigurationdialog.cpp" line="109"/>
+        <source>What&apos;s this ?</source>
+        <translation>Was ist das ?</translation>
+    </message>
+</context>
+<context>
+    <name>ksPluginItemWidget</name>
+    <message>
+        <location filename="../src/kspluginitemwidget.cpp" line="121"/>
+        <source>About</source>
+        <translation>Über</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginitemwidget.cpp" line="122"/>
+        <source>Configure</source>
+        <translation>Einrichten</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginitemwidget.cpp" line="126"/>
+        <source>Global</source>
+        <translation>Global</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginitemwidget.cpp" line="127"/>
+        <source>Local</source>
+        <translation>Lokal</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginitemwidget.cpp" line="126"/>
+        <source>The scope of the plugin can be configured here:</source>
+        <translation>Hier kann der Gültigkeitsbereich des Plugins eingestellt werden:</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginitemwidget.cpp" line="127"/>
+        <source>means, that this plugin will be loaded for all archives</source>
+        <translation>bedeutet, dass dieses Plugin bei allen Archiven geladen wird</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginitemwidget.cpp" line="128"/>
+        <source>means, that this plugin only will be loaded when opening this current archive</source>
+        <translation>bedeutet, dass dieses Plugin nur beim Öffnen des aktuellen Archivs geladen wird.</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginitemwidget.cpp" line="129"/>
+        <source>Here you can load/unload this plugin.</source>
+        <translation>Here kann man diesess Plugin Laden / Stoppen.</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginitemwidget.cpp" line="130"/>
+        <source>Click to configure this plugin.</source>
+        <translation>Klicken Sie, um dieses Plugin zu konfigurieren.</translation>
+    </message>
+    <message>
+        <location filename="../src/kspluginitemwidget.cpp" line="131"/>
+        <source>Click to get some information about this plugin.</source>
+        <translation>Klicken Sie um Informationen über dieses Plugin zu erhalten.</translation>
     </message>
 </context>
 <context>
@@ -936,12 +1055,12 @@ This program is distributed in the hope that it will be useful,       but WITHOU
         <translation>Schließen</translation>
     </message>
     <message>
-        <location filename="../src/ksstatisticsdialog.cpp" line="167"/>
+        <location filename="../src/ksstatisticsdialog.cpp" line="181"/>
         <source>Statistics of subject </source>
         <translation>Statistik des Faches </translation>
     </message>
     <message>
-        <location filename="../src/ksstatisticsdialog.cpp" line="171"/>
+        <location filename="../src/ksstatisticsdialog.cpp" line="185"/>
         <source>Statistics</source>
         <translation>Statistik</translation>
     </message>
@@ -954,6 +1073,16 @@ This program is distributed in the hope that it will be useful,       but WITHOU
         <location filename="../src/ksstatisticsdialog.cpp" line="102"/>
         <source>Semester:</source>
         <translation>Semester:</translation>
+    </message>
+    <message>
+        <location filename="../src/ksstatisticsdialog.cpp" line="119"/>
+        <source>Next Exam &gt;&gt;</source>
+        <translation>Nächstes Exam &gt;&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/ksstatisticsdialog.cpp" line="120"/>
+        <source>&lt;&lt; Exam before</source>
+        <translation>&lt;&lt; Vorheriges Exam</translation>
     </message>
 </context>
 <context>
@@ -1038,6 +1167,19 @@ This program is distributed in the hope that it will be useful,       but WITHOU
         <location filename="../src/kssubjectstatusbar.cpp" line="95"/>
         <source>Entire Average</source>
         <translation>Gesamtschnitt</translation>
+    </message>
+</context>
+<context>
+    <name>kspExportToHtml</name>
+    <message>
+        <location filename="../src/kspexporttohtml.cpp" line="41"/>
+        <source>To Html Exporter</source>
+        <translation>Zu Html Exportierer</translation>
+    </message>
+    <message>
+        <location filename="../src/kspexporttohtml.cpp" line="43"/>
+        <source>Exports database to an HTML-File</source>
+        <translation>Exportiert die Notendatenbank zu einer HTML-Datei</translation>
     </message>
 </context>
 </TS>

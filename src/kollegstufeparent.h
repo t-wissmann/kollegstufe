@@ -36,10 +36,13 @@
 #endif
 
 #include <QTranslator>
+
 #include "xmlparser.h"
 
 // own qobjects
 class ksDebugOutput;
+class ksPluginInformation;
+class ksPluginEngine;
 
 // own widgets
 class ksSubjectStatusbar;
@@ -50,6 +53,7 @@ class ksSubjectProperties;
 class ksDatabaseSelection;
 class ksStatisticsDialog;
 class ksDatabaseProperties;
+class ksPluginConfigurationDialog;
 class ksAbout;
 class ksConfigure;
 
@@ -94,10 +98,13 @@ class kollegstufeParent
             
 signals:
     //void languageChanged();
+    void closed();
 public slots:
     void showHelpDialog();
     void showAboutDialog();
     void showConfigureDialog();
+    void showPluginConfigDialog();
+    
     // Save/load
     void loadConfigFile();
     void saveConfigFile();
@@ -146,6 +153,8 @@ public:
     QString getFilename(){ return szFilename; };
     void reloadTranslator();
     void resetWindowTitle();
+    void setCloseAllIfGetClosed(bool closeAll);
+    bool closeAllIfGetClosed();
 protected:
     virtual void closeEvent(QCloseEvent* event);
     virtual void changeEvent(QEvent* event);
@@ -159,6 +168,7 @@ private:
     void    createLayouts();
     void    connectSlots();
     void    initWidgets();
+    void    initPluginEngine();
     
     void    retranslateTooltips();
     
@@ -175,6 +185,7 @@ private:
     QMenu*          mnmHelp;
     //actions
     // extras - menu
+    QAction*        mnaConfigurePlugins;
     QAction*        mnaConfigureKs;
     
     // edit - menu
@@ -233,12 +244,16 @@ private:
     ksDatabaseSelection*    diaDatabaseSelection;
     ksAbout*                diaAbout;
     ksConfigure*            diaConfigureKs;
+    ksPluginConfigurationDialog* diaPluginConfig;
     ksStatisticsDialog*     diaStatistics;
     
     // member variables
+    ksPluginEngine* pPluginEngine;
+    ksPluginInformation*    pluginInformation;
     
     QTranslator appTranslator;
     bool        bWantsToBeShown;
+    
     
     QString     szApplicationPath;
     QString     szFilename;

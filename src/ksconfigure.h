@@ -25,6 +25,8 @@
 #include <QTranslator>
 #include <QStringList>
 
+class ksPluginManager;
+
 class QEvent;
 class QPushButton;
 class QLabel;
@@ -77,7 +79,6 @@ private:
     QGridLayout* layoutLanguageSelection;
     QListWidget* lstLanguageSelection;
     QGroupBox*   grpLanguageSelection;
-    
     
     
     QStringList  languageList;
