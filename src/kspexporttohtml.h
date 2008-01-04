@@ -36,21 +36,22 @@ public:
     kspExportToHtml();
 
     ~kspExportToHtml();
-
+public slots:
+    void exportToHtml();
+    
     
 protected:
     
     // core functions
     virtual void load();
+    virtual void refresh();
     virtual void unload();
     virtual void retranslate();
     virtual void createConfiguration(ksConfigContainer* config);
     
-protected slots:
-    virtual void refresh();
-    
 private:
     
+    QAction*    mnaExportToHtml;
     
 };
 

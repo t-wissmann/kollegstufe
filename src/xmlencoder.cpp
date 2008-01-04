@@ -18,7 +18,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 #include "xmlencoder.h"
+#include "ksplattformspec.h"
+#include <QString>
 
 xmlEncoder::xmlEncoder()
 {
@@ -32,12 +35,24 @@ xmlEncoder::~xmlEncoder()
 
 char* xmlEncoder::xmlCodeToString(char* string)
 {
-    return string;
+    QString returnString = ksPlattformSpec::szToUmlauts(string);
+    returnString.replace(QString("&quot;"), QString("\""));
+    returnString.replace(QString("&apos;"), QString("\'"));
+    returnString.replace(QString("&amp;"), QString("&"));
+    returnString.replace(QString("&lt;"), QString("<"));
+    returnString.replace(QString("&gt;"), QString(">"));
+    return ksPlattformSpec::qstringToSz(returnString);
 }
 
 char* xmlEncoder::stringToXmlCode(char* string)
 {
-    return string;
+    QString returnString = ksPlattformSpec::szToUmlauts(string);
+    returnString.replace(QString("&"), QString("&amp;"));
+    returnString.replace(QString("\""), QString("&quot;"));
+    returnString.replace(QString("\'"), QString("&apos;"));
+    returnString.replace(QString("<"), QString("&lt;"));
+    returnString.replace(QString(">"), QString("&gt;"));
+    return ksPlattformSpec::qstringToSz(returnString);
 }
 
 

@@ -23,6 +23,7 @@
 
 class xmlObject;
 class kollegstufeParent;
+class QMenu;
 
 /**
 	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
@@ -50,6 +51,8 @@ public:
     void setCurrentExam(xmlObject*  newCurrentExam) { m_pCurrentExam = newCurrentExam; };
     xmlObject* currentExam() const { return m_pCurrentExam; };
     
+    void setPluginMenu(QMenu* newMenu) { m_pPluginMenu = newMenu; };
+    QMenu* pluginMenu() const { return m_pPluginMenu; };
     
 
 private:
@@ -60,6 +63,7 @@ private:
     xmlObject*  m_pCurrentCategory;
     xmlObject*  m_pCurrentSubject;
     xmlObject*  m_pCurrentExam;
+    QMenu*      m_pPluginMenu;
 };
 
 #endif

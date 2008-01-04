@@ -73,6 +73,7 @@ public:
     void retranslateUi();
     void setTitle(QString title, QString description = "");
     void setConfigContainer(ksConfigContainer* config);
+    ksConfigContainer* currentConfigContainer() const { return m_pConfigContainer; };
     void refreshGuiFromConfig(ksConfigContainer* config);
     
     void clearConfigSelectionMenu();

@@ -25,6 +25,7 @@ ksPluginInformation::ksPluginInformation()
 {
     setAllDatabasePointersToNull();
     m_pMainWindow = NULL;
+    m_pPluginMenu = NULL;
 }
 
 

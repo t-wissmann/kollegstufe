@@ -214,7 +214,7 @@ bool xmlLoader::parseTagName(xmlObject* target)
     char oldChar = m_szBuf[m_nParsingPosition]; // backup char at this position
     m_szBuf[m_nParsingPosition] = '\0'; // simulate string end
     // write name to target
-    target->setName(&(m_szBuf[nameStartPosition]));
+    target->setNameFromXmlCode(&(m_szBuf[nameStartPosition]));
     //restore old buf
     m_szBuf[m_nParsingPosition] = oldChar;
     return TRUE;
@@ -272,7 +272,7 @@ bool xmlLoader::parseNextAttribute(xmlObject* target)
     char oldChar = m_szBuf[m_nParsingPosition]; // backup char
     m_szBuf[m_nParsingPosition] = '\0';
     
-    attribute->SetName(&(m_szBuf[nameposition]));
+    attribute->setNameFromXmlCode(&(m_szBuf[nameposition]));
     //reset old char at m_nParsingPosition
     m_szBuf[m_nParsingPosition] = oldChar;
     
@@ -289,7 +289,7 @@ bool xmlLoader::parseNextAttribute(xmlObject* target)
     
     
     m_szBuf[m_nParsingPosition] = '\0'; //replace valueindicator by '\0'
-    attribute->SetValue(&(m_szBuf[valueposition])); // write value to attributeclass
+    attribute->setValueFromXmlCode(&(m_szBuf[valueposition])); // write value to attributeclass
     m_szBuf[m_nParsingPosition] = valueindicator; //restore old char
     
     m_nParsingPosition++; // leave ' or ": name="value"-> <-
@@ -320,7 +320,7 @@ bool xmlLoader::parseContent(xmlObject* target)
     }else
     {
         
-        target->appendToContent(&(m_szBuf[contentstart])); // write content to target class
+        target->appendToContent(xmlEncoder::xmlCodeToString(&(m_szBuf[contentstart]))); // write content to target class
     }
     m_szBuf[m_nParsingPosition] = oldChar; // restore old buf
     // done

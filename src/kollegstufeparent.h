@@ -38,10 +38,9 @@
 #include <QTranslator>
 
 #include "xmlparser.h"
-
+#include "ksplugininformation.h"
 // own qobjects
 class ksDebugOutput;
-class ksPluginInformation;
 class ksPluginEngine;
 
 // own widgets
@@ -180,11 +179,12 @@ private:
     // menus
     QMenu*          mnmFile;
     QMenu*          mnmEdit;
-    QMenu*          mnmExtras;
+    QMenu*          mnmSettings;
+    QMenu*          mnmPlugins;
     QMenu*          mnmWindow;
     QMenu*          mnmHelp;
     //actions
-    // extras - menu
+    // settings - menu
     QAction*        mnaConfigurePlugins;
     QAction*        mnaConfigureKs;
     
@@ -249,7 +249,7 @@ private:
     
     // member variables
     ksPluginEngine* pPluginEngine;
-    ksPluginInformation*    pluginInformation;
+    ksPluginInformation    pluginInformation;
     
     QTranslator appTranslator;
     bool        bWantsToBeShown;

@@ -973,7 +973,7 @@ int WriteObjectToBuf (xmlObject* TargetObject, char** szBuf, unsigned long* nBuf
     for (nCurrentAttribute = 0; nCurrentAttribute < TargetObject->nGetAttributeCounter(); nCurrentAttribute++)
     {
         nAttributeNameLength = strlen(TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->nameToXmlCode());
-        nAttributeValueLength = strlen(TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->szValue);
+        nAttributeValueLength = strlen(TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->valueToXmlCode());
         
         if ( (*nBufLength) < (strlen(*szBuf) + nAttributeNameLength + nAttributeValueLength +5) )
         {
@@ -983,7 +983,7 @@ int WriteObjectToBuf (xmlObject* TargetObject, char** szBuf, unsigned long* nBuf
         strcat( *szBuf, " ");
         strcat( *szBuf, TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->nameToXmlCode());
         strcat( *szBuf, "=\"");
-        strcat( *szBuf, TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->szValue);
+        strcat( *szBuf, TargetObject->cGetAttributeByIdentifier(nCurrentAttribute)->valueToXmlCode());
         strcat( *szBuf, "\"");
     }
     if ( (*nBufLength) < (strlen(*szBuf) + 2))
@@ -996,12 +996,12 @@ int WriteObjectToBuf (xmlObject* TargetObject, char** szBuf, unsigned long* nBuf
     //Write Content
     if (TargetObject->szGetContent() != NULL)
     {
-        if ( (*nBufLength) < (strlen(*szBuf) + strlen(TargetObject->szGetContent()) + 1) )
+        if ( (*nBufLength) < (strlen(*szBuf) + strlen(xmlEncoder::stringToXmlCode(TargetObject->szGetContent())) + 1) )
         {
-            if ((nResult = EditLengthOfBuf (szBuf, nBufLength, strlen(*szBuf)  + strlen(TargetObject->szGetContent()) +1 )) != 0)
+            if ((nResult = EditLengthOfBuf (szBuf, nBufLength, strlen(*szBuf)  + strlen(xmlEncoder::stringToXmlCode(TargetObject->szGetContent())) +1 )) != 0)
                 return nResult;
         }
-        strcat(*szBuf, TargetObject->szGetContent());
+        strcat(*szBuf, xmlEncoder::stringToXmlCode(TargetObject->szGetContent()));
     
     }
     //write contained OBJECTS

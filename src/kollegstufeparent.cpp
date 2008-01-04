@@ -28,7 +28,6 @@
 #include "ksconfigure.h"
 #include "examitem.h"
 #include "kspluginengine.h"
-#include "ksplugininformation.h"
 
 // dialogs:
 #include "kspluginconfigurationdialog.h"
@@ -97,8 +96,6 @@ kollegstufeParent::kollegstufeParent(QWidget* parentWidget)
     loadConfigFile();
     debugOutput->putDebugOutput("MainWindow created");
     
-    //update window's pixels
-    update();
 }
 
 
@@ -108,7 +105,6 @@ kollegstufeParent::~kollegstufeParent()
     debugOutput->putDebugOutput("MainWindow destroyed");
     
     delete pPluginEngine;
-    delete pluginInformation;
     
     delete debugOutput;
 }
@@ -211,9 +207,11 @@ void kollegstufeParent::createMenuBar()
     //add menus to menubar
     mnmFile     = mnbMenuBar->addMenu("&File");
     mnmEdit     = mnbMenuBar->addMenu("&Edit");
-    mnmExtras   = mnbMenuBar->addMenu("&Extras");
+    mnmPlugins  = mnbMenuBar->addMenu("");
+    mnmSettings = mnbMenuBar->addMenu("&Settings");
     mnmWindow   = mnbMenuBar->addMenu("&Window");
     mnmHelp     = mnbMenuBar->addMenu("&Help");
+    
     
     //add actions to menus
     // 1. File - menu
@@ -241,9 +239,9 @@ void kollegstufeParent::createMenuBar()
     mnaStatistics = mnmWindow->addAction("statistics");
     mnaStatistics->setCheckable(TRUE);
     
-    // 4. Extras - menu
-    mnaConfigurePlugins = mnmExtras->addAction("");
-    mnaConfigureKs      = mnmExtras->addAction("");
+    // 4. settings - menu
+    mnaConfigurePlugins = mnmSettings->addAction("");
+    mnaConfigureKs      = mnmSettings->addAction("");
     
     // 5. Help - menu
     mnaShowHelp   = mnmHelp->addAction("");
@@ -334,7 +332,7 @@ void kollegstufeParent::connectSlots()
     connect(mnaEditExamDelete, SIGNAL(triggered()), this, SLOT(examDelete()));
     connect(mnaEditExamEdit, SIGNAL(triggered()), this, SLOT(examEdit()));
     
-    // mnmExtras
+    // mnmSettings
     connect(mnaConfigureKs, SIGNAL(triggered()), this, SLOT(showConfigureDialog()));
     connect(mnaConfigurePlugins, SIGNAL(triggered()), this, SLOT(showPluginConfigDialog()));
     
@@ -416,10 +414,11 @@ void kollegstufeParent::initWidgets()
 
 void kollegstufeParent::initPluginEngine()
 {
-    pluginInformation = new ksPluginInformation;
-    pluginInformation->setMainWindow(this);
     
-    pPluginEngine = new ksPluginEngine(pluginInformation);
+    pluginInformation.setMainWindow(this);
+    pluginInformation.setPluginMenu(mnmPlugins);
+    
+    pPluginEngine = new ksPluginEngine(&pluginInformation);
 }
 
 void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
@@ -477,6 +476,10 @@ void kollegstufeParent::saveFile(QString newFilename)
     {
         newFilename = szFilename;
     }
+    
+    
+    debugOutput->putDebugOutput("Saving file \'" + newFilename + "\'");
+    
     
     ksPlattformSpec::addMissingDatabaseAttributes(&currentDatabase);
     // write local plugin config
@@ -554,8 +557,11 @@ void kollegstufeParent::loadConfigFile()
     
     // 3. update Language
     reloadTranslator();
+    // 4. load plugins
     
-    // 4. file
+    pPluginEngine->loadPluginConfigurations(xmlConfig.cGetObjectByName("plugins"), FALSE); // load global
+    
+    // 5. file
     if(ksPlattformSpec::fileExists(xmlConfig.cGetObjectByName("session")->cGetObjectByName("file")->szGetContent()))
     {
         loadFile(xmlConfig.cGetObjectByName("session")->cGetObjectByName("file")->szGetContent(), TRUE);
@@ -597,7 +603,12 @@ void kollegstufeParent::saveConfigFile()
     QList<int> list = splitterParent->sizes();
     QList<int>::Iterator it = list.begin();
     xmlConfig.cGetObjectByName("window-settings")->cGetObjectByName("splitterMain")->cGetAttributeByName("coord")->SetValueToInt(*it);
-    // 3. file
+    // 3. language:
+    // language is already saved to xmlconifig
+    // 4. plugins
+    pPluginEngine->savePluginConfigurations(xmlConfig.cGetObjectByName("plugins"), FALSE); // FALSE : global
+    
+    // 5. file
     xmlConfig.cGetObjectByName("session")->cGetObjectByName("file")->nSetContent(ksPlattformSpec::qstringToSz(szFilename));
     // create .kollegstufe direcotry if it doesnt exist
     if(!ksPlattformSpec::createKsDir())
@@ -630,8 +641,14 @@ void kollegstufeParent::retranslateUi()
     // menubar - menus
     mnmFile->setTitle(tr("&File"));
     mnmEdit->setTitle(tr("&Edit"));
+    // pluginsmenu
+    if(!mnmPlugins->title().isEmpty())
+    {
+        mnmPlugins->setTitle(tr("Plugins"));
+    }
+    
+    mnmSettings->setTitle(tr("&Settings"));
     mnmWindow->setTitle(tr("&Window"));
-    mnmExtras->setTitle(tr("&Extras"));
     mnmHelp->setTitle(tr("&Help"));
     //file menu
     mnaLoadDatabase->setText(tr("Load archiv"));
@@ -655,7 +672,7 @@ void kollegstufeParent::retranslateUi()
     mnaEditExamDelete->setText(tr("Delete"));
     mnaEditExamEdit->setText(tr("Edit"));
     
-    // extras menu
+    // settings menu
     mnaConfigurePlugins->setText(tr("Configure Plugins"));
     mnaConfigureKs->setText(tr("Configure Kollegstufe"));
     // window menu
@@ -835,6 +852,11 @@ void kollegstufeParent::showDatabaseProperties()
         {
             diaStatistics->setProperties(currentPropertyPart);
         }
+        if(currentPropertyPart && currentPropertyPart->cGetObjectByName("author"))
+        {
+            currentWindowTitle = ksPlattformSpec::szToUmlauts(currentPropertyPart->cGetObjectByName("author")->szGetContent());
+        }
+        resetWindowTitle();
         setDatabaseChanged();
         refreshExamList();
     }

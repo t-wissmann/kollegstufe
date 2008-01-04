@@ -21,7 +21,7 @@
 #include "kspexporttohtml.h"
 #include "ksplugininformation.h"
 #include "configdialog.h"
-#include <QMessageBox>
+#include <QAction>
 
 kspExportToHtml::kspExportToHtml()
  : ksPlugin()
@@ -49,6 +49,10 @@ void kspExportToHtml::retranslate()
 void kspExportToHtml::load()
 {
     qDebug("%s:%s gets loaded", identifier().toAscii().data(), name().toAscii().data());
+    mnaExportToHtml = new QAction(this);
+    mnaExportToHtml->setText(tr("Export To Html"));
+    addMenuAction(mnaExportToHtml);
+    connect(mnaExportToHtml, SIGNAL(triggered()), this, SLOT(exportToHtml()));
 }
 
 void kspExportToHtml::refresh()
@@ -58,8 +62,11 @@ void kspExportToHtml::refresh()
 
 void kspExportToHtml::unload()
 {
-    //QMessageBox::information(NULL, "kollegstufe", name() + " gets unloaded");
     qDebug("%s:%s gets unloaded", identifier().toAscii().data(), name().toAscii().data());
+    
+    disconnect(mnaExportToHtml, SIGNAL(triggered()), this, SLOT(exportToHtml()));
+    removeMenuAction(mnaExportToHtml);
+    delete mnaExportToHtml;
 }
 
 void kspExportToHtml::createConfiguration(ksConfigContainer* config)
@@ -69,7 +76,7 @@ void kspExportToHtml::createConfiguration(ksConfigContainer* config)
         return;
     }
     
-    config->setInGuiOptionPart(TRUE); // start of gui-options
+    /*config->setInGuiOptionPart(TRUE); // start of gui-options
     ksConfigOption* option;
     option = config->createOption(ksConfigOption("desktop size", 4));
     option->setDescription("Size of your Desktop");
@@ -80,7 +87,11 @@ void kspExportToHtml::createConfiguration(ksConfigContainer* config)
     option->setDescription("Your size");
     option->setMinMax(0.40, 3.00);
     
-    config->setInGuiOptionPart(FALSE); // end of gui - options
+    config->setInGuiOptionPart(FALSE); // end of gui - options*/
+}
+
+void kspExportToHtml::exportToHtml()
+{
 }
 
 

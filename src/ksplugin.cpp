@@ -22,24 +22,26 @@
 #include "ksplugin.h"
 #include "ksplugininformation.h"
 #include "ksconfigoption.h"
-#include <QMessageBox>
+#include "kollegstufeparent.h"
 #include "xmlparser.h"
 #include <QDateTime>
+#include <QMessageBox>
+#include <QMenu>
 
 #include "configdialog.h"
 
 
 ksPlugin::ksPlugin() :QObject()
 {
+    m_pConfigDia = NULL;
     m_pCurrentConfig = &m_cGlobalConfig;
     m_nState = StateUnloaded;
     m_nWantedState = StateUnloaded;
     m_pInformation = NULL;
-    setIsConfigurable(TRUE);
+    setIsConfigurable(FALSE);
     setIsHavingAnAboutDialog(FALSE);
     setIdentifier("ksPlugin");
     retranslateUi();
-    m_pConfigDia = NULL;
 }
 
 
@@ -52,15 +54,9 @@ ksPlugin::~ksPlugin()
 }
 
 
-
 void ksPlugin::load()
 {
-    /*
-    QMessageBox::information(m_pInformation ? (QWidget*)(m_pInformation->mainWindow()) : NULL,
-                             QString("Kollegstufe") + QString(" - ") + name(),
-                            name() + " gets loaded!");
-    */
-    m_pCurrentConfig->setOption(ksConfigOption("lastload", QDateTime::currentDateTime().toString()));
+    qDebug("Plugin \'%s\' gets loaded at %s", identifier().toAscii().data(), QDateTime::currentDateTime().toString().toAscii().data());
 }
 
 void ksPlugin::refresh()
@@ -70,12 +66,7 @@ void ksPlugin::refresh()
 
 void ksPlugin::unload()
 {
-    /*
-    QMessageBox::information(m_pInformation ? (QWidget*)(m_pInformation->mainWindow()) : NULL,
-                             QString("Kollegstufe") + QString(" - ") + name(),
-                                     name() + " gets unloaded!");
-    */
-    m_pCurrentConfig->setOption(ksConfigOption("lastunload", QDateTime::currentDateTime().toString()));
+    qDebug("Plugin \'%s\' gets unloaded at %s", identifier().toAscii().data(), QDateTime::currentDateTime().toString().toAscii().data());
 }
 
 
@@ -169,6 +160,7 @@ void ksPlugin::configure()
         {
             m_pConfigDia = new ConfigDialog;
         }
+        connect(m_pConfigDia, SIGNAL(configurationChanged()), this, SLOT(configHasChanged()));
     }
     createConfiguration(&m_cGlobalConfig); // create global config
     createConfiguration(&m_cLocalConfig); // create local config
@@ -241,7 +233,10 @@ void    ksPlugin::setInformationSource(ksPluginInformation*   newInformation)
 void ksPlugin::retranslateUi()
 {
     retranslate();
-    
+    if(m_pConfigDia != NULL && m_pConfigDia->isVisible()) // if config dialog is shown
+    {
+        configure(); // recreate configuration
+    }
 }
 
 void ksPlugin::retranslate()
@@ -255,6 +250,24 @@ void ksPlugin::retranslate()
 bool ksPlugin::operator==(const ksPlugin& other)
 {
     return (identifier() == other.identifier());
+}
+
+
+void ksPlugin::configHasChanged()
+{
+    if(m_pInformation && m_pInformation->mainWindow())
+    {
+        if(m_pConfigDia->currentConfigContainer() == &m_cLocalConfig)
+        {   // only set database changed, if config, that has been changed, is local config
+            // we don't need mainWindow()->setDatabaseChanged(TRUE) if global config has changed,
+            // because global config isn't in database.xml file !
+            m_pInformation->mainWindow()->setDatabaseChanged(TRUE);
+        }
+    }
+    if(isLoaded())
+    {// if not is loaded, we don't need to refresh, because plugin will be refreshed when loading
+        refresh(); // refresh from new configuration
+    }
 }
 
 void ksPlugin::setIdentifier(QString newIdentifier)
@@ -395,12 +408,66 @@ void ksPlugin::loadConfig(xmlObject* source, bool localOrGlobal) //TRUE: local ;
     if(localOrGlobal)
     {
         loadConfigFromXmlObject(&m_cLocalConfig, source);
+        
+        if((source && source->cGetAttributeByName("state"))) // always load , because localloaded has an higher priority
+        {   // only load if is not loaded before, because localloaded has an higher priority
+            QString newState = source->cGetAttributeByName("state")->value();
+            if(newState == "loaded")
+            {
+                loadLocal();
+            }
+            else
+            {
+                // if wanted state in source is unloaded, and state() is global loaded
+                // then let it be loaded, but if state() is StateLocalLoaded(), then unload it!
+                if(state() == StateLocalLoaded)
+                {
+                    unloadGlobalLocal();
+                }
+            }
+        }
     }
     else
     {
         loadConfigFromXmlObject(&m_cGlobalConfig, source);
+        
+        if((source && source->cGetAttributeByName("state")) && !isLoaded())
+        {   // only load if is not loaded before, because localloaded has an higher priority
+            QString newState = source->cGetAttributeByName("state")->value();
+            if(newState == "loaded")
+            {
+                loadGlobal();
+            }
+        }
     }
 }
+
+
+void ksPlugin::addMenuAction(QAction* action)
+{
+    if(action && m_pInformation && m_pInformation->pluginMenu())
+    {
+        m_pInformation->pluginMenu()->addAction(action);
+        if(m_pInformation->pluginMenu()->actions().size() == 1)
+        {
+            m_pInformation->pluginMenu()->setTitle(tr("Plugins"));
+        }
+    }
+}
+
+void ksPlugin::removeMenuAction(QAction* action)
+{
+    if(action && m_pInformation && m_pInformation->pluginMenu())
+    {
+        m_pInformation->pluginMenu()->removeAction(action);
+        if(m_pInformation->pluginMenu()->actions().size() <= 0)
+        {
+            m_pInformation->pluginMenu()->setTitle("");
+        }
+    }
+}
+
+
 
 
 

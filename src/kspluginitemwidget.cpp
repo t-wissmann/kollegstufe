@@ -60,8 +60,10 @@ void ksPluginItemWidget::allocateWidgets()
 {
     chkIsLoaded = new QCheckBox;
     chkIsLoaded->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    lblNameAndDescription = new QClickableLabel;
-    lblNameAndDescription->setWordWrap(TRUE);
+    chkIsLoaded->setText("");
+    lblName = new QClickableLabel;
+    //lblDescription = new QClickableLabel;
+    lblName->setWordWrap(TRUE);
     btnAbout    = new QPushButton;
     btnAbout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     btnConfigure= new QPushButton;
@@ -77,14 +79,15 @@ void ksPluginItemWidget::createLayouts()
 {
     layoutRightEnd = new QVBoxLayout;
     layoutRightEnd->setMargin(0);
+    //layoutRightEnd->addStretch(0);
     layoutRightEnd->addWidget(btnAbout);
     layoutRightEnd->addWidget(btnConfigure);
-    
-    layoutParent = new QHBoxLayout;
-    layoutParent->addWidget(chkIsLoaded);
-    layoutParent->addWidget(cmbScope);
-    layoutParent->addWidget(lblNameAndDescription);
-    layoutParent->addLayout(layoutRightEnd);
+    layoutRightEnd->setSizeConstraint(QLayout::SetFixedSize);
+    layoutParent = new QGridLayout;
+    layoutParent->addWidget(chkIsLoaded, 0, 0);
+    layoutParent->addWidget(cmbScope, 0, 1);
+    layoutParent->addWidget(lblName, 0, 2);
+    layoutParent->addLayout(layoutRightEnd, 0, 3);
     
     
     
@@ -94,7 +97,8 @@ void ksPluginItemWidget::createLayouts()
 void ksPluginItemWidget::connectSlots()
 {
     // about selection
-    connect(lblNameAndDescription, SIGNAL(clicked()), this, SLOT(setSelected()));
+    connect(lblName, SIGNAL(clicked()), this, SLOT(setSelected()));
+    //connect(lblDescription, SIGNAL(clicked()), this, SLOT(setSelected()));
     connect(this, SIGNAL(clicked()), this, SLOT(setSelected()));
     connect(btnAbout, SIGNAL(clicked()), this, SLOT(setSelected()));
     connect(btnConfigure, SIGNAL(clicked()), this, SLOT(setSelected()));
@@ -121,12 +125,15 @@ void ksPluginItemWidget::retranslateUi()
     {
         m_pCurrentPlugin->retranslateUi(); // To be sure, that is already translated
         setEnabled(TRUE);
-        QString text = "<b>";
-        text += m_pCurrentPlugin->name() + "</b><br>";
-        text += m_pCurrentPlugin->description();
-        lblNameAndDescription->setText(text);
-        btnAbout->setVisible(m_pCurrentPlugin->hasAboutDialog());
-        btnConfigure->setEnabled(m_pCurrentPlugin->isConfigurable());
+        QString nametext = "<b>";
+        nametext += m_pCurrentPlugin->name() + "</b>";
+        if(!m_pCurrentPlugin->description().isEmpty() && !m_pCurrentPlugin->name().isEmpty())
+        {
+            nametext += "<br>";
+        }
+        nametext += m_pCurrentPlugin->description();
+        lblName->setText(nametext);
+        //lblDescription->setText(m_pCurrentPlugin->description());
     }
     btnAbout->setText(tr("About"));
     btnConfigure->setText(tr("Configure"));
@@ -237,11 +244,13 @@ void ksPluginItemWidget::setSelected(bool ifIsSelected)
     if(ifIsSelected)
     {
         emit(selected(this));
-        lblNameAndDescription->setForegroundRole(QPalette::HighlightedText);
+        //lblDescription->setForegroundRole(QPalette::HighlightedText);
+        lblName->setForegroundRole(QPalette::HighlightedText);
     }
     else
     {
-        lblNameAndDescription->setForegroundRole(QPalette::WindowText);
+        lblName->setForegroundRole(QPalette::WindowText);
+        //lblDescription->setForegroundRole(QPalette::WindowText);
     }
     update();
 }
@@ -253,6 +262,17 @@ void ksPluginItemWidget::setPlugin(ksPlugin*    newPlugin)
     {
         chkIsLoaded->setChecked(m_pCurrentPlugin->isLoaded());
         cmbScope->setEnabled(chkIsLoaded->isChecked());
+        btnAbout->setVisible(m_pCurrentPlugin->hasAboutDialog());
+        btnConfigure->setVisible(m_pCurrentPlugin->isConfigurable());
+        if(m_pCurrentPlugin->state() == ksPlugin::StateLocalLoaded)
+        {
+            cmbScope->setCurrentIndex(1);
+        }
+        else
+        {
+            // set to global as standard
+            cmbScope->setCurrentIndex(0);
+        }
     }
     retranslateUi();
     

@@ -29,6 +29,8 @@ class ksPluginInformation;
 
 class xmlObject;
 
+class QAction;
+
 class ConfigDialog;
 
 /**
@@ -55,6 +57,9 @@ public:
     void loadGlobal();
     void loadLocal();
     void unloadGlobalLocal();
+    
+public slots:
+    void configHasChanged();
     
 public:
     
@@ -93,12 +98,13 @@ public:
 protected:
     // core functions
     virtual void load();
+    virtual void refresh();
     virtual void unload();
     virtual void retranslate();
     virtual void createConfiguration(ksConfigContainer* config);
     
-protected slots:
-    virtual void refresh();
+    void addMenuAction(QAction* action);
+    void removeMenuAction(QAction* action);
     
 protected:
     void    setIdentifier(QString newIdentifier);

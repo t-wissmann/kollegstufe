@@ -63,19 +63,6 @@ void  ksPluginEngine::createPluginList()
     addPlugin(new kspExportToHtml);
     addPlugin(new ksPlugin);
     
-    /// ONLY DURING TEST PHASE:
-    /* 
-    {
-        xmlObject obj;
-        ReadFileToClass("/home/thorsten/ksp.xml", &obj);
-        loadPluginConfigurations(&obj, FALSE);
-    }
-    {
-        xmlObject obj;
-        ReadFileToClass("/home/thorsten/ksplocal.xml", &obj);
-        loadPluginConfigurations(&obj, TRUE); // local
-    }*/
-    
     
 }
 
@@ -139,19 +126,6 @@ void ksPluginEngine::unloadAllPlugins()
 
 void  ksPluginEngine::deletePluginList()
 {
-    /// ONLY DURING TEST PHASE:
-    /* 
-    {
-        xmlObject obj;
-        savePluginConfigurations(&obj, FALSE); // GLOBAL
-        WriteClassToFile("/home/thorsten/ksp.xml", &obj);
-    }
-    
-    {
-        xmlObject obj;
-        savePluginConfigurations(&obj, TRUE); // LOCAL
-        WriteClassToFile("/home/thorsten/ksplocal.xml", &obj);
-    }*/
     
     
     ksPlugin* currentPlugin = NULL;

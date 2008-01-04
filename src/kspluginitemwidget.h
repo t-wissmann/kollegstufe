@@ -35,6 +35,7 @@ class QMouseEvent;
 class QEvent;
 class QHBoxLayout;
 class QVBoxLayout;
+class QBoxLayout;
 class QGridLayout;
 
 /**
@@ -77,13 +78,14 @@ private:
     void connectSlots();
     
     // layouts
-    QHBoxLayout* layoutParent;
-    QVBoxLayout* layoutRightEnd;
+    QGridLayout* layoutParent;
+    QBoxLayout* layoutRightEnd;
     
     // widgets
     QCheckBox*  chkIsLoaded;
     QComboBox*  cmbScope;
-    QClickableLabel* lblNameAndDescription;
+    QClickableLabel* lblName;
+    QClickableLabel* lblDescription;
     QPushButton* btnAbout;
     QPushButton* btnConfigure;
     
