@@ -267,7 +267,7 @@ void ksExamProperties::setExamToEdit(xmlObject* newExamToEdit)
     txtType->setText(ksPlattformSpec::szToUmlauts(examToEdit->cGetObjectByAttributeValue("name", "type")->
                                         cGetAttributeByName("value")->value()));
     
-    spinPoints->setValue(examToEdit->cGetObjectByAttributeValue("name", "points")->
+    spinPoints->setValue(examToEdit->cGetObjectByAttributeValue("name", "mark")->
                                         cGetAttributeByName("value")->nValueToInt());
     
     cDateConverter dateFile;
@@ -323,7 +323,7 @@ void ksExamProperties::writeWidgetAttributesToExam()
     examToEdit->cGetObjectByAttributeValue("name", "type")->
             cGetAttributeByName("value")->SetValue(ksPlattformSpec::qstringToSz(txtType->text()));
     
-    examToEdit->cGetObjectByAttributeValue("name", "points")->
+    examToEdit->cGetObjectByAttributeValue("name", "mark")->
             cGetAttributeByName("value")->SetValueToInt(spinPoints->value());
     
     

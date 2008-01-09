@@ -161,6 +161,7 @@ ksConfigOption* ksConfigContainer::createOption(const ksConfigOption& option)
     if(m_bInGuiOptionPart)
     {
         founditem->setChangeableByUser(TRUE);
+        
     }
     return founditem;
 }

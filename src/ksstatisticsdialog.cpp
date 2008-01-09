@@ -258,8 +258,8 @@ void ksStatisticsDialog::refreshExamListFromXmlSubject()
         currentCaption += ksPlattformSpec::szToUmlauts(currentExam->
                 cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value());
         
-        // get points
-        int currentPoints = currentExam->cGetObjectByAttributeValue("name", "points")
+        // get mark
+        int currentPoints = currentExam->cGetObjectByAttributeValue("name", "mark")
                                           ->cGetAttributeByName("value")->nValueToInt();
         
         //get date

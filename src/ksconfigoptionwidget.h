@@ -24,6 +24,7 @@
 #include <QWidget>
 
 class QPushButton;
+class ColorButton;
 class QVBoxLayout;
 class QSpinBox;
 class QDoubleSpinBox;
@@ -61,6 +62,7 @@ private:
     QPushButton* btnToDefault;
     QSpinBox*    spinValueInt;
     QDoubleSpinBox* spinValueDouble;
+    ColorButton* btnValueColor;
     QLineEdit*   txtValueString;
     QCheckBox*   chkValueBool;
     // layouts

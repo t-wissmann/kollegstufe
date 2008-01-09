@@ -21,6 +21,8 @@
 #include "ksconfigoptionwidget.h"
 #include "ksconfigoption.h"
 
+#include "colorbutton.h"
+
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QSpinBox>
@@ -57,10 +59,13 @@ void ksConfigOptionWidget::allocateWidgets()
     spinValueInt = new QSpinBox;
     spinValueDouble = new QDoubleSpinBox;
     txtValueString = new QLineEdit;
+    btnValueColor = new ColorButton;
     chkValueBool = new QCheckBox("");
     
     btnToDefault->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     chkValueBool->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    spinValueInt->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    spinValueDouble->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     txtValueString->setSizePolicy(spinValueInt->sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
 }
 
@@ -72,6 +77,7 @@ void ksConfigOptionWidget::createLayouts()
     layoutParent->addWidget(spinValueInt);
     layoutParent->addWidget(spinValueDouble);
     layoutParent->addWidget(txtValueString);
+    layoutParent->addWidget(btnValueColor);
     layoutParent->addWidget(chkValueBool);
     layoutParent->addWidget(btnToDefault);
     
@@ -98,6 +104,7 @@ void ksConfigOptionWidget::setConfigOption(ksConfigOption* configOption)
     spinValueDouble->setVisible(type == ksConfigOption::TypeDouble);
     txtValueString->setVisible(type == ksConfigOption::TypeString);
     chkValueBool->setVisible(type == ksConfigOption::TypeBool);
+    btnValueColor->setVisible(type == ksConfigOption::TypeColor);
     
     // set minmax at first
     spinValueInt->setMinimum((int)m_pConfigOption->minimum());
@@ -108,6 +115,11 @@ void ksConfigOptionWidget::setConfigOption(ksConfigOption* configOption)
     spinValueInt->setValue(m_pConfigOption->valueToInt());
     spinValueDouble->setValue(m_pConfigOption->valueToDouble());
     txtValueString->setText(m_pConfigOption->valueToString());
+    if(type == ksConfigOption::TypeColor)
+    {// only copy color if type == color,,,
+        // this if(){} was added to avoid a warning made by QColor on non color values
+        btnValueColor->setColor(m_pConfigOption->valueToColor());
+    }
     chkValueBool->setChecked(m_pConfigOption->valueToBool());
     
     lblDescription->setText(m_pConfigOption->description());
@@ -127,6 +139,11 @@ void ksConfigOptionWidget::setToDefault()
     spinValueDouble->setValue(m_pConfigOption->valueToDouble(defaultvalue));
     txtValueString->setText(defaultvalue);
     chkValueBool->setChecked(m_pConfigOption->valueToBool(defaultvalue));
+    if(m_pConfigOption->valueType() == ksConfigOption::TypeColor)
+    {// only copy color if type == color,,,
+        // this if(){} was added to avoid a warning made by QColor on non color values
+        btnValueColor->setColor(m_pConfigOption->valueToColor(defaultvalue));
+    }
 }
 
 void ksConfigOptionWidget::applyChanges()
@@ -142,6 +159,7 @@ void ksConfigOptionWidget::applyChanges()
         case ksConfigOption::TypeInt: m_pConfigOption->setValue(spinValueInt->value()); break;
         case ksConfigOption::TypeDouble: m_pConfigOption->setValue(spinValueDouble->value()); break;
         case ksConfigOption::TypeBool: m_pConfigOption->setValue(chkValueBool->isChecked());  break;
+        case ksConfigOption::TypeColor: m_pConfigOption->setValue(btnValueColor->color());  break;
         
         default: m_pConfigOption->setValue(txtValueString->text());
     }

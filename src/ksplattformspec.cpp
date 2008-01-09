@@ -466,7 +466,7 @@ double ksPlattformSpec::computeAverageOfSubject(xmlObject* subject, QString weig
         }
         
         // get points
-        currentAttribute = currentExam->cGetObjectByAttributeValue("name", "points");
+        currentAttribute = currentExam->cGetObjectByAttributeValue("name", "mark");
         sumn += currentAttribute->cGetAttributeByName("value")->nValueToInt();
         examCounter++;
     }
@@ -615,13 +615,13 @@ void    ksPlattformSpec::addMissingExamAttributes(xmlObject*  ExamToComplete)
     if(!ExamToComplete->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value"))
         ExamToComplete->cGetObjectByAttributeValue("name", "type")->nAddAttribute("value", qstringToSz(tr("Exam")));
     
-    if(!ExamToComplete->cGetObjectByAttributeValue("name", "points"))
+    if(!ExamToComplete->cGetObjectByAttributeValue("name", "mark"))
     {
         newObject = ExamToComplete->cGetObjectByIdentifier(ExamToComplete->nAddObject("attribute"));
-        newObject->nAddAttribute("name", "points");
+        newObject->nAddAttribute("name", "mark");
     }
-    if(!ExamToComplete->cGetObjectByAttributeValue("name", "points")->cGetAttributeByName("value"))
-        ExamToComplete->cGetObjectByAttributeValue("name", "points")->nAddAttribute("value", "0");
+    if(!ExamToComplete->cGetObjectByAttributeValue("name", "mark")->cGetAttributeByName("value"))
+        ExamToComplete->cGetObjectByAttributeValue("name", "mark")->nAddAttribute("value", "0");
     
     if(!ExamToComplete->cGetObjectByAttributeValue("name", "number"))
     {

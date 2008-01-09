@@ -51,9 +51,14 @@ public:
     void setCurrentExam(xmlObject*  newCurrentExam) { m_pCurrentExam = newCurrentExam; };
     xmlObject* currentExam() const { return m_pCurrentExam; };
     
+    void setCurrentPropertyPart(xmlObject*  newPropertyPart) { m_pCurrentPropertyPart = newPropertyPart; };
+    xmlObject* currentPropertyPart() const { return m_pCurrentPropertyPart; };
+    
     void setPluginMenu(QMenu* newMenu) { m_pPluginMenu = newMenu; };
     QMenu* pluginMenu() const { return m_pPluginMenu; };
     
+    void setCurrentDataPart(xmlObject* newDataPart) { m_pCurrentDataPart = newDataPart; };
+    xmlObject* currentDataPart() const { return m_pCurrentDataPart; };
 
 private:
     
@@ -62,6 +67,8 @@ private:
     xmlObject*  m_pCurrentDatabase;
     xmlObject*  m_pCurrentCategory;
     xmlObject*  m_pCurrentSubject;
+    xmlObject*  m_pCurrentPropertyPart;
+    xmlObject*  m_pCurrentDataPart;
     xmlObject*  m_pCurrentExam;
     QMenu*      m_pPluginMenu;
 };

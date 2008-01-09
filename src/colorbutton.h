@@ -18,28 +18,31 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksplugininformation.h"
-#include <stdlib.h>
+#ifndef COLORBUTTON_H
+#define COLORBUTTON_H
 
-ksPluginInformation::ksPluginInformation()
+#include <QColor>
+#include <QPushButton>
+class QPaintEvent;
+
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+class ColorButton : public QPushButton
 {
-    setAllDatabasePointersToNull();
-    m_pMainWindow = NULL;
-    m_pPluginMenu = NULL;
-}
+Q_OBJECT
+public:
+    ColorButton(QWidget *parent = 0);
 
+    ~ColorButton();
+    QColor color() const { return m_cColor; };
+    void setColor(const QColor& newColor);
+public slots:
+    void getColorFromDialog();
+protected:
+    virtual void paintEvent(QPaintEvent* event);
+private:
+    QColor m_cColor;
+};
 
-ksPluginInformation::~ksPluginInformation()
-{
-}
-
-void ksPluginInformation::setAllDatabasePointersToNull()
-{
-    
-    m_pCurrentDatabase = NULL;
-    m_pCurrentCategory = NULL;
-    m_pCurrentSubject = NULL;
-    m_pCurrentExam = NULL;
-    m_pCurrentDataPart = NULL;
-    m_pCurrentPropertyPart = NULL;
-}
+#endif

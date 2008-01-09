@@ -26,6 +26,7 @@
 */
 
 #include <QString>
+#include <QColor>
 class xmlObject;
 
 
@@ -37,6 +38,7 @@ public:
     ksConfigOption(QString newName, bool    newValue);
     ksConfigOption(QString newName, int     newValue);
     ksConfigOption(QString newName, double  newValue);
+    ksConfigOption(QString newName, QColor  newValue);
     ksConfigOption(QString newName, QString newValue);
 
     ~ksConfigOption();
@@ -45,8 +47,11 @@ public:
         TypeBool, // when type is bool, then m_szValue is "true" or "false", not "TRUE" or "FALSE" !
         TypeInt,
         TypeDouble,
+        TypeColor,
         TypeString
     };
+    
+    void rangeValue(); // only makes sense on numeric datatypes
     
     QString name() const;
     void setName(QString newName);
@@ -61,11 +66,13 @@ public:
     bool    valueToBool() const;
     int     valueToInt() const;
     double  valueToDouble() const;
+    QColor  valueToColor() const;
     QString valueToString() const;
     
     static bool    valueToBool(QString string);
     static int     valueToInt(QString string);
     static double  valueToDouble(QString string);
+    static QColor  valueToColor(QString string);
     static QString valueToString(QString string);
     
     void saveToXmlObject(xmlObject* target) const;
@@ -74,6 +81,7 @@ public:
     void setValue(bool    newValue);
     void setValue(int     newValue);
     void setValue(double  newValue);
+    void setValue(QColor  newValue);
     void setValue(QString newValue);
     
     void setMinimum(double min){ m_fMinimum = min; };

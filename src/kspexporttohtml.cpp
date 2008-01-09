@@ -21,7 +21,17 @@
 #include "kspexporttohtml.h"
 #include "ksplugininformation.h"
 #include "configdialog.h"
+#include "ksplattformspec.h"
+#include "xmlparser.h"
 #include <QAction>
+#include <QPalette>
+#include <QFile>
+#include <QFileDialog>
+
+#include <QColor>
+#include <QTextStream>
+
+#include <QMessageBox>
 
 kspExportToHtml::kspExportToHtml()
  : ksPlugin()
@@ -75,23 +85,212 @@ void kspExportToHtml::createConfiguration(ksConfigContainer* config)
     {
         return;
     }
-    
-    /*config->setInGuiOptionPart(TRUE); // start of gui-options
+    QPalette pal;
+    config->setInGuiOptionPart(TRUE); // start of gui-options
     ksConfigOption* option;
-    option = config->createOption(ksConfigOption("desktop size", 4));
-    option->setDescription("Size of your Desktop");
-    option->setMinMax(1, 10);
-    option = config->createOption(ksConfigOption("name", QString("thorsten")));
-    option->setDescription("Your name");
-    option = config->createOption(ksConfigOption("size", 1.70));
-    option->setDescription("Your size");
-    option->setMinMax(0.40, 3.00);
+    option = config->createOption(ksConfigOption("averagecol", TRUE));
+    option->setDescription("Print average in last column");
+    option->setWhatsThis("If checked, then there is a last column, which shows the subject average");
+    option->rangeValue();
     
-    config->setInGuiOptionPart(FALSE); // end of gui - options*/
+    
+    option = config->createOption(ksConfigOption("showheader", TRUE));
+    option->setDescription("Print a header");
+    option->setWhatsThis("Prints a header at the top of the table. This header containes the description of each column");
+    option->rangeValue();
+    
+    option = config->createOption(ksConfigOption("customcolors", FALSE));
+    option->setDescription("Use custom colors and style options");
+    option->setWhatsThis("Check this option to use custom colors and style options instead of system's default colors");
+    option->rangeValue();
+    
+    option = config->createOption(ksConfigOption("bgcolor", pal.base().color()));
+    option->setDescription("Custom background color");
+    option->setWhatsThis("This is the background color of your HTML-Document");
+    
+    option = config->createOption(ksConfigOption("borderwidth", (int)1));
+    option->setDescription("Custom border width");
+    option->setWhatsThis("This is the width of the borders");
+    option->setMinMax(0, 99);
+    option->rangeValue();
+    
+    option = config->createOption(ksConfigOption("bordercolor", pal.text().color()));
+    option->setDescription("Custom border color");
+    option->setWhatsThis("This is the color of the borders");
+    
+    option = config->createOption(ksConfigOption("alternatecolor", pal.alternateBase().color()));
+    option->setDescription("Custom alternate row color");
+    option->setWhatsThis("This is the background color of every second row");
+    
+    option = config->createOption(ksConfigOption("textcolor", pal.text().color()));
+    option->setDescription("Custom text color");
+    option->setWhatsThis("This is the color of text in your HTML Document");
+    
+    config->setInGuiOptionPart(FALSE); // end of gui - options
 }
 
 void kspExportToHtml::exportToHtml()
 {
+    if(!m_pInformation || !m_pInformation->currentDataPart() || !m_pCurrentConfig)
+    {
+        qDebug("kspExportToHtml::exportToHtml(): Error: plugin information or m_pCurrentConfig pointer not set");
+        return;
+    }
+    // create color palette
+    createConfiguration(m_pCurrentConfig); // ensure that there are enough config options
+    QPalette palette;
+    int      borderwidth = 1;
+    QColor bordercolor = palette.text().color();
+    if(m_pCurrentConfig->getOption("customcolors")->valueToBool())
+    {
+        palette.setColor(QPalette::Base, m_pCurrentConfig->getOption("bgcolor")->valueToColor());
+        palette.setColor(QPalette::Text, m_pCurrentConfig->getOption("textcolor")->valueToColor());
+        palette.setColor(QPalette::AlternateBase, m_pCurrentConfig->getOption("alternatecolor")->valueToColor());
+        bordercolor = m_pCurrentConfig->getOption("bordercolor")->valueToColor();
+        borderwidth = m_pCurrentConfig->getOption("borderwidth")->valueToInt();
+    }
+    if(borderwidth < 0)
+    {
+        borderwidth = 0;
+    }
+    
+    bool averagecol = m_pCurrentConfig->getOption("averagecol")->valueToBool();
+    bool header     = m_pCurrentConfig->getOption("showheader")->valueToBool();
+    
+    QString filename = "/home/thorsten/out.html";
+    filename = QFileDialog::getSaveFileName((QWidget*)m_pInformation->mainWindow(), tr("Export database to")
+                                           , QDir::homePath(), tr("Html files (*.html *.htm)"));
+    
+    if(filename.isEmpty())
+    {
+        return;
+    }
+    if(!filename.endsWith(".htm") && !filename.endsWith(".html"))
+    {
+        filename += ".html";
+    }
+    
+    xmlObject* data = m_pInformation->currentDataPart();
+    if(!data)
+    {
+        return;
+    }
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QMessageBox::critical((QWidget*)(m_pInformation->mainWindow()), tr("Error during saving file"),
+                              tr("The file") + " \'" +  filename + "\' " + tr("couldn't be written.") + "\n"
+                              + tr("Probably you haven't got enough write rights."));
+        return;
+    }
+    QTextStream out(&file);
+    
+    out << "<html>\n<head>";
+    out << "\n<style type=\"text/css\">";
+    out << "\ntable { border-style: solid; border-width: " << borderwidth << "px;\n"
+            << "border-bottom-width: 0px; \n"
+            << "border-right-width: 0px; \n"
+            << "border-color: " << bordercolor.name() << " ;}";
+    out << "\ntd { border-style: solid; border-width: " << borderwidth << "px;\nborder-color: "
+            << bordercolor.name()
+            << "; color: " << palette.text().color().name() << "; \n"
+            << "border-top-width: 0px; \n"
+            << "border-left-width: 0px; \n"
+            << "}\n";
+    out << ".normalrow {\n"
+            << "background-color: " << palette.base().color().name() << "; \n"
+            << " }\n";
+    out << ".alternaterow {\n"
+            << "background-color: " << palette.alternateBase().color().name() << "; \n"
+            << " }\n";
+    out << "</style>\n</head>";
+    out << "\n<body><table cellspacing=\"0\" cellpadding=\"2\" border=\"0\">";
+    
+    xmlObject* currentCategory;
+    xmlObject* currentSubject;
+    xmlObject* currentExam;
+    int currentRowCount = 0; // tells you in which row you are
+                             // should be increased when the row end tag "</tr>" is print
+    
+    if(header) // print header
+    {
+        out << "<tr class=\"normalrow\">";
+        out << "<td>" << tr("Subject") << "&nbsp;</td>";
+        out << "<td>" << tr("Exams") << "&nbsp;</td>";
+        if(averagecol)
+        {
+            out << "<td>" << tr("Average") << "&nbsp;</td>";
+        }
+        out << "</tr>";
+        currentRowCount++;
+    }
+    
+    
+    for(int i = 0; i < data->nGetObjectCounter(); i++)
+    {
+        currentCategory = data->cGetObjectByIdentifier(i);
+        if(!currentCategory)
+        {
+            continue;
+        }
+        for(int subject = 0; subject < currentCategory->nGetObjectCounter(); subject++)
+        {
+            currentSubject = currentCategory->cGetObjectByIdentifier(subject);
+            if(!currentSubject)
+            {
+                continue;
+            }
+            ksPlattformSpec::addMissingSubjectAttributes(currentSubject);
+            out << "\n<tr ";
+            if(currentRowCount % 2 == 1) // if is alternate row
+            {
+                out << "class=\"alternaterow\"";
+            }
+            else
+            { // normal row
+                out << "class=\"normalrow\"";
+            }
+            out << "><td>";
+            out << ksPlattformSpec::szToUmlauts(currentSubject->cGetAttributeByName("name")->valueToXmlCode()) << "</td><td>";
+            
+            for(int exam = 0; exam < currentSubject->nGetObjectCounter(); exam++)
+            {
+                currentExam = currentSubject->cGetObjectByIdentifier(exam);
+                if(!currentExam)
+                {
+                    continue;
+                }
+                ksPlattformSpec::addMissingExamAttributes(currentExam);
+                
+                out << currentExam->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->valueToXmlCode();
+                QString value = ksPlattformSpec::szToUmlauts(currentExam->cGetObjectByAttributeValue("name", "mark")->cGetAttributeByName("value")->valueToXmlCode());
+                out << ": ";
+                out << value;
+                if(exam < currentSubject->nGetObjectCounter()-1) // if this is before the last loop
+                {
+                   out << ", ";
+                }
+            }
+            out << "&nbsp;</td>\n";
+            if(averagecol) // if there is a third col with the average
+            {
+                double average = ksPlattformSpec::computeEntireAverageOfSubject(currentSubject, "all", NULL);
+                out << "<td>&nbsp;";
+                if(average != -1)
+                {
+                    out << QString::number(average);
+                }
+                out << "</td>";
+            }
+            out << "</tr>";
+            currentRowCount++;
+            
+        }
+        
+    }
+    
+    out << "\n</table></body>\n</html>";
+    file.close();
 }
 
 

@@ -92,7 +92,7 @@ void ksSubjectStatusbar::setEntireAverageTitle(double average)
     average *= 100;
     average = (int) average;
     average /= 100;
-    btnStatistics->setText(tr("Entire Average"));
+    btnStatistics->setText(tr("Subject Average"));
     if(average != -1)
     {
         btnStatistics->setText(btnStatistics->text() + ": " + QString::number(average));

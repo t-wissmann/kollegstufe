@@ -169,20 +169,7 @@ void  ConfigDialog::retranslateUi()
 
 void  ConfigDialog::refreshHeaderFromTitle()
 {
-    QString title;
-    title = tr("Configure");
-    if(!m_szTitle.isEmpty())
-    {
-        title += " \'" + m_szTitle + "\' ";
-    }
-    else
-    {
-        title += " ";
-    }
-    
-    title += tr("Plugin");
-    
-    setWindowTitle(title);
+    setWindowTitle(tr("Configure %pluginname plugin").replace("%pluginname", m_szTitle));
     QString text;
     text += "<b>" + m_szTitle + "</b>";
     if(!m_szDescription.isEmpty() && !m_szTitle.isEmpty())
@@ -375,7 +362,7 @@ void ConfigDialog::importConfig()
     QFileDialog filedia(this);
     filedia.setDirectory(QDir::home());
     filedia.setFilter(tr("Xml Files (*.xml)"));
-    filedia.setWindowTitle(tr("Export Plugin Configuration"));
+    filedia.setWindowTitle(tr("Import Plugin Configuration"));
     filedia.setConfirmOverwrite(TRUE);
     filedia.setAcceptMode(QFileDialog::AcceptOpen);
     if(filedia.exec() == QDialog::Rejected)
@@ -392,16 +379,17 @@ void ConfigDialog::importConfig()
     // load file
     if(!loader.loadFileToClass(fileName.toAscii().data(), &obj))
     {
-        QMessageBox::critical(this, tr("Error during reading file"), tr("Couldn't import configuration from") + " " + fileName
-                + ".\n" + tr("Probably you haven't got enough read rights."));
+        QMessageBox::critical(this, tr("Error during reading file"),
+                  tr("Couldn't import configuration from %filename").replace("%filename", fileName)
+                + tr("Probably you haven't got enough read rights."));
     }
     QMessageBox msgbox(this);
     msgbox.setIcon(QMessageBox::Warning);
     msgbox.setWindowTitle(tr("Importing a configuration"));
-    msgbox.addButton(tr("Yes, import and overwrite configuration"), QMessageBox::YesRole);
-    msgbox.addButton(tr("No, don't import"), QMessageBox::RejectRole);
     msgbox.setText(tr("If you import an configuration, then the changes are applied immediately and your old configuration gets lost.")
                   + "\n" + tr("Do you really want to import?"));
+    msgbox.addButton(tr("Yes, import and overwrite configuration"), QMessageBox::YesRole);
+    msgbox.addButton(tr("No, don't import"), QMessageBox::RejectRole);
     
     switch(msgbox.exec())
     {// return if rejected was clicked
@@ -416,13 +404,16 @@ void ConfigDialog::importConfig()
         questionbox.setIcon(QMessageBox::Warning);
         questionbox.setWindowTitle(tr("Importing a configuration"));
         
+        questionbox.setText(
+                  tr("The configuration in the file is incompatible to the configuration for %pluginname.\n"
+                      "To import it is very risky and not recommended.\n"
+                      "Do you really want to continue?").replace("%pluginname", m_szTitle)
+                           );
+    
         questionbox.addButton(tr("Yes, import"), QMessageBox::YesRole);
         questionbox.addButton(tr("No, don't take the risk"), QMessageBox::RejectRole);
         questionbox.setDefaultButton(QMessageBox::Cancel);
-        questionbox.setText(tr("The configuration in the file is incompatible to the configuration for") + " \'" + m_szTitle
-                + "\'\n" + tr("To import it is very risky and not recommended.") + "\n"
-                      + tr("Do you really want to continue?"));
-    
+        
         switch(questionbox.exec())
         {// return if rejected was clicked
             case QMessageBox::RejectRole: return;
@@ -467,8 +458,11 @@ void ConfigDialog::exportConfig()
     
     if(WriteClassToFile(fileName.toAscii().data(), &obj) != 0)
     {
-        QMessageBox::critical(this, tr("Error during writing file"), tr("Couldn't export configuration to") + " " + fileName
-                + ".\n" + tr("Probably you haven't got enough write rights."));
+        QMessageBox::critical(this, tr("Error during writing file"),
+                  tr("Couldn't export configuration to \'%filename\'.\n"
+                    "Probably you haven't got enough write rights."
+                    ).replace("%filename", fileName)
+                             );
     }
 }
 

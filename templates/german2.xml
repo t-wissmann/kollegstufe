@@ -14,7 +14,7 @@
    <subject name="Mathematik" teacher="" weightingOral="1" weightingWritten="2">
     <exam id="0">
      <attribute name="type" value="Abfrage"></attribute>
-     <attribute name="points" value="8"></attribute>
+     <attribute name="mark" value="8"></attribute>
      <attribute name="number" value="0"></attribute>
      <attribute name="date" value="20070928"></attribute>
      <attribute name="semester" value="auto"></attribute>
@@ -22,7 +22,7 @@
     </exam>
     <exam id="1">
      <attribute name="type" value="Stegreifaufgabe"></attribute>
-     <attribute name="points" value="12"></attribute>
+     <attribute name="mark" value="12"></attribute>
      <attribute name="number" value="1"></attribute>
      <attribute name="date" value="20071103"></attribute>
      <attribute name="semester" value="auto"></attribute>
@@ -30,7 +30,7 @@
     </exam>
     <exam id="2">
      <attribute name="type" value="Schulaufgabe"></attribute>
-     <attribute name="points" value="5"></attribute>
+     <attribute name="mark" value="5"></attribute>
      <attribute name="number" value="1"></attribute>
      <attribute name="date" value="20071006"></attribute>
      <attribute name="semester" value="auto"></attribute>
@@ -38,7 +38,7 @@
     </exam>
     <exam id="3">
      <attribute name="type" value="Schulaufgabe"></attribute>
-     <attribute name="points" value="13"></attribute>
+     <attribute name="mark" value="13"></attribute>
      <attribute name="number" value="2"></attribute>
      <attribute name="date" value="20080104"></attribute>
      <attribute name="semester" value="auto"></attribute>
@@ -46,7 +46,7 @@
     </exam>
     <exam id="4">
      <attribute name="type" value="Ex"></attribute>
-     <attribute name="points" value="11"></attribute>
+     <attribute name="mark" value="11"></attribute>
      <attribute name="number" value="1"></attribute>
      <attribute name="date" value="20080418"></attribute>
      <attribute name="semester" value="auto"></attribute>
@@ -54,7 +54,7 @@
     </exam>
     <exam id="5">
      <attribute name="type" value="Facharbeit"></attribute>
-     <attribute name="points" value="12"></attribute>
+     <attribute name="mark" value="12"></attribute>
      <attribute name="number" value="0"></attribute>
      <attribute name="date" value="20081003"></attribute>
      <attribute name="semester" value="auto"></attribute>
@@ -64,7 +64,7 @@
    <subject name="Deutsch" teacher="" weightingOral="1" weightingWritten="2">
     <exam id="0">
      <attribute name="type" value="Referat"></attribute>
-     <attribute name="points" value="4"></attribute>
+     <attribute name="mark" value="4"></attribute>
      <attribute name="number" value="0"></attribute>
      <attribute name="date" value="20071103"></attribute>
      <attribute name="semester" value="auto"></attribute>

@@ -30,7 +30,8 @@ SOURCES += main.cpp \
  ksconfigoption.cpp \
  configdialog.cpp \
  ksconfigoptionwidget.cpp \
- xmlencoder.cpp
+ xmlencoder.cpp \
+ colorbutton.cpp
 TEMPLATE = app
 CONFIG += warn_on \
 	  thread \
@@ -71,7 +72,8 @@ ksdebugoutput.h \
  ksconfigoption.h \
  configdialog.h \
  ksconfigoptionwidget.h \
- xmlencoder.h
+ xmlencoder.h \
+ colorbutton.h
 DISTFILES += ../doc/help.htm
 
 TRANSLATIONS += ../translations/german.ts \

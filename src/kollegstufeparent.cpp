@@ -36,7 +36,7 @@
 #include "ksabout.h"
 
 // own widgets
-#include <kssubjectstatusbar.h>
+#include "kssubjectstatusbar.h"
 
 // normal widgets
 #include <QComboBox>
@@ -117,12 +117,13 @@ void kollegstufeParent::initMembers()
     
     // init pointers
     pPluginEngine       = NULL;
+    /*
     currentDataPart     = NULL;
     currentPropertyPart = NULL;
     currentCathegory    = NULL;
     currentSubject      = NULL;
     currentExam         = NULL;
-    
+    */
     bDatabaseChanged    = FALSE;
     
     // get application path
@@ -447,22 +448,24 @@ void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
         splitterParent->setEnabled(TRUE);
     }
     // re-init pointers
+    pluginInformation.setAllDatabasePointersToNull();
+    /*
     currentDataPart     = NULL;
     currentPropertyPart = NULL;
     currentCathegory    = NULL;
     currentSubject      = NULL;
     currentExam         = NULL;
-    
+    */
     
     ksPlattformSpec::addMissingDatabaseAttributes(&currentDatabase);
-    currentPropertyPart = currentDatabase.cGetObjectByName("properties");
-    ksPlattformSpec::addMissingPropertiesAttributes(currentPropertyPart);
+    pluginInformation.setCurrentPropertyPart(currentDatabase.cGetObjectByName("properties"));
+    ksPlattformSpec::addMissingPropertiesAttributes(pluginInformation.currentPropertyPart());
     
     // load plugin configs to plugin engine
     pPluginEngine->loadPluginConfigurations(currentDatabase.cGetObjectByName("plugins"), TRUE);  // local
     
     // set window title to new author name
-    currentWindowTitle = ksPlattformSpec::szToUmlauts(currentPropertyPart->cGetObjectByName("author")->szGetContent());
+    currentWindowTitle = ksPlattformSpec::szToUmlauts(pluginInformation.currentPropertyPart()->cGetObjectByName("author")->szGetContent());
     resetWindowTitle();
     // reset Database change state:
     setDatabaseChanged(FALSE);
@@ -843,18 +846,18 @@ void kollegstufeParent::showDatabaseProperties()
         diaDatabaseProperties = new ksDatabaseProperties(this);
     }
     diaDatabaseProperties->setDatabasePropertiesToEdit(currentDatabase.cGetObjectByName("properties"));
-    diaDatabaseProperties->setDatabaseToEdit(currentDataPart);
+    diaDatabaseProperties->setDatabaseToEdit(pluginInformation.currentDataPart());
     diaDatabaseProperties->exec();
     if(diaDatabaseProperties->result() == QDialog::Accepted)
     {
         refreshCathegoryList();
         if(diaStatistics)
         {
-            diaStatistics->setProperties(currentPropertyPart);
+            diaStatistics->setProperties(pluginInformation.currentPropertyPart());
         }
-        if(currentPropertyPart && currentPropertyPart->cGetObjectByName("author"))
+        if(pluginInformation.currentPropertyPart() && pluginInformation.currentPropertyPart()->cGetObjectByName("author"))
         {
-            currentWindowTitle = ksPlattformSpec::szToUmlauts(currentPropertyPart->cGetObjectByName("author")->szGetContent());
+            currentWindowTitle = ksPlattformSpec::szToUmlauts(pluginInformation.currentPropertyPart()->cGetObjectByName("author")->szGetContent());
         }
         resetWindowTitle();
         setDatabaseChanged();
@@ -916,7 +919,7 @@ void kollegstufeParent::refreshMnaStatisticsChecked()
 
 void kollegstufeParent::subjectAdd()
 {
-    if( currentCathegory == NULL)
+    if( pluginInformation.currentCategory() == NULL)
     {
         return;
     }
@@ -927,10 +930,10 @@ void kollegstufeParent::subjectAdd()
     int        nNewSubjectId;
     xmlObject* newSubject;
     debugOutput->putDebugOutput("Adding Subject...");
-    if ((nNewSubjectId = currentCathegory->nAddObject("subject")) < 0)
+    if ((nNewSubjectId = pluginInformation.currentCategory()->nAddObject("subject")) < 0)
         return;
     
-    newSubject = currentCathegory->cGetObjectByIdentifier(nNewSubjectId);
+    newSubject = pluginInformation.currentCategory()->cGetObjectByIdentifier(nNewSubjectId);
     ksPlattformSpec::addMissingSubjectAttributes(newSubject);
     
      // set strings to current subject name
@@ -940,7 +943,7 @@ void kollegstufeParent::subjectAdd()
     //Find first "free" Subject Name
     int SubjectNumber = 1;
     xmlObject*  foundedSubject;
-    while((foundedSubject=currentCathegory->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(szNewSubjectName))) && foundedSubject != newSubject)
+    while((foundedSubject=pluginInformation.currentCategory()->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(szNewSubjectName))) && foundedSubject != newSubject)
     {
         SubjectNumber++;
         szNewSubjectName = szBasicName + " " + QString::number(SubjectNumber);
@@ -954,7 +957,7 @@ void kollegstufeParent::subjectAdd()
     }
     
     diaSubjectProperties->setSubjectToEdit(newSubject);
-    diaSubjectProperties->setCathegoryOfSubject(currentCathegory);
+    diaSubjectProperties->setCathegoryOfSubject(pluginInformation.currentCategory());
     diaSubjectProperties->exec();
     
     switch(diaSubjectProperties->result())
@@ -970,7 +973,7 @@ void kollegstufeParent::subjectAdd()
             debugOutput->putDebugOutput("Subject \'" + szNewSubjectName + "\' successfully added");
             break;
         case QDialog::Rejected:
-            currentCathegory->nDeleteObject(newSubject);
+            pluginInformation.currentCategory()->nDeleteObject(newSubject);
             break;
         default:
             refreshSubjectList();
@@ -992,7 +995,7 @@ void kollegstufeParent::subjectDelete()
     message += tr("\' ?");
     if(QMessageBox::question ( this, tr("Deleting a subject"), message , QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
     {
-        currentCathegory->nDeleteObject(currentCathegory->cGetObjectByAttributeValue("name",
+        pluginInformation.currentCategory()->nDeleteObject(pluginInformation.currentCategory()->cGetObjectByAttributeValue("name",
                                         ksPlattformSpec::qstringToSz(subjectNameToDelete)));
 
         
@@ -1009,13 +1012,13 @@ void kollegstufeParent::subjectEdit()
     {
         diaSubjectProperties = new ksSubjectProperties(this);
     }
-    if(!currentSubject)
+    if(!pluginInformation.currentSubject())
     {
         return;
     }
     
-    diaSubjectProperties->setSubjectToEdit(currentSubject);
-    diaSubjectProperties->setCathegoryOfSubject(currentCathegory);
+    diaSubjectProperties->setSubjectToEdit(pluginInformation.currentSubject());
+    diaSubjectProperties->setCathegoryOfSubject(pluginInformation.currentCategory());
     diaSubjectProperties->exec();
     switch(diaSubjectProperties->result())
     {
@@ -1035,7 +1038,7 @@ void kollegstufeParent::subjectEdit()
 
 void kollegstufeParent::subjectMoveUp()
 {
-    if(!currentSubject || !currentCathegory)
+    if(!pluginInformation.currentSubject() || !pluginInformation.currentCategory())
     {
         return;
     }
@@ -1043,14 +1046,14 @@ void kollegstufeParent::subjectMoveUp()
     {
         return;
     }
-    currentCathegory->moveObjectTo(currentSubject, lstSubjectList->currentRow()-1);
+    pluginInformation.currentCategory()->moveObjectTo(pluginInformation.currentSubject(), lstSubjectList->currentRow()-1);
     refreshSubjectList(lstSubjectList->currentRow()-1);
     setDatabaseChanged();
 }
 
 void kollegstufeParent::subjectMoveDown()
 {
-    if(!currentSubject || !currentCathegory)
+    if(!pluginInformation.currentSubject() || !pluginInformation.currentCategory())
     {
         return;
     }
@@ -1059,7 +1062,7 @@ void kollegstufeParent::subjectMoveDown()
         return;
     }
     
-    currentCathegory->moveObjectTo(currentSubject, lstSubjectList->currentRow()+1);
+    pluginInformation.currentCategory()->moveObjectTo(pluginInformation.currentSubject(), lstSubjectList->currentRow()+1);
     
     refreshSubjectList(lstSubjectList->currentRow()+1);
     setDatabaseChanged();
@@ -1068,13 +1071,13 @@ void kollegstufeParent::subjectMoveDown()
 void kollegstufeParent::examAdd()
 {
     
-    if(currentSubject == NULL)
+    if(pluginInformation.currentSubject() == NULL)
     {
         // return if there is no subject selected
         return;
     }
-    int nNewExamIdentifier = currentSubject->nAddObject("exam");
-    xmlObject* newExam = currentSubject->cGetObjectByIdentifier(nNewExamIdentifier);
+    int nNewExamIdentifier = pluginInformation.currentSubject()->nAddObject("exam");
+    xmlObject* newExam = pluginInformation.currentSubject()->cGetObjectByIdentifier(nNewExamIdentifier);
     if (newExam == NULL)
     {
         return; 
@@ -1082,7 +1085,7 @@ void kollegstufeParent::examAdd()
     int i = 0;
     QString newId;
     newId.setNum(i);
-    while (currentSubject->cGetObjectByAttributeValue("id", ksPlattformSpec::qstringToSz(newId)) != NULL)
+    while (pluginInformation.currentSubject()->cGetObjectByAttributeValue("id", ksPlattformSpec::qstringToSz(newId)) != NULL)
     {
         i++;
         newId.setNum(i);
@@ -1095,7 +1098,7 @@ void kollegstufeParent::examAdd()
     {
         diaExamProperties = new ksExamProperties(this);
     }
-    diaExamProperties->setProperties(currentPropertyPart);
+    diaExamProperties->setProperties(pluginInformation.currentPropertyPart());
     diaExamProperties->setExamToEdit(newExam);
     diaExamProperties->exec();
     switch(diaExamProperties->result())
@@ -1104,7 +1107,7 @@ void kollegstufeParent::examAdd()
             setDatabaseChanged();
             break;
         case QDialog::Rejected:
-            currentSubject->nDeleteObject(newExam);
+            pluginInformation.currentSubject()->nDeleteObject(newExam);
             refreshExamList();
             return;
             break;
@@ -1130,33 +1133,34 @@ void kollegstufeParent::examAdd()
 void kollegstufeParent::examDelete()
 {
     
-    if(currentSubject == NULL)
+    if(pluginInformation.currentSubject() == NULL)
     {
         // return if there is no subject selected
         return;
     }
-    if(currentExam == NULL)
+    if(pluginInformation.currentExam() == NULL)
     {
         // return if there is no exam selected
         return;
     }
     
     QString message = tr("Do you really want to delete ");
-    message += ksPlattformSpec::getArticleForNoun(currentExam->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value(), ksPlattformSpec::kasusAkkusativ);
-    if(currentExam->cGetObjectByAttributeValue("name", "number")->cGetAttributeByName("value")->nValueToInt() > 0)
+    message += ksPlattformSpec::getArticleForNoun(pluginInformation.currentExam()->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value(), ksPlattformSpec::kasusAkkusativ);
+    if(pluginInformation.currentExam()->cGetObjectByAttributeValue("name", "number")->cGetAttributeByName("value")->nValueToInt() > 0)
     {
-        message += currentExam->cGetObjectByAttributeValue("name", "number")->cGetAttributeByName("value")->value();
+        message += pluginInformation.currentExam()->cGetObjectByAttributeValue("name", "number")->cGetAttributeByName("value")->value();
         message += ". ";
     }
-    message += currentExam->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value();
+    message += pluginInformation.currentExam()->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value();
     message += tr(" from ");
     cDateConverter date;
-    date.setDateString(currentExam->cGetObjectByAttributeValue("name", "date")->cGetAttributeByName("value")->value());
+    date.setDateString(pluginInformation.currentExam()->cGetObjectByAttributeValue("name", "date")->cGetAttributeByName("value")->value());
     message += date.humanDate();
     message += tr(" ? Really Delete this exam ?");
     if(QMessageBox::question ( this, tr("Deleting of an Exam"), message , QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
     {
-        currentSubject->nDeleteObject(currentExam);
+        pluginInformation.currentSubject()->nDeleteObject(pluginInformation.currentExam());
+        pluginInformation.setCurrentExam(NULL);
         refreshExamList();
         setDatabaseChanged();
     }
@@ -1169,12 +1173,12 @@ void kollegstufeParent::examEdit()
     {
         diaExamProperties = new ksExamProperties(this);
     }
-    if(!currentExam)
+    if(!pluginInformation.currentExam())
     {
         return;
     }
-    diaExamProperties->setProperties(currentPropertyPart);
-    diaExamProperties->setExamToEdit(currentExam);
+    diaExamProperties->setProperties(pluginInformation.currentPropertyPart());
+    diaExamProperties->setExamToEdit(pluginInformation.currentExam());
     diaExamProperties->exec();
     switch(diaExamProperties->result())
     {
@@ -1193,13 +1197,13 @@ void kollegstufeParent::examEdit()
 
 void kollegstufeParent::selectedCathegoryChanged()
 {
-    if (currentDataPart)
+    if (pluginInformation.currentDataPart())
     {
-        currentCathegory = currentDataPart->cGetObjectByAttributeValue("name", (ksPlattformSpec::qstringToSz(cmbCathegory->currentText())));
+        pluginInformation.setCurrentCategory( pluginInformation.currentDataPart()->cGetObjectByAttributeValue("name", (ksPlattformSpec::qstringToSz(cmbCathegory->currentText()))));
     }
     else
     {
-        currentCathegory = NULL;
+        pluginInformation.setCurrentCategory(NULL);
     }
     refreshSubjectList();
     //to refresh everything
@@ -1208,11 +1212,11 @@ void kollegstufeParent::selectedCathegoryChanged()
 
 void kollegstufeParent::selectedSubjectChanged()
 {
-    if (lstSubjectList->currentItem() && currentCathegory)
+    if (lstSubjectList->currentItem() && pluginInformation.currentCategory())
     {
         grpExamList->setEnabled(TRUE);
         btnSubjectDelete->setEnabled(TRUE);
-        currentSubject = currentCathegory->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(lstSubjectList->currentItem()->text()));
+        pluginInformation.setCurrentSubject(pluginInformation.currentCategory()->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(lstSubjectList->currentItem()->text())));
         grpExamList->setTitle(tr("Properties of subject ") + lstSubjectList->currentItem()->text());
         
     }
@@ -1221,14 +1225,14 @@ void kollegstufeParent::selectedSubjectChanged()
         grpExamList->setEnabled(FALSE);
         btnSubjectDelete->setEnabled(FALSE);
         grpExamList->setTitle( tr("No Subject Selected"));
-        currentSubject = NULL;
+        pluginInformation.setCurrentSubject(NULL);
     }
     if(diaStatistics)
     {
-        diaStatistics->setSubject(currentSubject);
-        diaStatistics->setProperties(currentPropertyPart);
+        diaStatistics->setSubject(pluginInformation.currentSubject());
+        diaStatistics->setProperties(pluginInformation.currentPropertyPart());
     }
-    wdgSubjectStatusbar->setSubject(currentSubject);
+    wdgSubjectStatusbar->setSubject(pluginInformation.currentSubject());
     refreshExamList();
 }
 
@@ -1244,20 +1248,20 @@ void kollegstufeParent::selectedExamChanged()
     }
     else
     {
-        currentExam = NULL;
+        pluginInformation.setCurrentExam(NULL);
         return;
     }
-    if (currentSubject == NULL)
+    if (pluginInformation.currentSubject() == NULL)
     {
-        currentExam = NULL;
+        pluginInformation.setCurrentExam(NULL);
     }
     else
     {
-        currentExam = currentSubject->cGetObjectByAttributeValue("id", ksPlattformSpec::qstringToSz(selectedID));
+        pluginInformation.setCurrentExam(pluginInformation.currentSubject()->cGetObjectByAttributeValue("id", ksPlattformSpec::qstringToSz(selectedID)));
     }
     if(diaStatistics)
     {
-        diaStatistics->setSelectedExam(currentExam);
+        diaStatistics->setSelectedExam(pluginInformation.currentExam());
     }
     
 }
@@ -1271,24 +1275,24 @@ void kollegstufeParent::refreshCathegoryList()
     }
     cmbCathegory->clear();
     // add dataPart if is missing
-    if (!currentDataPart)
+    if (!pluginInformation.currentDataPart())
     {
         if(currentDatabase.cGetObjectByName("data"))
         {
-            currentDataPart = currentDatabase.cGetObjectByName("data");
+            pluginInformation.setCurrentDataPart( currentDatabase.cGetObjectByName("data"));
         }
         else
         {
-            currentDataPart = currentDatabase.cGetObjectByIdentifier(currentDatabase.nAddObject("data"));
+            pluginInformation.setCurrentDataPart( currentDatabase.cGetObjectByIdentifier(currentDatabase.nAddObject("data")));
         }
     }
-    for(int i = 0; i < currentDataPart->nGetObjectCounter(); i++)
+    for(int i = 0; i < pluginInformation.currentDataPart()->nGetObjectCounter(); i++)
     {
-        if(!currentDataPart->cGetObjectByIdentifier(i))
+        if(!pluginInformation.currentDataPart()->cGetObjectByIdentifier(i))
         {
             continue;
         }
-        xmlObject* currentObjectToAdd = currentDataPart->cGetObjectByIdentifier(i);
+        xmlObject* currentObjectToAdd = pluginInformation.currentDataPart()->cGetObjectByIdentifier(i);
         if (QString("cathegory") == currentObjectToAdd->szGetName())
         {
             if(!currentObjectToAdd->cGetAttributeByName("name"))
@@ -1301,7 +1305,7 @@ void kollegstufeParent::refreshCathegoryList()
     
     // restore Selection from before refresh
     cmbCathegory->setCurrentIndex(nBackupSelectedIndex);
-    currentCathegory = currentDataPart->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(cmbCathegory->currentText()));
+    pluginInformation.setCurrentCategory(pluginInformation.currentDataPart()->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(cmbCathegory->currentText())));
     
     selectedSubjectChanged();
 }
@@ -1318,18 +1322,18 @@ void kollegstufeParent::refreshSubjectList(int rowToSelectAfterRefresh)
         rowToSelectAfterRefresh = 0;
     }
     lstSubjectList->clear();
-    if( !currentCathegory)
+    if( !pluginInformation.currentCategory())
     {
-        currentSubject = NULL;
+        pluginInformation.setCurrentSubject(NULL);
         return;
     }
-    for (int i = 0; i < currentCathegory->nGetObjectCounter(); i++)
+    for (int i = 0; i < pluginInformation.currentCategory()->nGetObjectCounter(); i++)
     {
-        if(!currentCathegory->cGetObjectByIdentifier(i))
+        if(!pluginInformation.currentCategory()->cGetObjectByIdentifier(i))
         {
             continue;
         }
-        xmlObject* currentObjectToAdd = currentCathegory->cGetObjectByIdentifier(i);
+        xmlObject* currentObjectToAdd = pluginInformation.currentCategory()->cGetObjectByIdentifier(i);
         if (QString("subject") == currentObjectToAdd->szGetName())
         {
             if(!currentObjectToAdd->cGetAttributeByName("name"))
@@ -1355,13 +1359,13 @@ void kollegstufeParent::refreshExamList()
     
     // refresh list
     lstExamList->clear();
-    if(!currentPropertyPart || !currentSubject)
+    if(!pluginInformation.currentPropertyPart() || !pluginInformation.currentSubject())
     {
         return;
     }
     
-    int best  = currentPropertyPart->cGetObjectByName("rating")->cGetAttributeByName("best")->nValueToInt();
-    int worst = currentPropertyPart->cGetObjectByName("rating")->cGetAttributeByName("worst")->nValueToInt();
+    int best  = pluginInformation.currentPropertyPart()->cGetObjectByName("rating")->cGetAttributeByName("best")->nValueToInt();
+    int worst = pluginInformation.currentPropertyPart()->cGetObjectByName("rating")->cGetAttributeByName("worst")->nValueToInt();
     
     if (best > worst)
     {
@@ -1383,10 +1387,10 @@ void kollegstufeParent::refreshExamList()
     QString             currentType;
     QString             currentPoints;
     
-    for (int i = 0; i < currentSubject->nGetObjectCounter(); i++)
+    for (int i = 0; i < pluginInformation.currentSubject()->nGetObjectCounter(); i++)
     {
         xmlObject*          currentXmlExam;
-        if(!(currentXmlExam = currentSubject->cGetObjectByIdentifier(i)))
+        if(!(currentXmlExam = pluginInformation.currentSubject()->cGetObjectByIdentifier(i)))
         {
             continue;
         }
@@ -1396,7 +1400,7 @@ void kollegstufeParent::refreshExamList()
         currentDate     = ksPlattformSpec::szToUmlauts(currentXmlExam->cGetObjectByAttributeValue("name", "date")->cGetAttributeByName("value")->value());
         currentNumber   = ksPlattformSpec::szToUmlauts(currentXmlExam->cGetObjectByAttributeValue("name", "number")->cGetAttributeByName("value")->value());
         currentType     = ksPlattformSpec::szToUmlauts(currentXmlExam->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value());
-        currentPoints   = ksPlattformSpec::szToUmlauts(currentXmlExam->cGetObjectByAttributeValue("name", "points")->cGetAttributeByName("value")->value());
+        currentPoints   = ksPlattformSpec::szToUmlauts(currentXmlExam->cGetObjectByAttributeValue("name", "mark")->cGetAttributeByName("value")->value());
         
         // transform date
         currentDateClass.setDateString(ksPlattformSpec::qstringToSz(currentDate));
@@ -1418,7 +1422,7 @@ void kollegstufeParent::refreshExamList()
         if(currentSemester == "13/1")
             currentSemester = "13 / 1";
         if(currentSemester == "13/2")
-            currentSemester = "13 /2";
+            currentSemester = "13 / 2";
         
         examToAdd = new ExamItem(lstExamList);
         examToAdd->setText(0, currentXmlExam->cGetAttributeByName("id")->value());

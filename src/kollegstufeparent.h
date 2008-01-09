@@ -260,12 +260,13 @@ private:
     bool        bDatabaseChanged;
     
     xmlObject   currentDatabase;
+    /*
     xmlObject*  currentPropertyPart;
     xmlObject*  currentDataPart;
     xmlObject*  currentCathegory;
     xmlObject*  currentSubject;
     xmlObject*  currentExam;
-    
+    */
     
     QString     currentWindowTitle;
     
