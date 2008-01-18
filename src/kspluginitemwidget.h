@@ -65,7 +65,7 @@ public:
     void setPlugin(ksPlugin*    newPlugin);
     bool isSelected() const { return m_bIsSelected; };
     void retranslateUi();
-    
+    void reloadIcons();
     
 protected:
     virtual void changeEvent(QEvent* event);

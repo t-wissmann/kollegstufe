@@ -20,7 +20,8 @@
  ***************************************************************************/
 #include "kspluginconfigurationdialog.h"
 #include "kspluginmanager.h"
-#include "kspluginengine.h"
+#include "ksiconcatcher.h"
+#include "ksplattformspec.h"
 
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
@@ -42,6 +43,7 @@ ksPluginConfigurationDialog::ksPluginConfigurationDialog(QWidget *parent)
     createLayouts();
     connectSlots();
     retranslateUi();
+    reloadIcons();
 }
 
 
@@ -111,6 +113,14 @@ void ksPluginConfigurationDialog::retranslateUi()
     btnCancel->setText(tr("Cancel"));
     btnWhatsThis->setText(tr("What's this ?"));
     setWindowTitle(tr("Plugin Configuration") + " - " + tr("Kollegstufe"));
+}
+
+
+void ksPluginConfigurationDialog::reloadIcons()
+{
+    btnOk->setIcon(ksIconCatcher::getIcon("button_ok", 16));
+    btnApply->setIcon(ksIconCatcher::getIcon("apply", 16));
+    btnCancel->setIcon(ksIconCatcher::getIcon("button_cancel", 16));
 }
 
 

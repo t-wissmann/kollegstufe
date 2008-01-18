@@ -30,7 +30,7 @@ class xmlObject;
 /**
 	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
-class ksConfigContainer : public QList<ksConfigOption>
+class ksConfigContainer : public QList<ksConfigOption*>
 {
     
 public:
@@ -43,7 +43,7 @@ public:
     void loadFromXmlObject(xmlObject* source);
     
     bool inGuiOptionPart() const { return m_bInGuiOptionPart; };
-    void setInGuiOptionPart(bool inGui) { m_bInGuiOptionPart = inGui; };
+    void setInGuiOptionPart(bool inGui) { m_bInGuiOptionPart = inGui; m_nCurrentGuiOptionCounter = 0; };
     
     ksConfigOption* getOption(QString name);
     ksConfigOption* getOption(const ksConfigOption& option, bool createIfNotExists = TRUE);
@@ -52,6 +52,7 @@ public:
     
 private:
     bool m_bInGuiOptionPart;
+    unsigned int  m_nCurrentGuiOptionCounter;
     
 };
 

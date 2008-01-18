@@ -20,6 +20,7 @@
  ***************************************************************************/
 #include "ksconfigure.h"
 #include "ksplattformspec.h"
+#include "ksiconcatcher.h"
 #include "xmlparser.h"
 
 #include <QPushButton>
@@ -57,6 +58,7 @@ ksConfigure::ksConfigure(QWidget *parent)
     initWidgets();
     
     retranslateUi();
+    reloadIcons();
 }
 
 
@@ -130,6 +132,13 @@ void ksConfigure::retranslateUi()
     
     setWindowTitle(tr("Configure Kollegstufe"));
 }
+
+void ksConfigure::reloadIcons()
+{
+    btnOk->setIcon(ksIconCatcher::getIcon("button_ok", 16));
+    btnCancel->setIcon(ksIconCatcher::getIcon("button_cancel", 16));
+}
+
 
 
 void ksConfigure::setConfigToEdit(xmlObject* newConfig)

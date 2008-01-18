@@ -18,41 +18,46 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSPEXPORTTOHTML_H
-#define KSPEXPORTTOHTML_H
+#ifndef SELECTABLELABEL_H
+#define SELECTABLELABEL_H
 
-#include "ksplugin.h"
+#include <QWidget>
+#include <QString>
+
+class QPaintEvent;
+class QFocusEvent;
+class QMouseEvent;
 
 /**
 	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
-
-class ConfigDialog;
-
-class kspExportToHtml : public ksPlugin
+class SelectableLabel : public QWidget
 {
 Q_OBJECT
+signals:
+    void selectionChanged(bool selected);
 public:
-    kspExportToHtml();
+    SelectableLabel(QWidget *parent = 0);
 
-    virtual ~kspExportToHtml();
-public slots:
-    void exportToHtml();
+    ~SelectableLabel();
     
+    QString text() const;
+    void setText(QString text);
+    
+    bool isSelected() const { return m_bSelected; };
+    void setSelected(bool selected);
+    
+    void drawLabelAt(int x, int y, int width, int height, QString text, bool selected = FALSE);
     
 protected:
-    
-    // core functions
-    virtual void load();
-    virtual void refresh();
-    virtual void unload();
-    virtual void retranslate();
-    virtual void createConfiguration(ksConfigContainer* config);
+    virtual void focusInEvent(QFocusEvent* event);
+    virtual void focusOutEvent(QFocusEvent* event);
+    //virtual void mousePressEvent(QMouseEvent* event);
+    virtual void paintEvent(QPaintEvent* event);
     
 private:
-    
-    QAction*    mnaExportToHtml;
-    
+    QString  m_szText;
+    bool     m_bSelected;
 };
 
 #endif

@@ -42,7 +42,7 @@ public:
     
     void setPluginEngine(ksPluginEngine* newPluginEngine);
     void retranslateUi();
-    
+    void reloadIcons();
 public slots:
     void applyChanges();
     void enterWhatsThisMode();

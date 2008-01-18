@@ -450,7 +450,7 @@ void ksPlugin::addMenuAction(QAction* action)
         m_pInformation->pluginMenu()->addAction(action);
         if(m_pInformation->pluginMenu()->actions().size() == 1)
         {
-            m_pInformation->pluginMenu()->setTitle(tr("Plugins"));
+            m_pInformation->pluginMenu()->setTitle(tr("&Plugins"));
         }
     }
 }

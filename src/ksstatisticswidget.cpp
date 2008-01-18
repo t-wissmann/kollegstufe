@@ -19,6 +19,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "ksstatisticswidget.h"
+#include "ksiconcatcher.h"
+#include "ksstatisticsconfigwidget.h"
+#include "xmlparser.h"
+#include "dateConverter.h"
+#include "ksplattformspec.h"
 #include <QWidget>
 
 #include <QPalette>
@@ -27,35 +32,44 @@
 #include <QSizePolicy>
 
 #include <QRect>
+#include <QLineF>
 #include <QPoint>
 #include <QPointF>
 #include <QBrush>
 #include <QPainter>
 #include <QPainterPath>
 #include <QMouseEvent>
+#include <QEvent>
 #include <QPaintEvent>
 #include <QGradient>
 #include <QColor>
 #include <QLinearGradient>
 #include <QTextOption>
 #include <QMessageBox>
-#include <stdio.h>
 
 ksStatisticsWidget::ksStatisticsWidget(QWidget *parent)
  : QFrame(parent)
 {
+    nItemLabelVisibility = LabelAlwaysVisible;
     setFrameStyle(QFrame::Box);
     setMinimumWidth(100);
     setMinimumHeight(140);
     updateGridAndGraphProperties();
-    nPointDiameter = 16;
+    
+    
     
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     // set to 'white' background brush
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(TRUE);
     bItemListSorted = FALSE;
-    nSelectedItemIndex = 0;
+    nSelectedItemIndex = -1;
+    nHoveredItemIndex = -1;
+    setMouseTracking(TRUE);
+    resetDefaultColors();
+    initMembers();
+    allocateWidgets();
+    reloadIcons();
     
 }
 
@@ -66,20 +80,60 @@ ksStatisticsWidget::~ksStatisticsWidget()
 
 void ksStatisticsWidget::initMembers()
 {
-    nPointDiameter = 10;
+    nPointDiameter = 14;
     nMinimumY = 0;
     nMaximumY = 0;
-}
-
-void ksStatisticsWidget::mousePressEvent(QMouseEvent *event)
-{
+    
+    //init config button
+    configBtnAlignment = Qt::AlignBottom | Qt::AlignRight;
+    configBtnRadius = 15;
+    configBtnIsAnimated = FALSE;
+    configBtnTargetColor = configBtnNormalColor;
+    configBtnCurrentColor = configBtnNormalColor;
+    // int config button animation
+    tmrAnimations.setSingleShot(FALSE);
+    tmrAnimations.setInterval(40);
+    
+    // config box
+    configBoxYState = 0;
+    configBoxYTarget = 0;
+    configBoxYSpeed = 5;
+    configBoxIsAnimated = FALSE;
+    configBoxMarginLeft  = 5;
+    configBoxMarginRight  = 20;
+    
+    connect(&tmrAnimations, SIGNAL(timeout()), this, SLOT(animationEvent()));
     
 }
 
-void ksStatisticsWidget::mouseMoveEvent(QMouseEvent *event)
+void ksStatisticsWidget::allocateWidgets()
 {
+    wdgConfigBox = new ksStatisticsConfigWidget(this, Qt::Widget);
+    wdgConfigBox->resize(wdgConfigBox->sizeHint());
+    wdgConfigBox->setBackgroundRole(QPalette::Highlight);
+    wdgConfigBox->setForegroundRole(QPalette::HighlightedText);
+    wdgConfigBox->setStatisticsWidget(this);
+    adjustConfigBoxSize();
+    adjustConfigBoxPosition();
+}
+
+void ksStatisticsWidget::resetDefaultColors()
+{
+    //configBtnHoveredColor.setNamedColor("green"); // just a test color
+    configBtnHoveredColor = palette().highlight().color();
+    configBtnHoveredColor.setAlpha(255);
+    configBtnNormalColor = configBtnHoveredColor;
+    configBtnNormalColor.setHsv(configBtnNormalColor.hue(), 0, configBtnNormalColor.value(), configBtnNormalColor.alpha()/2);
+    //configBtnNormalColor.setNamedColor("#ff0000");
+}
+
+void ksStatisticsWidget::reloadIcons()
+{
+    configBtnIcon = ksIconCatcher::getIconPixmap("configure", 16);
+    configBoxMarginRight = configBtnIcon.width() + 10;
     
 }
+
 
 void ksStatisticsWidget::paintEvent(QPaintEvent *event)
 {
@@ -89,6 +143,8 @@ void ksStatisticsWidget::paintEvent(QPaintEvent *event)
     drawGraph();
     drawItems();
     //drawSelectionRectangle(10, 10, 160, 90);
+    drawConfigButton();
+    drawConfigBox();
     QFrame::paintEvent(event);
 }
 
@@ -157,13 +213,17 @@ void ksStatisticsWidget::drawYScaleLinesAndLabels(QPainter* painter)
 void ksStatisticsWidget::drawGrid()
 {
     
-    QPainter pen(this);
-    pen.setBrush(palette().brush(QPalette::Text));
-    pen.setPen(palette().brush(QPalette::Text).color());
+    QPainter painter(this);
+    QPen     pen;
+    pen.setColor(palette().windowText().color());
+    pen.setWidthF(1.5);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setBrush(palette().brush(QPalette::Text));
+    painter.setPen(pen);
     
     
-    drawAxis(&pen);
-    drawYScaleLinesAndLabels(&pen);
+    drawAxis(&painter);
+    drawYScaleLinesAndLabels(&painter);
 }
 
 void ksStatisticsWidget::drawGraph()
@@ -199,6 +259,7 @@ void ksStatisticsWidget::drawGraph()
         }
     }
 }
+
 
 
 int  ksStatisticsWidget::getScreenYForWorldY(int worldY) const
@@ -239,8 +300,8 @@ void ksStatisticsWidget::updateGridAndGraphProperties()
     getContentsMargins(&marginLeft, &marginTop, &marginRight, &marginBottom);
     
     YAxisLeft   = marginLeft + 20; // 20 for textlabels on the left
-    YAxisTop    = marginTop + 15;
-    XAxisBottom = marginBottom + 20; // 20 for textlabels on the bottom
+    YAxisTop    = marginTop + 40;
+    XAxisBottom = marginBottom + 30; // 20 for textlabels on the bottom
     XAxisRight  = marginRight + 15;
     
     scaleLineLength = 3;
@@ -268,7 +329,7 @@ void ksStatisticsWidget::drawItems()
         Qt::AlignmentFlag alignment = Qt::AlignHCenter;
         
         // find optimal space for placing label
-        /*
+        
         if (i == 0) // if is first item
         {
             if (itemList.size() > 1)
@@ -389,29 +450,54 @@ void ksStatisticsWidget::drawItems()
                 }
             }
         }
-        */
+        
         
         
         // place circle and label
-        drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, itemList[i].caption(),
-                      alignment, aboveOrBelow == -1, i == nSelectedItemIndex);
         
-        int circlealpha = 255;
-        drawCircleAt(x1, y1, circlealpha);
+        switch(nItemLabelVisibility)
+        {
+            case LabelAlwaysVisible:
+            {
+                drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, itemList[i].caption(),
+                              alignment, aboveOrBelow == -1, i == nSelectedItemIndex);
+                break;
+            }
+            case LabelSelectedVisible:
+            {
+                if(i == nSelectedItemIndex || i == nHoveredItemIndex)
+                {
+                    drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, itemList[i].caption(),
+                              alignment, aboveOrBelow == -1, FALSE);
+                }
+                break;
+            }
+            case LabelNeverVisible:
+            {
+                if(i == nHoveredItemIndex)
+                {
+                    drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, itemList[i].caption(),
+                                  alignment, aboveOrBelow == -1, FALSE);
+                }
+                break;
+            }
+        }
+        drawCircleAt(x1, y1, nPointDiameter+4 * ( i == nHoveredItemIndex)); // draw bigger if is selected
+        //drawCircleAt(x1, y1);
     }
     
     
 }
-void ksStatisticsWidget::drawCircleAt(int circleX, int circleY, int alpha)
+void ksStatisticsWidget::drawCircleAt(int circleX, int circleY, int diameter)
 {
-    QLinearGradient bgGradient( circleX, circleY-nPointDiameter/2, circleX, circleY+nPointDiameter/2);
+    QLinearGradient bgGradient( circleX, circleY-diameter/2, circleX, circleY+diameter/2);
     QColor  bgColorTop = palette().highlight().color();
     QColor  bgColorBottom = palette().highlight().color();
     int newValueTop = rangeValue(bgColorTop.value() < 3 ? 100 : bgColorTop.value(), 0, 255);
     int newValueBottom = rangeValue(bgColorTop.value()/2, 0, 255);
     
-    bgColorTop.setHsv( bgColorTop.hue(), bgColorTop.saturation(), newValueTop, alpha );
-    bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueBottom, alpha);
+    bgColorTop.setHsv( bgColorTop.hue(), bgColorTop.saturation(), newValueTop );
+    bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueBottom);
     bgGradient.setColorAt(0, bgColorTop);
     bgGradient.setColorAt(1, bgColorBottom);
     
@@ -419,7 +505,7 @@ void ksStatisticsWidget::drawCircleAt(int circleX, int circleY, int alpha)
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setBrush(bgGradient);
     painter.setPen(Qt::NoPen);
-    painter.drawEllipse(circleX-nPointDiameter/2, circleY-nPointDiameter/2, nPointDiameter, nPointDiameter);
+    painter.drawEllipse(circleX-diameter/2, circleY-diameter/2, diameter, diameter);
 }
 
 int ksStatisticsWidget::rangeValue(int value, int minValue, int maxValue)
@@ -479,18 +565,24 @@ void ksStatisticsWidget::drawCaptionAt(int captionX, int captionY, QString capti
     bgGradient.setColorAt(0, bgColorTop);
     bgGradient.setColorAt(1, bgColorBottom);
     
-    if(selected) // draw selection
+    if(selected) // draw selection if necessary
     {
-        drawSelectionRectangle(captionX-10, captionY-nPointDiameter-2-10, captionWidth+2*10, captionHeight+nPointDiameter+2+2*10);
+        int selectionx = captionX - 10;
+        int selectiony = captionY - 10 +  ( above ? 0 : (-1)*nPointDiameter-2);
+        int selectionwidth = captionWidth+2*10;
+        int selectionheight = captionHeight+nPointDiameter+2+2*10;
+        drawSelectionRectangle(selectionx, selectiony, selectionwidth, selectionheight);
     }
     
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
+    double cornerradius = 15;
     
-    //draw background if is not selected
+    //draw background
     painter.setBrush(bgGradient);
     painter.setPen(Qt::NoPen);
-    painter.drawRoundRect(captionX, captionY, captionWidth, captionHeight, 10, 60);
+    painter.drawRoundRect(captionX, captionY, captionWidth, captionHeight,
+                          (int)cornerradius, (int)((cornerradius) * captionWidth / captionHeight));
     
     
     //draw text
@@ -568,6 +660,86 @@ void ksStatisticsWidget::drawSelectionRectangle(int nX, int nY, int nWidth, int 
     
 }
 
+
+void ksStatisticsWidget::drawConfigButton()
+{
+    int size = configBtnIcon.width();
+    if(size < 16)
+    {
+        size = 16;
+    }
+    configBtnRadius = size;
+    configBtnRadius *= 1.41421356;
+    
+    configBtnRadius++; // create a 1px space
+    
+    QPainter painter(this);
+    QBrush   bgBrush(palette().highlight());
+    bgBrush.setColor(configBtnCurrentColor);
+    
+    painter.setRenderHint(QPainter::Antialiasing);
+    
+    // draw pie
+    QPainterPath pie;
+    pie.moveTo(width()-1, height());
+    pie.lineTo(width() - configBtnRadius, height());
+    pie.arcTo(width() - configBtnRadius, height() - configBtnRadius, configBtnRadius*2, configBtnRadius*2, 180*16, (-90)*16);
+    pie.lineTo(width(), height()-1);
+    pie.lineTo(width()-1, height()-1);
+    
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(bgBrush);
+    painter.drawPath(pie);
+    // draw icon
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(Qt::NoBrush);
+    painter.drawPixmap(width()-size-1, height()-size-2, configBtnIcon);
+    
+}
+
+void ksStatisticsWidget::drawConfigBox()
+{
+    
+    int x = wdgConfigBox->x(), y = wdgConfigBox->y();
+    int width = wdgConfigBox->width(), height = wdgConfigBox->height();
+    int cornerradius = 10; // in px
+    
+    if(y >= this->height() || x >= this->width() || height == 0|| width == 0)
+    {
+        // we don't need to paint if box can't be seen
+        return;
+    }
+    // create painterpath: rect with round top corners
+    QPainterPath path;
+    path.moveTo(x, y + height);
+    path.lineTo(x, y + cornerradius);
+    path.arcTo(x, y, cornerradius*2, cornerradius*2, 180, -90);
+    path.lineTo(x - cornerradius+width, y);
+    path.arcTo(x + width - cornerradius*2, y, cornerradius*2, cornerradius*2, 90, -90);
+    path.lineTo(x + width, y + height);
+    
+    // create bgBrush
+    QColor basicColor = palette().brush(wdgConfigBox->backgroundRole()).color();
+    QColor c1 = basicColor, c2 = basicColor;
+    c1.setAlpha(200);
+    c2.darker(20);
+    QLinearGradient bgGradient(x, y, x, y + height);
+    bgGradient.setColorAt(0, c1);
+    bgGradient.setColorAt(1, c2);
+    QBrush  bgBrush(bgGradient);
+    
+    // init painter
+    QPainter painter(this);
+    // !! TODO painter.set
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(bgBrush);
+    
+    
+    
+    painter.drawPath(path);
+}
+
 void ksStatisticsWidget::sortItemList()
 {
     if(isItemListSorted())
@@ -607,6 +779,7 @@ void ksStatisticsWidget::setMinMaxY(int newMinimumY, int newMaximumY)
     newMinimumHeight += marginBottom;
     
     setMinimumHeight(newMinimumHeight);
+    update();
 }
 
 int ksStatisticsWidget::pointDiameter() const
@@ -632,8 +805,73 @@ void ksStatisticsWidget::addItem(ksStatisticsItem newItem)
     setMinimumWidth(marginLeft + 10 + marginRight + (itemList.count()+1) * 45);
 }
 
+void ksStatisticsWidget::loadItemListFromSubject(xmlObject* subject)
+{
+    // clear current list
+    clearItemList();
+    if(!subject)
+    {
+        // if subject is invalid, then let list empty
+        return;
+    }
+    xmlObject* currentExam;
+    
+    for (int i = 0; (currentExam = subject->cGetObjectByIdentifier(i))  != NULL; i++)
+    {
+        //only use "real" exams
+        if(ksPlattformSpec::szToUmlauts(currentExam->name()) != "exam")
+        {
+            continue;
+        }
+        // ensure, that there are the required attributes
+        ksPlattformSpec::addMissingExamAttributes(currentExam);
+        
+        ksStatisticsItem itemToAdd;
+        QString currentCaption;
+        
+        int currentNumber = currentExam->cGetObjectByAttributeValue("name", "number")->cGetAttributeByName("value")->nValueToInt();
+        if(currentNumber != 0)
+        {
+            currentCaption += QString::number(currentNumber);
+            currentCaption += ". ";
+        }
+        
+        // add exam type
+        currentCaption += ksPlattformSpec::szToUmlauts(currentExam->
+                cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value());
+        
+        // get mark
+        int currentPoints = currentExam->cGetObjectByAttributeValue("name", "mark")
+                ->cGetAttributeByName("value")->nValueToInt();
+        
+        //get date
+        cDateConverter cDate;
+        cDate.setDateString(currentExam->
+                cGetObjectByAttributeValue("name", "date")->cGetAttributeByName("value")->value());
+        QDate   currentDate;
+        currentDate.setYMD(cDate.Year(), cDate.Month(), cDate.Day());
+        
+        //write variants to ksStatisticItem class
+        itemToAdd.setX(currentDate);
+        itemToAdd.setY(currentPoints);
+        itemToAdd.setCaption(currentCaption);
+        itemToAdd.setSourceItem(currentExam);
+        
+        // add itemToAdd to statistics widget
+        addItem(itemToAdd);
+        
+    }
+    
+    update();
+}
+
 void ksStatisticsWidget::setSelectedItem(int index)
 {
+    if(nSelectedItemIndex == index)
+    {
+        // if nothing has changed, then exit
+        return;
+    }
     nSelectedItemIndex = index;
     if(nSelectedItemIndex >= itemListSize())
     {
@@ -663,5 +901,319 @@ int ksStatisticsWidget::indexOfItem(xmlObject* item)
     return -1;
 }
 
+int ksStatisticsWidget::itemIndexAt(int x, int y)
+{
+    int result = -1;
+    
+    int itemNumber = itemListSize();
+    if(itemNumber < 0)
+    {
+        itemNumber = 0;
+    }
+    float graphWidth =  (float)((width()-XAxisRight-arrowLength) - (YAxisLeft+scaleLineLength));
+    float pointXDistance = graphWidth / ((float)itemNumber+1.0); // +1 because there will be a distance between Y-Axis an point
+                                                        // and so, it won't be devided by zero
+    
+    for(int i = 0; i < itemNumber; i++)
+    {
+        int x1 = YAxisLeft + arrowWidth + (int)((float)(i+1) * pointXDistance);
+        int y1 = getScreenYForWorldY(itemList[i].y());
+        QRect rect(x1 - nPointDiameter/2, y1 - nPointDiameter/2, nPointDiameter, nPointDiameter);
+        if(rect.contains(x, y))
+        {
+            result = i;
+            break;
+        }
+    }
+    
+    return result;
+}
+
+void ksStatisticsWidget::refreshConfigButtonColor()
+{
+    int newAlpha = configBtnCurrentColor.alpha();
+    int newS = configBtnCurrentColor.saturation();
+    int newV = configBtnCurrentColor.value();
+    int deltaAlpha = 5;
+    int dS = 5, dV = 5;
+    
+    // switch sign of delta values if necessarry
+    deltaAlpha *= newAlpha >= configBtnTargetColor.alpha() ? -1 : 1;
+    dS *= newS > configBtnTargetColor.saturation() ? -1 : 1;
+    dV *= newV > configBtnTargetColor.value() ? -1 : 1;
+    
+    // apply deltas
+    if(abs(newAlpha - configBtnTargetColor.alpha()) < abs(deltaAlpha))
+    {
+        deltaAlpha = 0;
+        newAlpha = configBtnTargetColor.alpha();
+    }
+    else
+    {
+        newAlpha += deltaAlpha;
+    }
+    if(abs(newS - configBtnTargetColor.saturation()) <= abs(dS))
+    {
+        dS = 0;
+        newS = configBtnTargetColor.saturation();
+    }
+    else
+    {
+        newS += dS;
+    }
+    if(abs(newV - configBtnTargetColor.value()) <= abs(dV))
+    {
+        dV = 0;
+        newV = configBtnTargetColor.value();
+    }
+    else
+    {
+        newV += dV;
+    }
+    
+    
+    // apply new hsv and alpha values
+    //configBtnCurrentColor.setAlpha(newAlpha);
+    configBtnCurrentColor.setHsv(configBtnCurrentColor.hue(), newS, newV, newAlpha);
+    if(deltaAlpha == 0 && dS == 0 && dV == 0)
+    {
+        //configBtnCurrentColor = configBtnTargetColor;
+        configBtnIsAnimated = FALSE;
+        resetAnimationTimerState();
+    }
+}
+
+bool ksStatisticsWidget::isPositionInConfigButton(int x, int y)
+{
+    int cornerX = width();
+    int cornerY = height();
+    
+    if(abs(cornerX - x) > configBtnRadius+1
+       || abs(cornerY - y) > configBtnRadius+1)
+    {
+        // is cursor isn't in the current rect
+        return FALSE;
+    }
+    else
+    {
+        QLineF distance(cornerX, cornerY, x, y);
+        
+        if(distance.length() <= configBtnRadius)
+        {
+            return TRUE;
+            
+        }else{
+            return FALSE;
+        }
+    }
+}
+
+void ksStatisticsWidget::startConfigButtonAnimation()
+{
+    configBtnIsAnimated = TRUE;
+    resetAnimationTimerState();
+}
+
+void ksStatisticsWidget::setConfigBtnTargetAlpha(int cursorx, int cursory)
+{
+    QColor newTargetColor = configBtnNormalColor;
+    
+    if(isPositionInConfigButton(cursorx, cursory))
+    {
+        newTargetColor = configBtnHoveredColor;
+    }
+    
+    if(newTargetColor != configBtnTargetColor)
+    {
+        configBtnTargetColor = newTargetColor;
+        startConfigButtonAnimation();
+    }
+}
+
+void ksStatisticsWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    if(!event)
+    {
+        return;
+    }
+    int index = itemIndexAt(event->x(), event->y());
+    if(index != nHoveredItemIndex)
+    {
+        nHoveredItemIndex = index;
+        update();
+    }
+    if(index == -1)
+    {
+        // if a item is hovered, then cursor can't hover config button
+        setConfigBtnTargetAlpha(event->x(), event->y());
+    }
+}
 
 
+void ksStatisticsWidget::leaveEvent(QEvent *)
+{
+    // just simulate a mouse cursor somewhere out of the config button
+    setConfigBtnTargetAlpha((-1)*width(), 0);
+}
+
+
+void ksStatisticsWidget::mousePressEvent(QMouseEvent *event)
+{
+    if(!event)
+    {
+        return;
+    }
+    int index = itemIndexAt(event->x(), event->y());
+    if(index != nSelectedItemIndex)
+    {
+        nSelectedItemIndex = index;
+        update();
+        emit currentItemChanged(index);
+        if(index != -1)
+        {
+            emit currentItemChanged(itemList[index].sourceItem());
+        }else{
+            emit currentItemChanged((xmlObject*)NULL);
+        }
+    }
+    if(index == -1)
+    {
+        // if a item is hovered, then cursor can't hover config button
+        if(isPositionInConfigButton(event->x(), event->y()))
+        {
+            toggleConfigBoxVisibility();
+        }
+    }
+}
+
+
+void ksStatisticsWidget::changeEvent ( QEvent * event )
+{
+    if(!event)
+    {
+        return;
+    }
+    //if color palette  has changed
+    if(event->type() == QEvent::PaletteChange)
+    {
+        resetDefaultColors();
+        if(isVisible())
+        {
+            // just simulate a mouse cursor somewhere out of the config button
+            setConfigBtnTargetAlpha((-1)*width(), 0);
+        }
+    }
+}
+
+
+void ksStatisticsWidget::showConfigBox()
+{
+    // set target to "shown":
+    configBoxYTarget = 100;
+    //  start timer
+    configBoxIsAnimated = TRUE;
+    resetAnimationTimerState();
+    
+}
+
+void ksStatisticsWidget::hideConfigBox()
+{
+    // set target to "hidden":
+    configBoxYTarget = 0;
+    //  start timer
+    configBoxIsAnimated = TRUE;
+    resetAnimationTimerState();
+}
+
+
+void ksStatisticsWidget::toggleConfigBoxVisibility()
+{
+    if(configBoxYTarget == 100) // if configBox currently is shown / showing
+    {
+        // then hide
+        hideConfigBox();
+    }
+    else  // if configBox  currently is hidden / hiding
+    {
+        // then show
+        showConfigBox();
+    }
+}
+
+void ksStatisticsWidget::adjustConfigBoxSize()
+{
+    wdgConfigBox->resize(width()-(configBoxMarginLeft + configBoxMarginRight), wdgConfigBox->height());
+}
+
+void ksStatisticsWidget::adjustConfigBoxPosition()
+{
+    wdgConfigBox->move(configBoxMarginLeft,(int)(height() - ((double)wdgConfigBox->height())*((double)configBoxYState/100)));
+}
+
+void ksStatisticsWidget::moveConfigBox()
+{
+    if(configBoxYTarget > configBoxYState)
+    {
+        configBoxYState += configBoxYSpeed;
+        if(configBoxYState > configBoxYTarget)
+        {// if config box was moved to far
+            configBoxYState = configBoxYTarget;
+        }
+    }
+    if(configBoxYTarget < configBoxYState)
+    {
+        configBoxYState -= configBoxYSpeed;
+        if(configBoxYState < configBoxYTarget)
+        {// if config box was moved to far
+            configBoxYState = configBoxYTarget;
+        }
+    }
+    if(configBoxYTarget == configBoxYState)
+    {
+        // if config box reached the target
+        // then stop timer
+        configBoxIsAnimated = FALSE;
+        resetAnimationTimerState();
+    }
+    adjustConfigBoxPosition();
+}
+
+
+void ksStatisticsWidget::animationEvent()
+{
+    refreshConfigButtonColor();
+    moveConfigBox();
+    update();
+}
+
+void ksStatisticsWidget::resetAnimationTimerState()
+{
+    bool tmrIsActive = configBoxIsAnimated || configBtnIsAnimated;
+    if(tmrIsActive && !tmrAnimations.isActive())
+    {
+        tmrAnimations.start();
+    }
+    else if(!tmrIsActive && tmrAnimations.isActive())
+    {
+        tmrAnimations.stop();
+    }
+}
+
+void ksStatisticsWidget::resizeEvent( QResizeEvent* )
+{
+    adjustConfigBoxSize();
+    adjustConfigBoxPosition();
+}
+
+
+xmlObject* ksStatisticsWidget::selectedXmlSource() const
+{
+    if(nSelectedItemIndex < 0 || nSelectedItemIndex >= itemList.size())
+    {
+        return NULL;
+    }
+    else
+    {
+        return itemList[nSelectedItemIndex].sourceItem();
+    }
+}

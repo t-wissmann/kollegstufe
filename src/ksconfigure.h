@@ -57,6 +57,7 @@ public:
     
     void retranslateUi();
     void setConfigToEdit(xmlObject* newConfig);
+    void reloadIcons();
     
 protected:
     virtual void changeEvent(QEvent* event);

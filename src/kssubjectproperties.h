@@ -55,6 +55,7 @@ public:
     void setCathegoryOfSubject(xmlObject* newCathegory); // needed to avoid multible same Names
     
     void retranslateUi();
+    void reloadIcons();
 public slots:
     void writeWidgetAttributesToSubject();
     void checkForMultibleNames();

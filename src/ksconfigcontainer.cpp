@@ -22,9 +22,10 @@
 #include "xmlparser.h"
 
 
-ksConfigContainer::ksConfigContainer() : QList<ksConfigOption>()
+ksConfigContainer::ksConfigContainer() : QList<ksConfigOption*>()
 {
     m_bInGuiOptionPart = FALSE;
+    m_nCurrentGuiOptionCounter = 0;
 }
 
 
@@ -49,7 +50,10 @@ void ksConfigContainer::saveToXmlObject(xmlObject* target) const
     for(int i = 0; i < size(); i++)
     {
         currentObject = target->cGetObjectByIdentifier(i);
-        (*this)[i].saveToXmlObject(currentObject);
+        if((*this)[i])
+        {
+            (*this)[i]->saveToXmlObject(currentObject);
+        }
     }
     
 }
@@ -86,9 +90,9 @@ ksConfigOption* ksConfigContainer::getOption(QString name)
     ksConfigOption* returnItem = NULL;
     for(int i = 0; i < size(); i++)
     {
-        if(name == (*this)[i].name())
+        if(name == (*this)[i]->name())
         {
-            returnItem = &((*this)[i]);
+            returnItem = (*this)[i];
             break;
         }
     }
@@ -106,8 +110,9 @@ ksConfigOption* ksConfigContainer::getOption(const ksConfigOption& option, bool 
         {
             newoption.setChangeableByUser(TRUE);
         }
-        append(newoption); // append it
-        item = &(last()); // set return-item to just created item's address
+        ksConfigOption* newOptionPointer = new ksConfigOption(newoption);
+        append(newOptionPointer); // append it
+        item = newOptionPointer; // set return-item to just created item's address
     }
     
     return item;
@@ -123,14 +128,15 @@ ksConfigOption* ksConfigContainer::setOption(const ksConfigOption& option)
     }
     for(int i = 0; i < size(); i++)
     {
-        if((*this)[i].name() == newoption.name())
+        if((*this)[i]->name() == newoption.name())
         {
-            (*this)[i] = newoption;
-            return &((*this)[i]);
+            
+            (*this)[i]->operator=(newoption);
+            return (*this)[i];
         }
     }// if option couldn't be found, then add it and set m_bStandardChangeableByUser
-    append(newoption);
-    return &(last());
+    append(new ksConfigOption(newoption));
+    return last();
 }
 
 
@@ -140,28 +146,36 @@ ksConfigOption* ksConfigContainer::createOption(const ksConfigOption& option)
     ksConfigOption* founditem = NULL;
     for(i = 0; i < size(); i++)
     {
-        if((*this)[i].name() == option.name())
+        if((*this)[i]->name() == option.name())
         {
-            founditem = &((*this)[i]);
+            founditem = (*this)[i];
             break;
         }
     }
     if(!founditem)
     {// if no item has been found, then create it
-        append(ksConfigOption(option));
-        founditem = &(this->last());
+        ksConfigOption* newOption = new ksConfigOption(option);
+        append(newOption);
+        founditem = newOption;
     }
     QString backupValue = founditem->valueToString(); // backup value and type
     ksConfigOption::OptionType backupType = founditem->valueType();
     // copy complete option
     (*founditem) = option;
-    // backup actual value and type
+    // copy back actual value and type
     founditem->setValue(backupValue);
     founditem->setValueType(backupType);
     if(m_bInGuiOptionPart)
     {
         founditem->setChangeableByUser(TRUE);
-        
+        // move current option to the front
+        int oldIndex = indexOf(founditem);
+        if(oldIndex < 0 || m_nCurrentGuiOptionCounter >= size() || m_nCurrentGuiOptionCounter < 0)
+        {
+            return founditem;
+        }
+        move(oldIndex, m_nCurrentGuiOptionCounter);
+        m_nCurrentGuiOptionCounter++;
     }
     return founditem;
 }
@@ -172,7 +186,7 @@ int ksConfigContainer::sizeOfUserChangableOptions()
     int changableoptions = 0;
     for(int i = 0 ; i < size(); i++)
     {
-        if((*this)[i].changeableByUser())
+        if((*this)[i]->changeableByUser())
         {
             changableoptions++;
         }

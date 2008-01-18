@@ -18,41 +18,26 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSPEXPORTTOHTML_H
-#define KSPEXPORTTOHTML_H
+#ifndef KSICONCATCHER_H
+#define KSICONCATCHER_H
 
-#include "ksplugin.h"
+#include <QIcon>
+#include <QPixmap>
+#include <QString>
 
 /**
 	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
-
-class ConfigDialog;
-
-class kspExportToHtml : public ksPlugin
-{
-Q_OBJECT
+class ksIconCatcher{
 public:
-    kspExportToHtml();
+    ksIconCatcher();
 
-    virtual ~kspExportToHtml();
-public slots:
-    void exportToHtml();
+    ~ksIconCatcher();
+    static QIcon  getIcon(QString name, int size = 128);
+    static QPixmap  getIconPixmap(QString name, int size = 128);
+    static QPixmap  getIconPixmapFromApplicationTheme(QString name, int size = 128);
     
-    
-protected:
-    
-    // core functions
-    virtual void load();
-    virtual void refresh();
-    virtual void unload();
-    virtual void retranslate();
-    virtual void createConfiguration(ksConfigContainer* config);
-    
-private:
-    
-    QAction*    mnaExportToHtml;
-    
+
 };
 
 #endif

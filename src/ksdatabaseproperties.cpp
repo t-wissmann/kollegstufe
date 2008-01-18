@@ -20,6 +20,7 @@
  ***************************************************************************/
 #include "ksdatabaseproperties.h"
 #include "ksplattformspec.h"
+#include "ksiconcatcher.h"
 #include "kscathegoryeditorwidget.h"
 
 #include "xmlparser.h"
@@ -67,6 +68,7 @@ ksDatabaseProperties::ksDatabaseProperties(QWidget *parent)
         setWindowIcon(parent->windowIcon());
     }
     retranslateUi();
+    reloadIcons();
 }
 
 
@@ -105,6 +107,13 @@ void ksDatabaseProperties::retranslateUi()
     
     setWindowTitle(tr("Edit properties of Mark-Database"));
 }
+
+void ksDatabaseProperties::reloadIcons()
+{
+    btnOk->setIcon(ksIconCatcher::getIcon("button_ok", 16));
+    btnCancel->setIcon(ksIconCatcher::getIcon("button_cancel", 16));
+}
+
 
 void ksDatabaseProperties::allocateWidgets()
 {

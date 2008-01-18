@@ -231,56 +231,7 @@ void ksStatisticsDialog::refreshExamListFromXmlSubject()
         statistics->update();
         return;
     }
-    
-    xmlObject* currentExam;
-    
-    for (int i = 0; (currentExam = subject->cGetObjectByIdentifier(i))  != NULL; i++)
-    {
-        //only use "real" exams
-        if(ksPlattformSpec::szToUmlauts(currentExam->name()) != "exam")
-        {
-            continue;
-        }
-        // ensure, that there are the required attributes
-        ksPlattformSpec::addMissingExamAttributes(currentExam);
-        
-        ksStatisticsItem itemToAdd;
-        QString currentCaption;
-        
-        int currentNumber = currentExam->cGetObjectByAttributeValue("name", "number")->cGetAttributeByName("value")->nValueToInt();
-        if(currentNumber != 0)
-        {
-            currentCaption += QString::number(currentNumber);
-            currentCaption += ". ";
-        }
-        
-        // add exam type
-        currentCaption += ksPlattformSpec::szToUmlauts(currentExam->
-                cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value());
-        
-        // get mark
-        int currentPoints = currentExam->cGetObjectByAttributeValue("name", "mark")
-                                          ->cGetAttributeByName("value")->nValueToInt();
-        
-        //get date
-        cDateConverter cDate;
-        cDate.setDateString(currentExam->
-                cGetObjectByAttributeValue("name", "date")->cGetAttributeByName("value")->value());
-        QDate   currentDate;
-        currentDate.setYMD(cDate.Year(), cDate.Month(), cDate.Day());
-        
-        //write variants to ksStatisticItem class
-        itemToAdd.setX(currentDate);
-        itemToAdd.setY(currentPoints);
-        itemToAdd.setCaption(currentCaption);
-        itemToAdd.setSourceItem(currentExam);
-        
-        // add itemToAdd to statistics widget
-        statistics->addItem(itemToAdd);
-        
-    }
-    
-    statistics->update();
+    statistics->loadItemListFromSubject(subject);
 }
 
 

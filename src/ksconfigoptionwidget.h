@@ -32,6 +32,9 @@ class QLineEdit;
 class QLabel;
 class QCheckBox;
 
+class QMouseEvent;
+class QPaintEvent;
+class QFocusEvent;
 class QHBoxLayout;
 
 class ksConfigOption;
@@ -42,6 +45,8 @@ class ksConfigOption;
 class ksConfigOptionWidget : public QWidget
 {
 Q_OBJECT
+signals:
+    void clicked();
 public:
     ksConfigOptionWidget(QWidget *parent = 0);
 
@@ -49,9 +54,17 @@ public:
     
     void setConfigOption(ksConfigOption* configOption);
     void retranslateUi();
+    bool isSelected() const { return m_bSelected; };
+    bool hasMatchOn(QString text);
 public slots:
     void setToDefault();
     void applyChanges();
+    void childWasClicked();
+    void setSelected(bool selected = TRUE);
+
+protected:
+    virtual void mousePressEvent(QMouseEvent* event);
+    virtual void paintEvent(QPaintEvent* event);
 private:
     void allocateWidgets();
     void createLayouts();
@@ -69,6 +82,7 @@ private:
     QHBoxLayout* layoutParent;
     
     // members    
+    bool            m_bSelected;
     ksConfigOption* m_pConfigOption;
 };
 

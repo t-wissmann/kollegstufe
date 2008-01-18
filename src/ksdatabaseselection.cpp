@@ -22,6 +22,7 @@
 #include "ksplattformspec.h"
 #include "ksdatabaseproperties.h"
 #include "xmlparser.h"
+#include "ksiconcatcher.h"
 
 #include <QPushButton>
 #include <QListWidget>
@@ -60,6 +61,7 @@ ksDatabaseSelection::ksDatabaseSelection(QWidget *parent)
     //    setWindowIcon(parent->windowIcon());
     //}
     retranslateUi();
+    reloadIcons();
 }
 
 
@@ -89,6 +91,13 @@ void    ksDatabaseSelection::retranslateUi()
     mnaExtrasExport->setText(tr("Export"));
     
     setWindowTitle(tr("Select Database to load - Kollegstufe"));
+}
+
+void   ksDatabaseSelection::reloadIcons()
+{
+    btnNew->setIcon(ksIconCatcher::getIcon("filenew", 16));
+    btnOk->setIcon(ksIconCatcher::getIcon("button_ok", 16));
+    btnCancel->setIcon(ksIconCatcher::getIcon("button_cancel", 16));
 }
 
 void    ksDatabaseSelection::allocateWidgets()

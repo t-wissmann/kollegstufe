@@ -19,6 +19,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "kspluginengine.h"
+#include "kspwidgettester.h"
 #include "ksplugin.h"
 #include "kspexporttohtml.h"
 #include "ksplugininformation.h"
@@ -61,6 +62,7 @@ void  ksPluginEngine::setPluginInformation(ksPluginInformation* newPluginInforma
 void  ksPluginEngine::createPluginList()
 {
     addPlugin(new kspExportToHtml);
+    addPlugin(new kspWidgetTester);
     addPlugin(new ksPlugin);
     
     

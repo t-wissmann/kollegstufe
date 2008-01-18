@@ -20,7 +20,6 @@
  ***************************************************************************/
 #include "kspexporttohtml.h"
 #include "ksplugininformation.h"
-#include "configdialog.h"
 #include "ksplattformspec.h"
 #include "xmlparser.h"
 #include <QAction>

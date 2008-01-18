@@ -56,6 +56,7 @@ public:
     static QString getFileListLineForPath(QString path);
     static QString getHtmlInfoForPath(QString path);
     void   retranslateUi();
+    void   reloadIcons();
 public slots:
     void    refreshFileList();
     void    selectedFileChanged(int newCurrentFile);

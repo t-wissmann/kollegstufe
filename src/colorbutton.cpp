@@ -103,7 +103,11 @@ void ColorButton::paintEvent(QPaintEvent* event)
 
 void ColorButton::getColorFromDialog()
 {
-    m_cColor = QColorDialog::getColor(m_cColor, this);
+    QColor newColor = QColorDialog::getColor(m_cColor, this);
+    if(newColor.isValid())
+    {// only apply changes if color is valid, i.e. user didn't cancel the color dialog
+        m_cColor = newColor;
+    }
 }
 
 

@@ -31,7 +31,11 @@ SOURCES += main.cpp \
  configdialog.cpp \
  ksconfigoptionwidget.cpp \
  xmlencoder.cpp \
- colorbutton.cpp
+ colorbutton.cpp \
+ selectablelabel.cpp \
+ kspwidgettester.cpp \
+ ksiconcatcher.cpp \
+ ksstatisticsconfigwidget.cpp
 TEMPLATE = app
 CONFIG += warn_on \
 	  thread \
@@ -73,7 +77,11 @@ ksdebugoutput.h \
  configdialog.h \
  ksconfigoptionwidget.h \
  xmlencoder.h \
- colorbutton.h
+ colorbutton.h \
+ selectablelabel.h \
+ kspwidgettester.h \
+ ksiconcatcher.h \
+ ksstatisticsconfigwidget.h
 DISTFILES += ../doc/help.htm
 
 TRANSLATIONS += ../translations/german.ts \

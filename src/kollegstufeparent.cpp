@@ -28,6 +28,7 @@
 #include "ksconfigure.h"
 #include "examitem.h"
 #include "kspluginengine.h"
+#include "ksiconcatcher.h"
 
 // dialogs:
 #include "kspluginconfigurationdialog.h"
@@ -37,6 +38,7 @@
 
 // own widgets
 #include "kssubjectstatusbar.h"
+#include "ksstatisticswidget.h"
 
 // normal widgets
 #include <QComboBox>
@@ -44,11 +46,14 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QTreeWidget>
+#include <QLabel>
+#include <QStatusBar>
 
 // widget containing widgets
 #include <QGroupBox>
 #include <QMenuBar>
 #include <QAction>
+#include <QStackedWidget>
 
 // layouts
 #include <QHBoxLayout>
@@ -90,6 +95,7 @@ kollegstufeParent::kollegstufeParent(QWidget* parentWidget)
     connectSlots();
     initWidgets();
     initPluginEngine();
+    reloadIcons();
     
     debugOutput->putDebugOutput("Loading configuration");
     retranslateUi(); // ensure, that there are texts
@@ -164,10 +170,11 @@ void kollegstufeParent::handleArguments()
 
 void kollegstufeParent::allocateWidgets()
 {
-    //cathegory & subject selection
+    //cathegory & subject selection & parent Widgets
     cmbCathegory    = new QComboBox;
     lstSubjectList  = new QListWidget;
     wdgSubjectSelection = new QWidget;
+    statusbar = new QStatusBar;
     // subject tools:
     /*btnSubjectAdd       = new QPushButton(tr("Hinzufuegen"));
     btnSubjectDelete    = new QPushButton("Entfernen");*/
@@ -179,11 +186,20 @@ void kollegstufeParent::allocateWidgets()
     
     //exam selection
     grpExamList     = new QGroupBox;
+    stackedExamLists = new QStackedWidget;
+    lblExamListStyle = new QLabel;
+    cmbExamListStyle = new QComboBox;
+    cmbExamListStyle->addItem("table");
+    cmbExamListStyle->addItem("chart");
     wdgSubjectStatusbar = new ksSubjectStatusbar;
     lstExamList     = new QTreeWidget;
+    statisticsExamList = new ksStatisticsWidget;
     btnExamAdd      = new QPushButton;
     btnExamDelete   = new QPushButton;
     btnExamEdit     = new QPushButton;
+    
+    stackedExamLists->addWidget(lstExamList);
+    stackedExamLists->addWidget(statisticsExamList);
     
 }
 
@@ -251,8 +267,8 @@ void kollegstufeParent::createMenuBar()
     mnaAboutKs    = mnmHelp->addAction("");
     mnaStatistics->setCheckable(TRUE);
     
-    // INFO: icons will be set at initWidgets
-    // INFO: texts will be set at retranslateUi;
+    // INFO: icons will be set at reloadIcons()
+    // INFO: texts will be set at retranslateUi();
     
 }
 
@@ -270,10 +286,18 @@ void kollegstufeParent::createLayouts()
     wdgSubjectSelection->setLayout(layoutSubjectSelection);
     
     //exam List layout
+    layoutExamToolbar = new QHBoxLayout;
+    layoutExamToolbar->setMargin(0);
+    layoutExamToolbar->addWidget(lblExamListStyle);
+    layoutExamToolbar->addWidget(cmbExamListStyle);
+    layoutExamToolbar->addStretch(0);
+    layoutExamToolbar->addWidget(wdgSubjectStatusbar);
+    
+    
     layoutExamList = new QGridLayout;
-    layoutExamList->setMargin(2);
-    layoutExamList->addWidget(wdgSubjectStatusbar, 0, 0, 1, 4);
-    layoutExamList->addWidget(lstExamList, 1, 0,1, 4);
+    //layoutExamList->setMargin(2);
+    layoutExamList->addLayout(layoutExamToolbar, 0, 0, 1, 4);
+    layoutExamList->addWidget(stackedExamLists, 1, 0,1, 4);
     layoutExamList->addWidget(btnSubjectEdit, 2, 0, 1, 1);
     layoutExamList->addWidget(btnExamAdd, 2, 1, 1, 1);
     layoutExamList->addWidget(btnExamEdit, 2, 2, 1, 1);
@@ -290,13 +314,18 @@ void kollegstufeParent::createLayouts()
 #ifndef KS_IS_MAIN_WINDOW
     layoutParent = new QVBoxLayout;
     layoutParent->setMargin(0);
+    layoutParent->setSpacing(0);
     layoutParent->addWidget(mnbMenuBar);
+    mnbMenuBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     layoutParent->addWidget(splitterParent);
+    layoutParent->addWidget(statusbar);
+    statusbar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     
     setLayout(layoutParent);
 #else
     setCentralWidget(splitterParent);
     setMenuBar(mnbMenuBar);
+    setStatusBar(statusbar);
 #endif
     
 }
@@ -308,6 +337,7 @@ void kollegstufeParent::connectSlots()
     connect(cmbCathegory, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedCathegoryChanged()));
     connect(lstSubjectList, SIGNAL(currentRowChanged(int)), this, SLOT(selectedSubjectChanged()));
     connect(lstExamList, SIGNAL(itemSelectionChanged()), this, SLOT(selectedExamChanged()));
+    connect(statisticsExamList, SIGNAL(currentItemChanged(int)), this, SLOT(selectedExamChanged()));
     
     //subject control
     connect(btnSubjectAdd, SIGNAL(clicked()), this, SLOT(subjectAdd()));
@@ -349,6 +379,7 @@ void kollegstufeParent::connectSlots()
     connect(mnaAboutKs, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
     
     //exam control
+    connect(cmbExamListStyle, SIGNAL(currentIndexChanged(int)), stackedExamLists, SLOT(setCurrentIndex(int)));
     connect(btnExamAdd, SIGNAL(clicked()), this, SLOT(examAdd()));
     connect(btnExamDelete, SIGNAL(clicked()), this, SLOT(examDelete()));
     connect(btnExamEdit, SIGNAL(clicked()), this, SLOT(examEdit()));
@@ -380,36 +411,55 @@ void kollegstufeParent::initWidgets()
     splitterParent->setChildrenCollapsible(FALSE);
     
     
-    setWindowIcon(ksPlattformSpec::getIcon("kollegstufe"));
     
+    //set alternatingrowcolors
+    lstSubjectList->setAlternatingRowColors(TRUE);
+    lstExamList->setAlternatingRowColors(TRUE);
+    
+}
+
+void kollegstufeParent::reloadIcons()
+{
+    
+    setWindowIcon(ksIconCatcher::getIcon("kollegstufe"));
     // set Icons for MenuBar:
-    mnaLoadDatabase->setIcon(ksPlattformSpec::getIcon("fileopen"));
-    mnaSave->setIcon(ksPlattformSpec::getIcon("filesave"));
-    mnaQuit->setIcon(ksPlattformSpec::getIcon("exit"));
-    mnaAboutKs->setIcon(ksPlattformSpec::getIcon("kollegstufe16"));
+    mnaLoadDatabase->setIcon(ksIconCatcher::getIcon(QString("fileopen"), 16));
+    mnaSave->setIcon(ksIconCatcher::getIcon(QString("filesave"), 16));
+    mnaQuit->setIcon(ksIconCatcher::getIcon(QString("exit"), 16));
+    mnaAboutKs->setIcon(ksIconCatcher::getIcon(QString("kollegstufe"), 16));
     
-    mnaEditSubjectAdd->setIcon(ksPlattformSpec::getIcon("add"));
-    mnaEditSubjectDelete->setIcon(ksPlattformSpec::getIcon("remove"));
-    mnaEditSubjectMoveUp->setIcon(ksPlattformSpec::getIcon("up"));
-    mnaEditSubjectMoveDown->setIcon(ksPlattformSpec::getIcon("down"));
+    mnaEditSubjectAdd->setIcon(ksIconCatcher::getIcon(QString("add"), 16));
+    mnaEditSubjectDelete->setIcon(ksIconCatcher::getIcon(QString("remove"), 16));
+    mnaEditSubjectEdit->setIcon(ksIconCatcher::getIcon(QString("configure"), 16));
+    mnaEditSubjectMoveUp->setIcon(ksIconCatcher::getIcon(QString("up"), 16));
+    mnaEditSubjectMoveDown->setIcon(ksIconCatcher::getIcon(QString("down"), 16));
     
-    mnaEditExamAdd->setIcon(ksPlattformSpec::getIcon("add"));
-    mnaEditExamDelete->setIcon(ksPlattformSpec::getIcon("remove"));
+    mnaEditExamAdd->setIcon(ksIconCatcher::getIcon(QString("add"), 16));
+    mnaEditExamDelete->setIcon(ksIconCatcher::getIcon(QString("remove"), 16));
+    mnaEditExamEdit->setIcon(ksIconCatcher::getIcon(QString("edit"), 16));
+    
+    mnaConfigureKs->setIcon(ksIconCatcher::getIcon(QString("configure"), 16));
+    mnaConfigurePlugins->setIcon(ksIconCatcher::getIcon(QString("configure"), 16));
     
     // set Icons for Subject-control-buttons
-    btnSubjectAdd->setIcon(ksPlattformSpec::getIcon("add"));
-    btnSubjectDelete->setIcon(ksPlattformSpec::getIcon("remove"));
-    btnSubjectMoveUp->setIcon(ksPlattformSpec::getIcon("up"));
-    btnSubjectMoveDown->setIcon(ksPlattformSpec::getIcon("down"));
+    btnSubjectAdd->setIcon(ksIconCatcher::getIcon(QString("add"), 16));
+    btnSubjectDelete->setIcon(ksIconCatcher::getIcon(QString("remove"), 16));
+    btnSubjectMoveUp->setIcon(ksIconCatcher::getIcon(QString("up"), 16));
+    btnSubjectMoveDown->setIcon(ksIconCatcher::getIcon(QString("down"), 16));
+    btnSubjectEdit->setIcon(ksIconCatcher::getIcon(QString("configure"), 16));
+    
+    // set Icons for Exam-controlButtons
+    btnExamAdd->setIcon(ksIconCatcher::getIcon(QString("add"), 16));
+    btnExamDelete->setIcon(ksIconCatcher::getIcon(QString("remove"), 16));
+    btnExamEdit->setIcon(ksIconCatcher::getIcon(QString("edit"), 16));
+    
+    
+    
     //set icons for dialogs
     if(diaStatistics)
     {
         diaStatistics->setWindowIcon(this->windowIcon());
     }
-    
-    //set alternatingrowcolors
-    lstSubjectList->setAlternatingRowColors(TRUE);
-    lstExamList->setAlternatingRowColors(TRUE);
     
 }
 
@@ -464,9 +514,8 @@ void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
     // load plugin configs to plugin engine
     pPluginEngine->loadPluginConfigurations(currentDatabase.cGetObjectByName("plugins"), TRUE);  // local
     
-    // set window title to new author name
-    currentWindowTitle = ksPlattformSpec::szToUmlauts(pluginInformation.currentPropertyPart()->cGetObjectByName("author")->szGetContent());
-    resetWindowTitle();
+    applyPropertyChanges(); // load properties to gui
+    
     // reset Database change state:
     setDatabaseChanged(FALSE);
     //refresh GUI
@@ -686,6 +735,9 @@ void kollegstufeParent::retranslateUi()
     mnaAboutKs->setText(tr("About Kollegstufe"));
     
     // exam list table
+    lblExamListStyle->setText(tr("List style:"));
+    cmbExamListStyle->setItemText(0, tr("Table"));
+    cmbExamListStyle->setItemText(1, tr("Chart"));
     QTreeWidgetItem* examListHeader = lstExamList->headerItem();
     examListHeader->setText(1, tr("Semester"));
     examListHeader->setText(2, tr("Date"));
@@ -812,27 +864,24 @@ bool kollegstufeParent::askForSavingChangedDatabase()
     if (databaseChanged())
     {
         QMessageBox questionBox(this);
-        questionBox.addButton(tr("Save"), QMessageBox::ApplyRole);
-        questionBox.addButton(tr("Discard"), QMessageBox::DestructiveRole);
-        questionBox.addButton(tr("Don't Close"), QMessageBox::RejectRole);
-        questionBox.setIcon(QMessageBox::Question);
+        QPushButton* saveButton = new QPushButton(ksIconCatcher::getIcon("filesave", 16), tr("Save"));
+        QPushButton* discardButton = new QPushButton(tr("Discard"));
+        QPushButton* rejectButton = new QPushButton(ksIconCatcher::getIcon("button_cancel", 16), tr("Don't Close"));
+        questionBox.addButton(saveButton, QMessageBox::ApplyRole);
+        questionBox.addButton(discardButton, QMessageBox::DestructiveRole);
+        questionBox.addButton(rejectButton, QMessageBox::RejectRole);
+        questionBox.setIconPixmap(ksIconCatcher::getIconPixmap("exit", 48));
         questionBox.setText(tr("Seit dem letzten Speichern haben sich Daten verandert!\nMoechten Sie diese vor dem Schliessen speichern oder verwerfen ?"));
         questionBox.setWindowTitle(tr("Closing Database - Kollegstufe"));
         
-        switch (questionBox.exec()) {
-            case 0:
+        questionBox.exec();
+        if(questionBox.clickedButton() == saveButton) {
                 saveFile();
                 return TRUE;
-                break;
-            case 1:
+        } else if(questionBox.clickedButton() == discardButton){
                 return TRUE;
-                break;
-            case 2:
-                return FALSE;
-                break;
-            default:
-                return TRUE;
-                break;
+        } else if(questionBox.clickedButton() == rejectButton){
+            return FALSE;
         }
     }
     // else
@@ -851,15 +900,7 @@ void kollegstufeParent::showDatabaseProperties()
     if(diaDatabaseProperties->result() == QDialog::Accepted)
     {
         refreshCathegoryList();
-        if(diaStatistics)
-        {
-            diaStatistics->setProperties(pluginInformation.currentPropertyPart());
-        }
-        if(pluginInformation.currentPropertyPart() && pluginInformation.currentPropertyPart()->cGetObjectByName("author"))
-        {
-            currentWindowTitle = ksPlattformSpec::szToUmlauts(pluginInformation.currentPropertyPart()->cGetObjectByName("author")->szGetContent());
-        }
-        resetWindowTitle();
+        applyPropertyChanges();
         setDatabaseChanged();
         refreshExamList();
     }
@@ -989,11 +1030,21 @@ void kollegstufeParent::subjectDelete()
     
     QString subjectNameToDelete = lstSubjectList->currentItem()->text();
     
-    debugOutput->putDebugOutput("Deleting Subject \'" + subjectNameToDelete + "\' ...");
-    QString message = tr("Do you really want to delete the subject\'");
-    message += subjectNameToDelete;
-    message += tr("\' ?");
-    if(QMessageBox::question ( this, tr("Deleting a subject"), message , QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+    debugOutput->putDebugOutput(QString("Deleting Subject \'%subjectname\' ...").replace("%subjectname", subjectNameToDelete));
+    QString message = tr("Do you really want to delete the subject \'%subjectname\' ?").replace("%subjectname", subjectNameToDelete);
+    
+    // create messagebox
+    QMessageBox msgBox(this);
+    QPushButton* yesButton = new QPushButton(ksIconCatcher::getIconPixmap("button_ok" , 16), tr("Yes"));
+    msgBox.setWindowTitle(tr("Deleting a subject"));
+    msgBox.setText(message);
+    msgBox.setIconPixmap(ksIconCatcher::getIconPixmap("editdelete", 48));
+    msgBox.addButton(yesButton,
+                     (QMessageBox::YesRole));
+    msgBox.addButton(new QPushButton(ksIconCatcher::getIconPixmap("button_cancel" , 16), tr("No")),
+                     (QMessageBox::NoRole));
+    msgBox.exec();
+    if(msgBox.clickedButton() == yesButton)
     {
         pluginInformation.currentCategory()->nDeleteObject(pluginInformation.currentCategory()->cGetObjectByAttributeValue("name",
                                         ksPlattformSpec::qstringToSz(subjectNameToDelete)));
@@ -1136,10 +1187,12 @@ void kollegstufeParent::examDelete()
     if(pluginInformation.currentSubject() == NULL)
     {
         // return if there is no subject selected
+        statusbar->showMessage(tr("Select a subject first"), 3000);
         return;
     }
     if(pluginInformation.currentExam() == NULL)
     {
+        statusbar->showMessage(tr("Select an exam first"), 3000);
         // return if there is no exam selected
         return;
     }
@@ -1152,12 +1205,23 @@ void kollegstufeParent::examDelete()
         message += ". ";
     }
     message += pluginInformation.currentExam()->cGetObjectByAttributeValue("name", "type")->cGetAttributeByName("value")->value();
-    message += tr(" from ");
     cDateConverter date;
     date.setDateString(pluginInformation.currentExam()->cGetObjectByAttributeValue("name", "date")->cGetAttributeByName("value")->value());
-    message += date.humanDate();
-    message += tr(" ? Really Delete this exam ?");
-    if(QMessageBox::question ( this, tr("Deleting of an Exam"), message , QMessageBox::Yes, QMessageBox::No) == QMessageBox::Yes)
+    
+    message += tr(" from %date ?").replace("%date", date.humanDate());
+    
+    // create messagebox
+    QMessageBox msgBox(this);
+    QPushButton* yesButton = new QPushButton(ksIconCatcher::getIconPixmap("button_ok" , 16), tr("Yes"));
+    msgBox.setWindowTitle( tr("Deleting an Exam"));
+    msgBox.setText(message);
+    msgBox.setIconPixmap(ksIconCatcher::getIconPixmap("editdelete", 48));
+    msgBox.addButton(yesButton,
+                     (QMessageBox::YesRole));
+    msgBox.addButton(new QPushButton(ksIconCatcher::getIconPixmap("button_cancel" , 16), tr("No")),
+                     (QMessageBox::NoRole));
+    msgBox.exec();
+    if(msgBox.clickedButton() == yesButton)
     {
         pluginInformation.currentSubject()->nDeleteObject(pluginInformation.currentExam());
         pluginInformation.setCurrentExam(NULL);
@@ -1175,6 +1239,7 @@ void kollegstufeParent::examEdit()
     }
     if(!pluginInformation.currentExam())
     {
+        statusbar->showMessage(tr("Select an exam first"), 3000);
         return;
     }
     diaExamProperties->setProperties(pluginInformation.currentPropertyPart());
@@ -1238,31 +1303,44 @@ void kollegstufeParent::selectedSubjectChanged()
 
 void kollegstufeParent::selectedExamChanged()
 {
-    
-    //backup last Selection
-    QString selectedID = "foo";
-    QList<QTreeWidgetItem *> itemList = lstExamList->selectedItems ();
-    if( itemList.size() > 0)
-    {
-        selectedID = itemList.first()->text(0);
-    }
-    else
-    {
+    if (pluginInformation.currentSubject() == NULL)
+    {// if no subject is selected, then there can't be an currentExam
         pluginInformation.setCurrentExam(NULL);
         return;
     }
-    if (pluginInformation.currentSubject() == NULL)
+    
+    xmlObject* currentExam = NULL;
+    if(cmbExamListStyle->currentIndex() == 0) // if table is shown
     {
-        pluginInformation.setCurrentExam(NULL);
+        QString selectedID = "foo";
+        QList<QTreeWidgetItem *> itemList = lstExamList->selectedItems();
+        
+        if( itemList.size() > 0)
+        {
+            selectedID = itemList.first()->text(0);
+        }
+        else
+        {
+            pluginInformation.setCurrentExam(NULL);
+            return;
+            
+        }
+        
+        currentExam = pluginInformation.currentSubject()->cGetObjectByAttributeValue("id", ksPlattformSpec::qstringToSz(selectedID));
+    }
+    else if(cmbExamListStyle->currentIndex() == 1) // if chart is shown
+    {
+        currentExam = statisticsExamList->selectedXmlSource();
+        //qDebug("statistik hat selektiert: %d", (int)currentExam);
     }
     else
     {
-        pluginInformation.setCurrentExam(pluginInformation.currentSubject()->cGetObjectByAttributeValue("id", ksPlattformSpec::qstringToSz(selectedID)));
-    }
-    if(diaStatistics)
-    {
-        diaStatistics->setSelectedExam(pluginInformation.currentExam());
-    }
+        return;
+    } // return if nothing valid is chosen in cmbExamListStyle
+    
+    selectExam(currentExam);
+        
+    
     
 }
 
@@ -1310,6 +1388,7 @@ void kollegstufeParent::refreshCathegoryList()
     selectedSubjectChanged();
 }
 
+
 void kollegstufeParent::refreshSubjectList(int rowToSelectAfterRefresh)
 {
     if(rowToSelectAfterRefresh < 0 || rowToSelectAfterRefresh >= lstSubjectList->count())
@@ -1351,11 +1430,7 @@ void kollegstufeParent::refreshSubjectList(int rowToSelectAfterRefresh)
 void kollegstufeParent::refreshExamList()
 {
     //backup last Selection
-    QString BackupSelectedID = "foo";
-    if( lstExamList->currentItem() != NULL)
-    {
-        BackupSelectedID = lstExamList->currentItem()->text(0);
-    }
+    xmlObject* backupCurrentExam = pluginInformation.currentExam();
     
     // refresh list
     lstExamList->clear();
@@ -1440,22 +1515,86 @@ void kollegstufeParent::refreshExamList()
         lstExamList->resizeColumnToContents(i);
     }
     
+    // refresh exam list in chart i.e. ksStatisticsWidget
+    statisticsExamList->loadItemListFromSubject(pluginInformation.currentSubject());
+    
     
     // restore Selection from before refresh
-    QList <QTreeWidgetItem*> itemList = lstExamList->findItems(BackupSelectedID ,0);
-    if (itemList.size() > 0)
-        lstExamList->setCurrentItem(itemList.first());
-    else
-        lstExamList->setCurrentItem(lstExamList->itemAt(0,0));
+    selectExam(backupCurrentExam);
+    
     // refresh average computing components
     diaStatistics->refreshUiAndChildren();
     wdgSubjectStatusbar->calculateAverage();
-    //simulate selection change
-    selectedExamChanged();
-    
     
 }
 
+void kollegstufeParent::selectExam(xmlObject* exam)
+{
+    if(exam == pluginInformation.currentExam())
+    {
+        return; // return if nothing would change
+    }
+    if(pluginInformation.currentSubject() == NULL)
+    {
+        // if there isn't a current subject,
+        // then there can't be any exams
+        return;
+    }
+    // apply new exam to pluginInformation object
+    pluginInformation.setCurrentExam(exam);
+    
+    
+    // get index in list of chart widget i.e. ksStatisticswidget i.e. exam list
+    int statIndex = statisticsExamList->indexOfItem(exam);
+    // select new selected item in exam list chart
+    statisticsExamList->setSelectedItem(statIndex);
+        
+        // select new selected item in exam list table
+    QString id = "foo";
+    if(exam && exam->cGetAttributeByName("id"))
+    {
+        id = exam->cGetAttributeByName("id")->value();
+    }
+    QList <QTreeWidgetItem*> itemList = lstExamList->findItems(id ,0);
+    if (itemList.size() > 0)
+    {
+        lstExamList->setCurrentItem(itemList.first());
+    }
+    else
+    {
+        lstExamList->setCurrentItem(NULL);
+    }
+    //qDebug("id %s was selected, pointer = %d", id.toAscii().data(), (int)exam);
+        
+    if(diaStatistics)
+    {
+        diaStatistics->setSelectedExam(exam);
+    }
+}
+
+void kollegstufeParent::applyPropertyChanges()
+{
+    xmlObject* properties = pluginInformation.currentPropertyPart();
+    if(!properties)
+    {
+        return;
+    }
+    ksPlattformSpec::addMissingPropertiesAttributes(properties);
+    int best  = properties->cGetObjectByName("rating")->cGetAttributeByName("best")->nValueToInt();
+    int worst = properties->cGetObjectByName("rating")->cGetAttributeByName("worst")->nValueToInt();
+    
+    statisticsExamList->setMinMaxY(worst, best);
+    
+    if(diaStatistics)
+    {
+        diaStatistics->setProperties(pluginInformation.currentPropertyPart());
+    }
+    if(pluginInformation.currentPropertyPart() && pluginInformation.currentPropertyPart()->cGetObjectByName("author"))
+    {
+        currentWindowTitle = ksPlattformSpec::szToUmlauts(pluginInformation.currentPropertyPart()->cGetObjectByName("author")->szGetContent());
+    }
+    resetWindowTitle();
+}
 
 
 

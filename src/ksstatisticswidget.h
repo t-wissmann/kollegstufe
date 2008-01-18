@@ -26,8 +26,17 @@
 #include "ksstatisticsitem.h"
 #include <QList>
 #include <QPainter>
+#include <QPixmap>
+#include <QTimer>
+
+class ksStatisticsConfigWidget;
+
+class QResizeEvent;
 class QMouseEvent;
 class QPaintEvent;
+class QEvent;
+
+class xmlObject;
 
 /**
 	@author Thorsten Wissmann <towi89@web.de>
@@ -35,14 +44,42 @@ class QPaintEvent;
 class ksStatisticsWidget : public QFrame
 {
 Q_OBJECT
+signals:
+    void currentItemChanged(int index);
+    void currentItemChanged(xmlObject* item);
+public slots:
+    void refreshConfigButtonColor();
+    void startConfigButtonAnimation();
+    void animationEvent();
+    
+    void showConfigBox();
+    void hideConfigBox();
+    void toggleConfigBoxVisibility();
+    void adjustConfigBoxSize();
+    void adjustConfigBoxPosition();
+    
+    void resetAnimationTimerState();
+    
 public:
     ksStatisticsWidget(QWidget *parent = 0);
 
     ~ksStatisticsWidget();
     
+    enum LabelVisibility
+    {
+        LabelAlwaysVisible,
+        LabelSelectedVisible,
+        LabelNeverVisible,
+    };
+    
+    void reloadIcons();
+    void resetDefaultColors();
+    
     void clearItemList();
+    void loadItemListFromSubject(xmlObject* subject);
     void addItem(ksStatisticsItem newItem);
     int indexOfItem(xmlObject* item);
+    
     
     int minimumY() const;
     int maximumY() const;
@@ -62,25 +99,55 @@ public:
     int selectedItemIndex() const { return nSelectedItemIndex; };
     void setSelectedItem(int index);
     
+    xmlObject* selectedXmlSource() const;
+    
+    void setItemLabelVisibility(LabelVisibility visible) { nItemLabelVisibility = visible; update(); };
+    LabelVisibility itemLabelVisibility() const { return nItemLabelVisibility; };
+    
+    int itemIndexAt(int x, int y);
+    
+    bool isPositionInConfigButton(int x, int y);
+    
 protected: // events
     void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void paintEvent(QPaintEvent *event);
+    virtual void paintEvent(QPaintEvent *event);
+    virtual void leaveEvent(QEvent *event);
+    virtual void changeEvent ( QEvent * event );
+    virtual void resizeEvent( QResizeEvent* event);
     
     void drawAxis(QPainter* painter);
     void drawYScaleLinesAndLabels(QPainter* painter);
     void drawGrid();
     void drawGraph();
     void drawItems();
-    void drawCircleAt(int circleX, int circleY, int alpha = 255);
+    void drawCircleAt(int circleX, int circleY) { drawCircleAt(circleX, circleY, nPointDiameter); };
+    void drawCircleAt(int circleX, int circleY, int diameter);
     void drawCaptionAt(int captionX, int captionY, QString caption, Qt::AlignmentFlag alignment = Qt::AlignHCenter, bool above = FALSE, bool selected = FALSE);
     void updateGridAndGraphProperties();
     void drawSelectionRectangle(int nX, int nY, int nWidth, int nHeight);
     
-    int  getScreenYForWorldY(int item) const;
+    // about config button
+    void drawConfigButton();
+    void drawConfigBox();
+    void moveConfigBox();
+    
+    
+    int  getScreenYForWorldY(int worldY) const;
+    
+    void setConfigBtnTargetAlpha(int cursorx, int cursory);
+    
+    virtual void mouseMoveEvent(QMouseEvent* event);
+    
     
 private:
     void initMembers();
+    
+    void allocateWidgets();
+    
+    // widgets
+    ksStatisticsConfigWidget* wdgConfigBox;
+    
+    //members
     
     int  nPointDiameter; // in pixels; german: durchmesser
     
@@ -92,6 +159,7 @@ private:
     int nMinimumY;
     int nMaximumY;
     int nSelectedItemIndex;
+    int nHoveredItemIndex;
     
 // grid and graph properities
     
@@ -107,6 +175,28 @@ private:
     int scaleLineLength;
     int arrowLength; // parallel to Axis
     int arrowWidth;
+    
+    LabelVisibility nItemLabelVisibility;
+    
+    QTimer          tmrAnimations;
+// config button
+    Qt::Alignment   configBtnAlignment;
+    QPixmap         configBtnIcon;
+    QColor          configBtnCurrentColor;
+    QColor          configBtnTargetColor;
+    QColor          configBtnNormalColor;
+    QColor          configBtnHoveredColor;
+    double          configBtnRadius;
+    bool            configBtnIsAnimated;
+//config box
+    char            configBoxYState; // between 0(hidden) and 100 (shown)
+    char            configBoxYTarget;
+    char            configBoxYSpeed; // pixels in 40 ms = tmrAnimations time
+    bool            configBoxIsAnimated;
+    int             configBoxMarginLeft;
+    int             configBoxMarginRight;
+    
+    
 };
 
 #endif

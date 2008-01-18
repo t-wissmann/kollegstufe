@@ -58,6 +58,7 @@ public:
     void setDatabasePropertiesToEdit(xmlObject* newProperties);
     void setDatabaseToEdit(xmlObject* newDatabase);
     void retranslateUi();
+    void reloadIcons();
 public slots:
     void writeWidgetAttributesToProperties();
     void setMinMaxDate();

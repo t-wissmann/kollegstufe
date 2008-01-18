@@ -358,27 +358,6 @@ QString  ksPlattformSpec::getArticleForNoun(QString noun, kasus kasusOfNoun)
 }
 
 
-    // icon catcher
-QIcon ksPlattformSpec::getIcon(QString name, QString extension)
-{
-    return QIcon(getIconPixmap(name, extension));
-}
-
-
-QPixmap ksPlattformSpec::getIconPixmap(QString name, QString extension)
-{
-    return getIconPixmapFromApplicationTheme(name, extension);
-}
-
-QPixmap ksPlattformSpec::getIconPixmapFromApplicationTheme(QString name, QString extension)
-{
-    QDir iconDir(QApplication::applicationDirPath());
-    iconDir.cdUp();
-    iconDir.cd("pic");
-    
-    return QPixmap(iconDir.filePath(name + "." + extension));
-}
-
 // average computing functions // return -1 if average is invalid
 
 double ksPlattformSpec::computeEntireAverageOfSubject(xmlObject* subject, QString semester, xmlObject* pSemesterList)

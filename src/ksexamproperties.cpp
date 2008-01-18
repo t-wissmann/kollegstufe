@@ -21,6 +21,7 @@
 #include "ksexamproperties.h"
 #include "ksplattformspec.h"
 #include "dateConverter.h"
+#include "ksiconcatcher.h"
 
 
 #include "xmlparser.h"
@@ -59,6 +60,7 @@ ksExamProperties::ksExamProperties(QWidget *parent)
         setWindowIcon(parent->windowIcon());
     }
     retranslateUi();
+    reloadIcons();
 }
 
 
@@ -103,6 +105,13 @@ void ksExamProperties::retranslateUi()
     resetWindowTitle();
     
 }
+
+void ksExamProperties::reloadIcons()
+{
+    btnOk->setIcon(ksIconCatcher::getIcon("button_ok", 16));
+    btnCancel->setIcon(ksIconCatcher::getIcon("button_cancel", 16));
+}
+
 void ksExamProperties::allocateWidgets()
 {
     // bottom buttons

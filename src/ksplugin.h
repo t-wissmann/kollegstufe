@@ -44,7 +44,7 @@ class ksPlugin : public QObject
 public:
     ksPlugin();
 
-    ~ksPlugin();
+    virtual ~ksPlugin();
     
     enum PluginState {
         StateUnloaded,

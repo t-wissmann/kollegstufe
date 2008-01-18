@@ -51,6 +51,7 @@ public:
     ksExamProperties(QWidget *parent = 0);
     ~ksExamProperties();
     void retranslateUi();
+    void reloadIcons();
 public slots:
     void setProperties(xmlObject*     newProperties);
     void setExamToEdit(xmlObject* newExamToEdit);

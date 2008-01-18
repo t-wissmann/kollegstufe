@@ -21,6 +21,7 @@
 #include "configdialog.h"
 #include "ksconfigcontainer.h"
 #include "ksconfigoptionwidget.h"
+#include "ksiconcatcher.h"
 #include "xmlparser.h"
 #include "xmlloader.h"
 
@@ -31,11 +32,14 @@
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QPushButton>
+#include <QToolButton>
 #include <QScrollArea>
+#include <QLineEdit>
 #include <QWhatsThis>
 #include <QMenu>
 #include <QAction>
 #include <QActionGroup>
+#include <QStringList>
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -54,6 +58,7 @@ ConfigDialog::ConfigDialog(QWidget *parent)
     createLayouts();
     connectSlots();
     retranslateUi();
+    reloadIcons();
     setConfigIdentifier("");
 }
 
@@ -93,15 +98,26 @@ void  ConfigDialog::allocateWidgets()
     btnBoxBottom->addButton(btnApply, QDialogButtonBox::ApplyRole);
     btnBoxBottom->addButton(btnWhatsThis, QDialogButtonBox::HelpRole);
     
+    // filter widgets
+    txtFilter   = new QLineEdit;
+    lblFilter   = new QLabel;
+    btnClearFilter = new QToolButton;
+    
 }
 
 void  ConfigDialog::createLayouts()
 {
     layoutOptionWidgets = new QVBoxLayout;
     layoutOptionWidgets->setMargin(0);
+    layoutOptionWidgets->setSpacing(0);
     
     layoutConfigSelection = new QHBoxLayout;
     layoutConfigSelection->setMargin(0);
+    
+    layoutConfigSelection->addWidget(lblFilter);
+    layoutConfigSelection->addWidget(txtFilter);
+    layoutConfigSelection->addWidget(btnClearFilter);
+    layoutConfigSelection->addSpacing(10);
     layoutConfigSelection->addStretch(0);
     layoutConfigSelection->addWidget(lblConfigSelection);
     layoutConfigSelection->addWidget(btnConfigSelection);
@@ -132,6 +148,10 @@ void  ConfigDialog::connectSlots()
     connect(btnWhatsThis, SIGNAL(clicked()), this, SLOT(enterWhatsThisMode()));
     connect(acgrpConfigSelection, SIGNAL(triggered(QAction*)), this, SLOT(configSelected(QAction*)));
     connect(this, SIGNAL(accepted()), this, SLOT(applyChanges()));
+    
+    //connect about filter
+    connect(txtFilter, SIGNAL(textChanged(QString)), this, SLOT(setConfigOptionFilter(QString)));
+    connect(btnClearFilter, SIGNAL(clicked()), txtFilter, SLOT(clear()));
     
     connect(mnaConfigExport, SIGNAL(triggered()), this, SLOT(exportConfig()));
     connect(mnaConfigImport, SIGNAL(triggered()), this, SLOT(importConfig()));
@@ -164,7 +184,21 @@ void  ConfigDialog::retranslateUi()
     lblConfigSelection->setText(tr("Current Configuration:"));
     mnaConfigExport->setText(tr("Export Configuration"));
     mnaConfigImport->setText(tr("Import Configuration"));
+    // filter widgets
+    lblFilter->setText(tr("Filter:"));
+    btnClearFilter->setToolTip(tr("Clear filter"));
+    btnClearFilter->setWhatsThis(tr("Click to clear the filter box"));
+    txtFilter->setWhatsThis(tr("Here you can input some keywords.\nThen only the options that match to these keywords are shown."));
+    
     refreshHeaderFromTitle();
+}
+
+void ConfigDialog::reloadIcons()
+{
+    btnOk->setIcon(ksIconCatcher::getIcon("button_ok", 16));
+    btnCancel->setIcon(ksIconCatcher::getIcon("button_cancel", 16));
+    btnApply->setIcon(ksIconCatcher::getIcon("apply", 16));
+    btnClearFilter->setIcon(ksIconCatcher::getIcon("editclear", 16));
 }
 
 void  ConfigDialog::refreshHeaderFromTitle()
@@ -262,7 +296,7 @@ void ConfigDialog::refreshGuiFromConfig(ksConfigContainer* config)
      // 3. copy configoptions to configoptionwidgets
      for(int i = 0; i < config->size(); i++)
      {
-         currentOption =  &((*config)[i]);
+         currentOption =  (*config)[i];
              
          if(currentOption->changeableByUser())
          {
@@ -465,6 +499,39 @@ void ConfigDialog::exportConfig()
                              );
     }
 }
+
+
+void ConfigDialog::setConfigOptionFilter(QString filter)
+{
+    ksConfigOptionWidget* currentWidget = NULL;
+    bool currentIsVisible = TRUE;
+    QStringList keywords = filter.split(" ",  QString::SkipEmptyParts);
+    for(int i = 0; i < listConfigOptions.size(); i++)
+    {
+        currentWidget = listConfigOptions[i];
+        if(!currentWidget)
+        {
+            continue;
+        }
+        currentIsVisible = TRUE;
+        // keyw means: current keyword
+        for(int keyw = 0; keyw < keywords.size(); keyw++)
+        {
+            currentIsVisible = currentWidget->hasMatchOn(keywords[keyw]);
+            if(!currentIsVisible)
+            { // if current widget doesn't have a match on only one keyword, we don't need to check all the other keywords
+                break;
+            }
+        }
+        
+        // only show widget, if it has a match on current filter, else hide this widget
+        currentWidget->setVisible(currentIsVisible);
+        //currentWidget->setSelected(currentIsVisible && (keywords.size() > 0)); // another possibility: matches get selected
+        
+    }
+}
+
+
 
 
 

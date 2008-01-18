@@ -20,6 +20,7 @@
  ***************************************************************************/
 #include "ksconfigoptionwidget.h"
 #include "ksconfigoption.h"
+#include "qclickablelabel.h"
 
 #include "colorbutton.h"
 
@@ -30,19 +31,28 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QCheckBox>
+#include <QMouseEvent>
+#include <QPaintEvent>
+#include <QFocusEvent>
 
 #include <QHBoxLayout>
 #include <QSizePolicy>
+#include <QPen>
+#include <QPainter>
+#include <QApplication>
 
 
 ksConfigOptionWidget::ksConfigOptionWidget(QWidget *parent)
  : QWidget(parent)
 {
     m_pConfigOption = NULL;
+    m_bSelected = FALSE;
     allocateWidgets();
     createLayouts();
     connectSlots();
     retranslateUi();
+    setSelected(FALSE);
+    //setFocusPolicy(Qt::ClickFocus);
 }
 
 
@@ -54,7 +64,7 @@ ksConfigOptionWidget::~ksConfigOptionWidget()
 void ksConfigOptionWidget::allocateWidgets()
 {
     
-    lblDescription = new QLabel;
+    lblDescription = new QClickableLabel;
     btnToDefault = new QPushButton;
     spinValueInt = new QSpinBox;
     spinValueDouble = new QDoubleSpinBox;
@@ -87,6 +97,13 @@ void ksConfigOptionWidget::createLayouts()
 void ksConfigOptionWidget::connectSlots()
 {
     connect(btnToDefault, SIGNAL(clicked()), this, SLOT(setToDefault()));
+    // slots for click event
+    connect(btnToDefault, SIGNAL(clicked()), this, SLOT(childWasClicked()));
+    connect(chkValueBool, SIGNAL(clicked(bool)), this, SLOT(childWasClicked()));
+    connect(lblDescription, SIGNAL(clicked()), this, SLOT(childWasClicked()));
+    connect(btnValueColor, SIGNAL(clicked()), this, SLOT(childWasClicked()));
+    
+    //connect(this, SIGNAL(clicked()), this, SLOT(setSelected()));
 }
     
 void ksConfigOptionWidget::setConfigOption(ksConfigOption* configOption)
@@ -166,8 +183,88 @@ void ksConfigOptionWidget::applyChanges()
     
 }
 
+void ksConfigOptionWidget::childWasClicked()
+{
+    setFocus(Qt::MouseFocusReason);
+    emit clicked();
+}
+
+
+void ksConfigOptionWidget::mousePressEvent(QMouseEvent* event)
+{
+    /*
+    if(event->button() == Qt::LeftButton)
+    {
+        setFocus();
+        emit clicked();
+    }
+    */
+}
+
+
+void ksConfigOptionWidget::paintEvent(QPaintEvent* event)
+{
+    if(m_bSelected)
+    {
+        QLinearGradient gradient(0, 0, 0, height());
+        QColor main = palette().highlight().color();
+        QColor c1 = main;
+        QColor c2 = main;
+        c1.setHsv(c1.hue(), c1.saturation(), c1.value()+30, main.alpha());
+        c2.setHsv(c2.hue(), c2.saturation(), c2.value()-30, main.alpha());
+        gradient.setColorAt(0, c1);
+        gradient.setColorAt(1, c2);
+        QBrush brush(gradient);
+        QPen   pen;
+        pen.setColor(palette().highlight().color());
+        
+        QPainter painter(this);
+        painter.setPen(pen);
+        painter.setBrush(brush);
+        painter.drawRect(0, 0, width()-1, height()-1);
+    }
+}
+
+void ksConfigOptionWidget::setSelected(bool selected)
+{
+    if(selected != m_bSelected)
+    {
+        m_bSelected = selected;
+        if(m_bSelected)
+        {
+            lblDescription->setForegroundRole(QPalette::HighlightedText);
+        }
+        else
+        {
+            lblDescription->setForegroundRole(QPalette::WindowText);
+        }
+    }
+    update();
+}
+
 void ksConfigOptionWidget::retranslateUi()
 {
     btnToDefault->setText(tr("To Default"));
 }
+
+bool ksConfigOptionWidget::hasMatchOn(QString text)
+{
+    bool result = FALSE;
+    
+    if(whatsThis().contains(text, Qt::CaseInsensitive))
+    {
+        result = TRUE;
+    }
+    if(lblDescription->text().contains(text, Qt::CaseInsensitive))
+    {
+        result = TRUE;
+    }
+    if(txtValueString->text().contains(text, Qt::CaseInsensitive))
+    {
+        result = TRUE;
+    }
+    
+    return result;
+}
+
 

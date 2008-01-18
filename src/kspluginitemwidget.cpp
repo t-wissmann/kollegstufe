@@ -23,6 +23,8 @@
 #include "ksplugin.h"
 #include "qclickablelabel.h"
 
+#include "ksiconcatcher.h"
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -48,6 +50,7 @@ ksPluginItemWidget::ksPluginItemWidget(QWidget *parent)
     createLayouts();
     connectSlots();
     retranslateUi();
+    reloadIcons();
 }
 
 
@@ -64,10 +67,11 @@ void ksPluginItemWidget::allocateWidgets()
     lblName = new QClickableLabel;
     //lblDescription = new QClickableLabel;
     lblName->setWordWrap(TRUE);
+    lblName->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     btnAbout    = new QPushButton;
-    btnAbout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    btnAbout->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     btnConfigure= new QPushButton;
-    btnConfigure->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    btnConfigure->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     cmbScope    = new QComboBox;
     cmbScope->addItem("Global");
     cmbScope->addItem("Local");
@@ -146,6 +150,12 @@ void ksPluginItemWidget::retranslateUi()
     chkIsLoaded->setWhatsThis(tr("Here you can load/unload this plugin."));
     btnConfigure->setWhatsThis(tr("Click to configure this plugin."));
     btnAbout->setWhatsThis(tr("Click to get some information about this plugin."));
+}
+
+void ksPluginItemWidget::reloadIcons()
+{
+    btnAbout->setIcon(ksIconCatcher::getIcon("info", 16));
+    btnConfigure->setIcon(ksIconCatcher::getIcon("configure", 16));
 }
 
 void ksPluginItemWidget::showConfigurationDialog()

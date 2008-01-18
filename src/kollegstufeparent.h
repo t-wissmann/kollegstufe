@@ -45,6 +45,7 @@ class ksPluginEngine;
 
 // own widgets
 class ksSubjectStatusbar;
+class ksStatisticsWidget;
 
 // own dialogs
 class ksExamProperties;
@@ -63,10 +64,12 @@ class QComboBox;
 class QListWidget;
 class QPushButton;
 class QTreeWidget;
+class QStatusBar;
 
 // widget containing widgets
 class QGroupBox;
 class QStatusBar;
+class QStackedWidget;
 // menubar:
 class QMenuBar;
 class QMenu;
@@ -77,6 +80,7 @@ class QAction;
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
+class QStackedLayout;
 class QSplitter;
 
 // other Q_Objects
@@ -135,6 +139,7 @@ public slots:
     
     void retranslateUi();
     
+    void applyPropertyChanges();
     
 public:
     kollegstufeParent(QWidget* parentWidget = 0);
@@ -148,10 +153,12 @@ public:
     bool askForSavingChangedDatabase();//returns true if everything is okey, false if file mustn't be closed
     void setDatabaseChanged( bool newChangeState = TRUE) {  bDatabaseChanged = newChangeState; };
     bool databaseChanged(){ return bDatabaseChanged; };
+    void selectExam(xmlObject* exam);
     
     QString getFilename(){ return szFilename; };
     void reloadTranslator();
     void resetWindowTitle();
+    void reloadIcons();
     void setCloseAllIfGetClosed(bool closeAll);
     bool closeAllIfGetClosed();
 protected:
@@ -174,6 +181,7 @@ private:
     // parentWidgets
     QSplitter*      splitterParent;
     QVBoxLayout*    layoutParent;
+    QStatusBar*     statusbar;
     //menubar:
     QMenuBar*       mnbMenuBar;
     // menus
@@ -225,11 +233,16 @@ private:
     QPushButton*    btnSubjectMoveUp;
     QPushButton*    btnSubjectMoveDown;
     
-    // widgets for exam selection;
+    // widgets for exam selection
     QGridLayout*    layoutExamList;
+    QHBoxLayout*    layoutExamToolbar;
     QGroupBox*      grpExamList;
-    ksSubjectStatusbar* wdgSubjectStatusbar;
+    QLabel*         lblExamListStyle;
+    QComboBox*      cmbExamListStyle;
+    QStackedWidget* stackedExamLists;
     QTreeWidget*    lstExamList;
+    ksStatisticsWidget* statisticsExamList;
+    ksSubjectStatusbar* wdgSubjectStatusbar;
     QPushButton*    btnExamAdd;
     QPushButton*    btnExamDelete;
     QPushButton*    btnExamEdit;
@@ -260,13 +273,6 @@ private:
     bool        bDatabaseChanged;
     
     xmlObject   currentDatabase;
-    /*
-    xmlObject*  currentPropertyPart;
-    xmlObject*  currentDataPart;
-    xmlObject*  currentCathegory;
-    xmlObject*  currentSubject;
-    xmlObject*  currentExam;
-    */
     
     QString     currentWindowTitle;
     

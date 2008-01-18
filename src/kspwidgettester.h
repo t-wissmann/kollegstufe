@@ -18,41 +18,44 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSPEXPORTTOHTML_H
-#define KSPEXPORTTOHTML_H
+#ifndef KSPWIDGETTESTER_H
+#define KSPWIDGETTESTER_H
 
-#include "ksplugin.h"
+#include <QObject>
+#include <ksplugin.h>
+
+class SelectableLabel;
+class QDialog;
 
 /**
 	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
-
-class ConfigDialog;
-
-class kspExportToHtml : public ksPlugin
+class kspWidgetTester : public ksPlugin
 {
-Q_OBJECT
+    Q_OBJECT
 public:
-    kspExportToHtml();
-
-    virtual ~kspExportToHtml();
-public slots:
-    void exportToHtml();
     
+    kspWidgetTester();
+    
+    virtual ~kspWidgetTester();
+    
+public slots:
+    void testWidgets();
     
 protected:
-    
-    // core functions
+
+// core functions
     virtual void load();
     virtual void refresh();
     virtual void unload();
     virtual void retranslate();
     virtual void createConfiguration(ksConfigContainer* config);
-    
+
 private:
-    
-    QAction*    mnaExportToHtml;
-    
+
+    QAction*    mnaTestWidgets;
+    QDialog*    testDialog;
+
 };
 
 #endif

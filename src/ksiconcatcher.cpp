@@ -18,41 +18,46 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSPEXPORTTOHTML_H
-#define KSPEXPORTTOHTML_H
+#include "ksiconcatcher.h"
 
-#include "ksplugin.h"
+#include <QDir>
+#include <QApplication>
 
-/**
-	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
-*/
-
-class ConfigDialog;
-
-class kspExportToHtml : public ksPlugin
+ksIconCatcher::ksIconCatcher()
 {
-Q_OBJECT
-public:
-    kspExportToHtml();
+}
 
-    virtual ~kspExportToHtml();
-public slots:
-    void exportToHtml();
-    
-    
-protected:
-    
-    // core functions
-    virtual void load();
-    virtual void refresh();
-    virtual void unload();
-    virtual void retranslate();
-    virtual void createConfiguration(ksConfigContainer* config);
-    
-private:
-    
-    QAction*    mnaExportToHtml;
-    
-};
 
-#endif
+ksIconCatcher::~ksIconCatcher()
+{
+}
+
+
+    // icon catcher
+QIcon ksIconCatcher::getIcon(QString name, int size)
+{
+    return QIcon(getIconPixmap(name, size));
+}
+
+
+QPixmap ksIconCatcher::getIconPixmap(QString name, int size)
+{
+    return getIconPixmapFromApplicationTheme(name, size);
+}
+
+QPixmap ksIconCatcher::getIconPixmapFromApplicationTheme(QString name, int size)
+{
+    QDir iconDir(QApplication::applicationDirPath());
+    iconDir.cdUp();
+    iconDir.cd("pic");
+    QString filename = name;
+    if(size != 128)
+    {
+        filename += QString::number(size);
+    }
+    filename += ".png";
+    
+    return QPixmap(iconDir.filePath(filename));
+}
+
+

@@ -18,41 +18,51 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSPEXPORTTOHTML_H
-#define KSPEXPORTTOHTML_H
+#ifndef KSSTATISTICSCONFIGWIDGET_H
+#define KSSTATISTICSCONFIGWIDGET_H
 
-#include "ksplugin.h"
+#include <QWidget>
+class ksStatisticsWidget;
+
+class QComboBox;
+class QLabel;
+class QHBoxLayout;
+class QEvent;
+
 
 /**
 	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
-
-class ConfigDialog;
-
-class kspExportToHtml : public ksPlugin
+class ksStatisticsConfigWidget : public QWidget
 {
 Q_OBJECT
-public:
-    kspExportToHtml();
-
-    virtual ~kspExportToHtml();
 public slots:
-    void exportToHtml();
-    
+    void applyChanges();
+public:
+    ksStatisticsConfigWidget(QWidget *parent = 0, Qt::WindowFlags f = 0 );
+
+    ~ksStatisticsConfigWidget();
+    void setStatisticsWidget(ksStatisticsWidget* statistics);
+    void retranslateUi();
     
 protected:
-    
-    // core functions
-    virtual void load();
-    virtual void refresh();
-    virtual void unload();
-    virtual void retranslate();
-    virtual void createConfiguration(ksConfigContainer* config);
-    
+    void changeEvent(QEvent* event);
 private:
     
-    QAction*    mnaExportToHtml;
+    void allocateWidgets();
+    void createLayouts();
+    void connectSlots();
+    void connectWidgetValueSlots();
+    void disconnectWidgetValueSlots();
     
+    // widgets
+    QLabel*             lblLabelVisibility;
+    QComboBox*          cmbLabelVisibility;
+    //layouts
+    QHBoxLayout*        layoutParent;
+    
+    //members
+    ksStatisticsWidget* m_pStatisticsWidget;
 };
 
 #endif

@@ -27,9 +27,11 @@
 
 class QDialogButtonBox;
 class QPushButton;
+class QToolButton;
 class QLabel;
 class QScrollArea;
 class QMenu;
+class QLineEdit;
 
 class QEvent;
 class QVBoxLayout;
@@ -71,6 +73,7 @@ public:
     ~ConfigDialog();
     
     void retranslateUi();
+    void reloadIcons();
     void setTitle(QString title, QString description = "");
     void setConfigContainer(ksConfigContainer* config);
     ksConfigContainer* currentConfigContainer() const { return m_pConfigContainer; };
@@ -88,6 +91,7 @@ public slots:
     void configSelected(QAction* action);
     void exportConfig();
     void importConfig();
+    void setConfigOptionFilter(QString filter);
     
 protected:
     virtual void changeEvent(QEvent* event);
@@ -122,7 +126,10 @@ private:
     QAction*            mnaConfigImport;
     QActionGroup*       acgrpConfigSelection;
     QList<ConfigItem>   listConfigMenuItems;
-    
+    // filter widgets
+    QLineEdit*          txtFilter;
+    QLabel*             lblFilter;
+    QToolButton*        btnClearFilter;
     
     
     // members

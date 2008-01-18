@@ -20,7 +20,7 @@
  ***************************************************************************/
 #include "kssubjectproperties.h"
 #include "ksplattformspec.h"
-
+#include "ksiconcatcher.h"
 #include "xmlparser.h"
 
 #include <QString>
@@ -57,6 +57,7 @@ ksSubjectProperties::ksSubjectProperties(QWidget *parent)
         setWindowIcon(parent->windowIcon());
     }
     retranslateUi();
+    reloadIcons();
 }
 
 
@@ -89,6 +90,11 @@ void ksSubjectProperties::retranslateUi()
     lblWeightingOral->setText(tr("Oral"));
 }
 
+void ksSubjectProperties::reloadIcons()
+{
+    btnOk->setIcon(ksIconCatcher::getIcon("button_ok", 16));
+    btnCancel->setIcon(ksIconCatcher::getIcon("button_cancel", 16));
+}
 
 
 void ksSubjectProperties::allocateWidgets()

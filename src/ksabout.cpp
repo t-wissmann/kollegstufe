@@ -21,6 +21,7 @@
 
 #include "ksabout.h"
 #include "ksplattformspec.h"
+#include "ksiconcatcher.h"
 
 #include <QPushButton>
 #include <QApplication>
@@ -130,12 +131,13 @@ void ksAbout::initGui()
     txtInfoLicense->setLineWrapMode(QTextEdit::WidgetWidth);
     txtInfoLicense->setWordWrapMode(QTextOption::WordWrap);
     QPalette pal = palette();
-    pal.setBrush(QPalette::Base, pal.brush(QPalette::Window));
+    pal.setBrush(QPalette::Base, QColor( 0, 255, 0, 0)); // set transparent background
     txtInfoLicense->setPalette(pal);
+    //txtInfoLicense->setBackgroundRole();
     txtInfoLicense->setReadOnly(TRUE);
     
     txtInfoLicense->setFrameStyle(QFrame::NoFrame);
-    txtInfoLicense->setAutoFillBackground(FALSE);
+    //txtInfoLicense->setAutoFillBackground(FALSE);
     
     lblInfoAuthor->setContentsMargins(10, 10, 10, 10);
     
@@ -157,7 +159,7 @@ void ksAbout::initGui()
         szApplicationPath += QDir::separator();
     }
     
-    lblIcon->setPixmap(ksPlattformSpec::getIconPixmap("kollegstufe"));
+    lblIcon->setPixmap(ksIconCatcher::getIconPixmap("kollegstufe"));
     
     
     resize(400, 250);
