@@ -1,88 +1,87 @@
-SOURCES += main.cpp \
- kollegstufeparent.cpp \
- ksdebugoutput.cpp \
- xmlparser.cpp \
- error.cpp \
- dateConverter.cpp \
- examitem.cpp \
- ksplattformspec.cpp \
- ksexamproperties.cpp \
- ksabout.cpp \
- kssubjectproperties.cpp \
- ksdatabaseselection.cpp \
- ksdatabaseproperties.cpp \
- ksstatisticsdialog.cpp \
- ksstatisticswidget.cpp \
- ksstatisticsitem.cpp \
- ksconfigure.cpp \
- kscathegoryeditorwidget.cpp \
- kssubjectinformationwidget.cpp \
- kssubjectstatusbar.cpp \
- xmlloader.cpp \
- ksplugin.cpp \
- ksplugininformation.cpp \
- kspexporttohtml.cpp \
- kspluginengine.cpp \
- kspluginitemwidget.cpp \
- kspluginmanager.cpp \
- kspluginconfigurationdialog.cpp \
- ksconfigcontainer.cpp \
- ksconfigoption.cpp \
- configdialog.cpp \
- ksconfigoptionwidget.cpp \
- xmlencoder.cpp \
- colorbutton.cpp \
- selectablelabel.cpp \
- kspwidgettester.cpp \
- ksiconcatcher.cpp \
- ksstatisticsconfigwidget.cpp
-TEMPLATE = app
 CONFIG += warn_on \
 	  thread \
           qt \
  assistant
 TARGET = ../bin/kollegstufe
 
-HEADERS += kollegstufeparent.h \
-ksdebugoutput.h \
- xmlparser.h \
- error.h \
- dateConverter.h \
- examitem.h \
- ksplattformspec.h \
- ksexamproperties.h \
- ksabout.h \
- kssubjectproperties.h \
- ksdatabaseselection.h \
- ksdatabaseproperties.h \
- ksstatisticsdialog.h \
- ksstatisticswidget.h \
- ksstatisticsitem.h \
- ksconfigure.h \
- kscathegoryeditorwidget.h \
- kssubjectinformationwidget.h \
- kssubjectstatusbar.h \
- xmlloader.h \
- ksplugin.h \
- ksplugininformation.h \
- kspexporttohtml.h \
- kspluginengine.h \
- kspluginitemwidget.h \
- qclickablelabel.h \
- kspluginmanager.h \
- kspluginconfigurationdialog.h \
- nokeyscrollarea.h \
- ksconfigcontainer.h \
- ksconfigoption.h \
- configdialog.h \
- ksconfigoptionwidget.h \
- xmlencoder.h \
- colorbutton.h \
- selectablelabel.h \
- kspwidgettester.h \
- ksiconcatcher.h \
- ksstatisticsconfigwidget.h
 DISTFILES += ../doc/help.htm
 
 TRANSLATIONS += ../translations/german.ts \
 ../translations/english.ts
+
+SUBDIRS +=TEMPLATE = app
+
+SOURCES += main.cpp \
+core/configdialog.cpp \
+core/dateConverter.cpp \
+core/kollegstufeparent.cpp \
+core/ksconfigcontainer.cpp \
+core/ksconfigoption.cpp \
+core/ksconfigoptionwidget.cpp \
+core/ksplattformspec.cpp \
+dialogs/ksabout.cpp \
+dialogs/ksconfigure.cpp \
+dialogs/ksdatabaseproperties.cpp \
+dialogs/ksdatabaseselection.cpp \
+dialogs/ksexamproperties.cpp \
+dialogs/ksstatisticsdialog.cpp \
+dialogs/kssubjectproperties.cpp \
+io/error.cpp \
+io/ksdebugoutput.cpp \
+io/ksiconcatcher.cpp \
+io/xmlencoder.cpp \
+io/xmlloader.cpp \
+io/xmlparser.cpp \
+pluginengine/kspluginconfigurationdialog.cpp \
+pluginengine/ksplugin.cpp \
+pluginengine/kspluginengine.cpp \
+pluginengine/ksplugininformation.cpp \
+pluginengine/kspluginitemwidget.cpp \
+pluginengine/kspluginmanager.cpp \
+widgets/colorbutton.cpp \
+widgets/examitem.cpp \
+widgets/kscathegoryeditorwidget.cpp \
+widgets/ksstatisticsconfigwidget.cpp \
+widgets/ksstatisticsitem.cpp \
+widgets/ksstatisticswidget.cpp \
+widgets/kssubjectinformationwidget.cpp \
+widgets/kssubjectstatusbar.cpp \
+widgets/selectablelabel.cpp
+HEADERS += core/configdialog.h \
+core/dateConverter.h \
+core/kollegstufeparent.h \
+core/ksconfigcontainer.h \
+core/ksconfigoption.h \
+core/ksconfigoptionwidget.h \
+core/ksplattformspec.h \
+dialogs/ksabout.h \
+dialogs/ksconfigure.h \
+dialogs/ksdatabaseproperties.h \
+dialogs/ksdatabaseselection.h \
+dialogs/ksexamproperties.h \
+dialogs/ksstatisticsdialog.h \
+dialogs/kssubjectproperties.h \
+io/error.h \
+io/ksdebugoutput.h \
+io/ksiconcatcher.h \
+io/xmlencoder.h \
+io/xmlloader.h \
+io/xmlparser.h \
+pluginengine/kspluginconfigurationdialog.h \
+pluginengine/kspluginengine.h \
+pluginengine/ksplugin.h \
+pluginengine/ksplugininformation.h \
+pluginengine/kspluginitemwidget.h \
+pluginengine/kspluginmanager.h \
+widgets/colorbutton.h \
+widgets/examitem.h \
+widgets/kscathegoryeditorwidget.h \
+widgets/ksstatisticsconfigwidget.h \
+widgets/ksstatisticsitem.h \
+widgets/ksstatisticswidget.h \
+widgets/kssubjectinformationwidget.h \
+widgets/kssubjectstatusbar.h \
+widgets/nokeyscrollarea.h \
+widgets/qclickablelabel.h \
+widgets/selectablelabel.h \
+ pluginengine/ksplugininterface.h

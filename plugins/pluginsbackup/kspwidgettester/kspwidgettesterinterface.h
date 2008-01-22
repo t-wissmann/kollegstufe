@@ -18,65 +18,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "io/ksdebugoutput.h"
+#ifndef KSPWIDGETTESTERINTERFACE_H
+#define KSPWIDGETTESTERINTERFACE_H
 
-#include <QApplication>
-#include "core/kollegstufeparent.h"
-#include <stdio.h>
-
+#include <pluginengine/ksplugininterface.h>
+#include <QObject>
+#include <QtPlugin> // needed for  Q_INTERFACES macro
 
 #include <QString>
-#include "io/xmlloader.h"
-#include "io/xmlparser.h"
-#include <string.h>
+#include <pluginengine/ksplugin.h>
+#include "kspwidgettester.h"
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+class kspWidgetTesterInterface : public QObject, public ksPluginInterface
 {
-    
-    
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
+Q_OBJECT
+Q_INTERFACES(ksPluginInterface);
+public:
+    kspWidgetTesterInterface();
 
-int testNewXmlLoader()
-{
-    
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
+    virtual ~kspWidgetTesterInterface();
+    virtual ksPlugin* createNewInstance();
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+};
 
-
-
-
-
-
-
-
-
-
+#endif

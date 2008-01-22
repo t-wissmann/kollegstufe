@@ -18,65 +18,70 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "io/ksdebugoutput.h"
+#ifndef KSPLUGININTERFACE_H
+#define KSPLUGININTERFACE_H
 
-#include <QApplication>
-#include "core/kollegstufeparent.h"
-#include <stdio.h>
+#include <QtPlugin> // needed for  Q_DECLARE_INTERFACE macro
 
+class QAction;
+class ksPlugin;
 
-#include <QString>
-#include "io/xmlloader.h"
-#include "io/xmlparser.h"
-#include <string.h>
-
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
-{
+typedef void (ksPlugin::*stringSetter) (QString);
+typedef void (ksPlugin::*qactionSetter) (QAction*);
     
+
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+
+class ksPluginInterface{
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
+public:
+    ksPluginInterface(){
+        m_pParent = 0;
+        addMenuAction = 0;
+        removeMenuAction = 0;
+        printDebugMsg = 0;
+    };
     
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
+    virtual void init() {};
+    virtual ~ksPluginInterface() {};
+    
+    virtual void load() {} ;
+    virtual void unload() {};
+    
+    virtual void retranslate() = 0;
+    
+    QString identifier() const { return m_szIdentifier;};
+    QString name() const {return m_szName; };
+    QString description() const {return m_szDescription; };
+    QString author() const {return m_szAuthor; };
+    
+    qactionSetter addMenuAction;
+    qactionSetter removeMenuAction;
+    
+    stringSetter  printDebugMsg;
+    
+    void print(QString message) {
+        if(m_pParent)
+        {
+            (m_pParent->*printDebugMsg)(message);
+        }else{
+            qDebug("%s", message.toAscii().data());
+        }
+    };
+    
+    ksPlugin*     m_pParent;
+    
+protected:
+    QString m_szIdentifier;
+    QString m_szName;
+    QString m_szDescription;
+    QString m_szAuthor;
+    
+};
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+Q_DECLARE_INTERFACE(ksPluginInterface , "thorsten.wissmann.kollegstufe.ksPluginInterface/1.0");
 
 
-
-
-
-
-
-
-
-
+#endif

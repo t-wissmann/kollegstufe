@@ -18,65 +18,47 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "io/ksdebugoutput.h"
-
-#include <QApplication>
-#include "core/kollegstufeparent.h"
-#include <stdio.h>
-
-
+#include "examitem.h"
 #include <QString>
-#include "io/xmlloader.h"
-#include "io/xmlparser.h"
-#include <string.h>
+#include <QHeaderView>
+#include <QTreeWidget>
+#include <QObject>
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
+#include <core/dateConverter.h>
 
-int main(int argc, char *argv[])
+bool ExamItem::operator< ( const QTreeWidgetItem & other ) const
 {
+    if (!treeWidget())
+        return FALSE;
+    if (!treeWidget()->headerItem())
+        return FALSE;
     
+    int sortCol = treeWidget()->sortColumn();
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
-    
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
+    if(treeWidget()->headerItem()->text(sortCol) == QObject::tr("Date"))
     {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
+        return thisIsEarlierDate(other);
     }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
-
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
+    if(treeWidget()->headerItem()->text(sortCol) == QObject::tr("Points"))
     {
-        mainWindow.show();
-        nResult = app.exec();
+        int ownValue = this->text(sortCol).toInt();
+        int otherValue = other.text(sortCol).toInt();
+        
+        return (ownValue < otherValue);
     }
-    return nResult;
+    return ( 0 < QString::compare(this->text(sortCol), other.text(sortCol), Qt::CaseInsensitive));
 }
 
 
-
-
-
-
-
-
+bool ExamItem::thisIsEarlierDate( const QTreeWidgetItem & other ) const
+{
+    int col = treeWidget()->sortColumn();
+    cDateConverter dateOwn;
+    cDateConverter dateToCompare;
+    dateOwn.setHumanDate(this->text(col).toAscii().data());
+    dateToCompare.setHumanDate(other.text(col).toAscii().data());
+    return (-1 == cDateConverter::compareDates( dateOwn, dateToCompare )); // compare dates returns -1 
+                                                                           //if dateOwn was earlier than dateToCompare
+}
 
 

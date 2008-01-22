@@ -18,65 +18,43 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "io/ksdebugoutput.h"
+#ifndef NOKEYSCROLLAREA_H
+#define NOKEYSCROLLAREA_H
 
-#include <QApplication>
-#include "core/kollegstufeparent.h"
-#include <stdio.h>
+#include <QScrollArea>
 
-
-#include <QString>
-#include "io/xmlloader.h"
-#include "io/xmlparser.h"
-#include <string.h>
-
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
+#include <pluginengine/kspluginmanager.h>
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+class NoKeyScrollArea : public QScrollArea
 {
-    
-    
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
-    
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
+    Q_OBJECT
+public:
+    NoKeyScrollArea(QWidget* parent = 0) : QScrollArea(parent)
     {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
+        m_pPluginManagerParent = NULL;
     }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
-
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
+    void setPluginManagerParent(ksPluginManager* newPluginManagerParent)
     {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+        m_pPluginManagerParent = newPluginManagerParent;
+    };
 
+protected:
+    virtual void keyPressEvent(QKeyEvent* event)
+    {
+        if(m_pPluginManagerParent)
+        {
+            m_pPluginManagerParent->pressKey(event);
+        }
+        else
+        {
+            QScrollArea::keyPressEvent(event);
+        }
+    };
+private:
+    ksPluginManager* m_pPluginManagerParent;
 
+};
 
-
-
-
-
-
-
-
+#endif

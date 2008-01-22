@@ -18,65 +18,55 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "io/ksdebugoutput.h"
-
-#include <QApplication>
-#include "core/kollegstufeparent.h"
-#include <stdio.h>
-
-
-#include <QString>
-#include "io/xmlloader.h"
-#include "io/xmlparser.h"
+#include "ksdebugoutput.h"
+#include <core/ksplattformspec.h>
+#include <QtGlobal>
+#include <QChar>
 #include <string.h>
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
+// ensure that there's a debug output
+#ifndef QT_NO_DEBUG_OUTPUT
+#define QT_NO_DEBUG_OUTPUT
+#endif
 
-int main(int argc, char *argv[])
+ksDebugOutput *ksDebugOutput::lastInstance = 0;
+
+ksDebugOutput::ksDebugOutput()
+ : QObject()
 {
-    
-    
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
+    bDebugMode = FALSE;
+    lastInstance = this;
 }
 
-int testNewXmlLoader()
+
+ksDebugOutput::~ksDebugOutput()
 {
-    
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
+    if(lastInstance == this)
     {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
+        lastInstance = 0;
     }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
 }
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
+void ksDebugOutput::putStandartQtDebugOutut(QString outputString)
 {
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
+    // only put debug string if debug mode is enabled
+    qDebug(ksPlattformSpec::qstringToSz(outputString));
 }
-
-
-
-
-
-
-
-
-
+void ksDebugOutput::putDebugOutput(QString outputString)
+{
+    if (!bDebugMode)
+        return;
+    emit printDebugLine(outputString);
+}
+void ksDebugOutput::print(QString msg)
+{
+    if(lastInstance)
+    {
+        lastInstance->putDebugOutput(msg);
+    }
+    else
+    {
+        qDebug("%s", msg.toAscii().data());
+    }
+}
 

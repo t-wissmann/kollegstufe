@@ -18,65 +18,31 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "io/ksdebugoutput.h"
+#include "kspwidgettesterinterface.h"
+//#include "kspwidgettester.h"
 
-#include <QApplication>
-#include "core/kollegstufeparent.h"
-#include <stdio.h>
+#include <QtPlugin>
+
+Q_EXPORT_PLUGIN2 (kspwidgettesterinterface, kspWidgetTesterInterface);
 
 
-#include <QString>
-#include "io/xmlloader.h"
-#include "io/xmlparser.h"
-#include <string.h>
-
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
+kspWidgetTesterInterface::kspWidgetTesterInterface()
+ : QObject()
 {
-    
-    
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
-    
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
-
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
+    qDebug("plugin says hello");
 }
 
 
+kspWidgetTesterInterface::~kspWidgetTesterInterface()
+{
+    qDebug("plugin says goodbye");
+}
 
-
-
-
-
-
+ksPlugin* kspWidgetTesterInterface::createNewInstance()
+{
+    //return "es funktioniert";
+    //return new kspWidgetTester;
+    return (ksPlugin*)289;
+}
 
 

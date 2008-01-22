@@ -18,65 +18,36 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "io/ksdebugoutput.h"
+#ifndef KSDEBUGOUTPUT_H
+#define KSDEBUGOUTPUT_H
 
-#include <QApplication>
-#include "core/kollegstufeparent.h"
-#include <stdio.h>
-
-
+#include <stdlib.h>
+#include <QObject>
 #include <QString>
-#include "io/xmlloader.h"
-#include "io/xmlparser.h"
-#include <string.h>
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
-
-int main(int argc, char *argv[])
+/**
+	@author Thorsten Wissmann <towi89@web.de>
+*/
+class ksDebugOutput : public QObject
 {
+    Q_OBJECT
+signals:
+    void printDebugLine(QString);
+public slots:
+    void putStandartQtDebugOutut(QString outputString);
+    void putDebugOutput(QString outputString);
+public:
+    ksDebugOutput();
+    ~ksDebugOutput();
+    bool isDebugMode(){ return bDebugMode; };
+    void setDebugMode(bool newDebugMode){ bDebugMode = newDebugMode; };
+    void enableDebugMode(){ setDebugMode(TRUE); };
+    void disableDebugMode(){ setDebugMode(FALSE); };
+    static void print(QString msg);
     
-    
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
+private:
+    bool bDebugMode;
+    static ksDebugOutput* lastInstance;
+};
 
-int testNewXmlLoader()
-{
-    
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
-
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
-
-
-
-
-
-
-
-
-
-
+#endif

@@ -18,65 +18,67 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "io/ksdebugoutput.h"
+#ifndef KSABOUT_H
+#define KSABOUT_H
 
-#include <QApplication>
-#include "core/kollegstufeparent.h"
-#include <stdio.h>
+class QEvent;
+class QPushButton;
+class QLabel;
+class QFrame;
+class QTextEdit;
+class QGroupBox;
+class QTabWidget;
+class QWidget;
+
+// layouts
+class QHBoxLayout;
+class QVBoxLayout;
+class QGridLayout;
 
 
-#include <QString>
-#include "io/xmlloader.h"
-#include "io/xmlparser.h"
-#include <string.h>
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
+#include <QDialog>
 
-int main(int argc, char *argv[])
+/**
+	@author Thorsten Wissmann <towi89@web.de>
+*/
+class ksAbout : public QDialog
 {
+Q_OBJECT
+public:
+    ksAbout(QWidget *parent = 0);
+
+    ~ksAbout();
     
+    void retranslateUi();
+    void reloadIcons();
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
+protected:
+    virtual void changeEvent(QEvent* event);
+private:
+    void createGui();
+    void initGui();
+    //widgets
+    QLabel*         lblHeader;
+    QLabel*         lblVersion;
+    QLabel*         lblIcon;
+    QPushButton*    btnClose;
+    QTabWidget*     tabContainer;
+    //QGroupBox*      frmContainer;
+    QLabel*         lblInfoAbout;
+    QLabel*         lblInfoAuthor;
+    QTextEdit*      txtInfoLicense;
+    QWidget*        wdgInfoAbout;
     
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
+    //layout for tabs
+    QHBoxLayout*    layoutInfoAbout;
+    
+    //layouts
+    QGridLayout*    layoutTop;
+    QVBoxLayout*    layoutParent;
+    QHBoxLayout*    layoutBottom;
+    
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+};
 
-
-
-
-
-
-
-
-
-
+#endif

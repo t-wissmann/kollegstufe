@@ -18,65 +18,53 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "io/ksdebugoutput.h"
+#ifndef KSPWIDGETTESTER_H
+#define KSPWIDGETTESTER_H
 
-#include <QApplication>
-#include "core/kollegstufeparent.h"
-#include <stdio.h>
+#include <QObject>
+#include <pluginengine/ksplugin.h>
 
+#include <core/ksconfigcontainer.h>
+class QAction;
 
-#include <QString>
-#include "io/xmlloader.h"
-#include "io/xmlparser.h"
-#include <string.h>
+#include <QtGui>
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
+class QDialog;
 
-int main(int argc, char *argv[])
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+
+class kspWidgetTester : public ksPlugin
 {
+    Q_INTERFACES(ksPlugin);
+public:
+    
+    kspWidgetTester();
+    
+    virtual ~kspWidgetTester();
+    
+    virtual void configure() { ksPlugin::configure(); };
+    virtual void about() {ksPlugin::about(); };
     
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
+public slots:
+    void testWidgets();
     
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
+protected:
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
+// core functions
+    virtual void load();
+    virtual void refresh();
+    virtual void unload();
+    virtual void retranslate();
+    virtual void createConfiguration(ksConfigContainer* config);
 
+private:
 
+    QAction*    mnaTestWidgets;
+    QDialog*    testDialog;
 
+};
 
-
-
-
-
-
-
+#endif

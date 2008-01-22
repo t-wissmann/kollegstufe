@@ -18,65 +18,53 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "io/ksdebugoutput.h"
+#ifndef KSPEXPORTTOHTML_H
+#define KSPEXPORTTOHTML_H
 
-#include <QApplication>
-#include "core/kollegstufeparent.h"
-#include <stdio.h>
+#include <pluginengine/ksplugin.h>
 
 
-#include <QString>
-#include "io/xmlloader.h"
-#include "io/xmlparser.h"
-#include <string.h>
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
 
-int testNewXmlLoader();
-int runStdKs(int argc, char *argv[]);
+class ConfigDialog;
 
-int main(int argc, char *argv[])
+class kspExportToHtml : public ksPlugin
 {
+    Q_OBJECT
+    Q_INTERFACES(ksPlugin)
+    
+            
+public:
+    kspExportToHtml();
+    virtual ~kspExportToHtml();
     
     
-    return runStdKs(argc, argv);
-    //return testNewXmlLoader();
-}
-
-int testNewXmlLoader()
-{
+    virtual void configure() { //ksPlugin::configure();
+    };
+    virtual void about(){ //ksPlugin::about();
+    };
     
-    xmlObject* myObject = new xmlObject;
-    xmlLoader* loader = new xmlLoader;
-    if(!loader->loadFileToClass("/home/thorsten/.kollegstufe/archiv_zwei.xml", myObject))
-    {
-        printf("Error during parsing at position %d\n", loader->parsingPosition());
-    }
-    //qDebug("content is: %s", myObject->szGetContent());
-    PutObjectToScreen(myObject);
-    //printf("strlen of %s is %d\n", "test", strlen("test"));
-    delete myObject;
-    delete loader;
-    return 0;
-}
+    
+    
+public slots:
+    void exportToHtml();
+    
+    
+protected:
+    
+    // core functions
+    virtual void load();
+    virtual void refresh();
+    virtual void unload();
+    virtual void retranslate();
+    virtual void createConfiguration(ksConfigContainer* config);
+    
+private:
+    
+    QAction*    mnaExportToHtml;
+    
+};
 
-int runStdKs(int argc, char *argv[]) // run standard kollegstufe
-{
-    int nResult = 0;
-    QApplication app(argc, argv);
-    kollegstufeParent mainWindow;
-    if(mainWindow.wantsToBeShown())
-    {
-        mainWindow.show();
-        nResult = app.exec();
-    }
-    return nResult;
-}
-
-
-
-
-
-
-
-
-
-
+#endif
