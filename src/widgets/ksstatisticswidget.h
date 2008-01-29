@@ -28,6 +28,7 @@
 #include <QPainter>
 #include <QPixmap>
 #include <QTimer>
+#define BASISWIDGET QFrame
 
 class ksStatisticsConfigWidget;
 
@@ -35,19 +36,23 @@ class QResizeEvent;
 class QMouseEvent;
 class QPaintEvent;
 class QEvent;
+class QKeyEvent;
 
 class xmlObject;
+
+typedef QList<const ksStatisticsItem*> StatisticsItemsPointerList;
 
 /**
 	@author Thorsten Wissmann <towi89@web.de>
 */
-class ksStatisticsWidget : public QFrame
+class ksStatisticsWidget : public BASISWIDGET
 {
 Q_OBJECT
 signals:
     void currentItemChanged(int index);
     void currentItemChanged(xmlObject* item);
     void itemDoubleClicked(int index);
+    void itemTriggered(int index);
 public slots:
     void refreshConfigButtonColor();
     void startConfigButtonAnimation();
@@ -60,6 +65,7 @@ public slots:
     void adjustConfigBoxPosition();
     
     void resetAnimationTimerState();
+    void setFilter(QString filter);
     
 public:
     ksStatisticsWidget(QWidget *parent = 0);
@@ -93,7 +99,8 @@ public:
     void sortItemList();
     bool isItemListSorted() const { return bItemListSorted; };
     
-    int  itemListSize() const { return itemList.size(); };
+    int  itemListSize() const;
+    int  visibleItems() const;
     
     static int rangeValue(int value, int minValue, int maxValue);
     
@@ -109,6 +116,8 @@ public:
     
     bool isPositionInConfigButton(int x, int y);
     
+    void refreshVisibleItemList();
+    
 protected: // events
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
@@ -116,12 +125,15 @@ protected: // events
     virtual void leaveEvent(QEvent *event);
     virtual void changeEvent ( QEvent * event );
     virtual void resizeEvent( QResizeEvent* event);
+    virtual void mouseMoveEvent(QMouseEvent* event);
+    virtual void keyPressEvent(QKeyEvent* event);
     
     void drawAxis(QPainter* painter);
     void drawYScaleLinesAndLabels(QPainter* painter);
     void drawGrid();
     void drawGraph();
     void drawItems();
+    void drawFrame();
     void drawCircleAt(int circleX, int circleY) { drawCircleAt(circleX, circleY, nPointDiameter); };
     void drawCircleAt(int circleX, int circleY, int diameter);
     void drawCaptionAt(int captionX, int captionY, QString caption, Qt::AlignmentFlag alignment = Qt::AlignHCenter, bool above = FALSE, bool selected = FALSE);
@@ -138,7 +150,6 @@ protected: // events
     
     void setConfigBtnTargetAlpha(int cursorx, int cursory);
     
-    virtual void mouseMoveEvent(QMouseEvent* event);
     
     
 private:
@@ -153,7 +164,9 @@ private:
     
     int  nPointDiameter; // in pixels; german: durchmesser
     
+    QString     szFilter;
     
+    QList<ksStatisticsItem>  visibleItemList;
     QList<ksStatisticsItem>  itemList;
     bool                     bItemListSorted;
     QDate nXMinimum;

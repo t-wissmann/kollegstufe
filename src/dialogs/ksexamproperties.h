@@ -28,6 +28,7 @@
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
+class QDialogButtonBox;
 
 // widgets
 class QPushButton;
@@ -99,7 +100,7 @@ private:
     
     //layouts
     QGridLayout*    layoutSemester;
-    QHBoxLayout*    layoutBottom;
+    QDialogButtonBox* boxBottom;
     QGridLayout*    layoutParent;
     
     // members

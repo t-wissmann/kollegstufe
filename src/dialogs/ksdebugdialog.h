@@ -18,81 +18,63 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSDATABASESELECTION_H
-#define KSDATABASESELECTION_H
+#ifndef KSDEBUGDIALOG_H
+#define KSDEBUGDIALOG_H
 
 #include <QDialog>
-#include <QString>
-#include <QStringList>
 
-class QListWidget;
-class QLabel;
-class QPushButton;
-class QTextEdit;
-class QAction;
-
-
-//layouts
-class QDialogButtonBox;
 class QHBoxLayout;
 class QVBoxLayout;
-class QGridLayout;
-class QSplitter;
+
+class ksFilterWidget;
+class QTextEdit;
+class QPushButton;
+class QDialogButtonBox;
+
+class QEvent;
+class QKeyEvent;
 
 /**
-	@author Thorsten Wissmann <towi89@web.de>
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
-class ksDatabaseSelection : public QDialog
+class ksDebugDialog : public QDialog
 {
 Q_OBJECT
 public:
-    ksDatabaseSelection(QWidget *parent = 0);
+    ksDebugDialog(QWidget *parent = 0);
 
-    ~ksDatabaseSelection();
-    QString getCurrentFile();
-    void    setCurrentFile(QString szNewFile);
-    void    catchStringList();
-    void    printfFileInfo();
-    static QString getFileListLineForPath(QString path);
-    static QString getHtmlInfoForPath(QString path);
-    void   retranslateUi();
-    void   reloadIcons();
+    ~ksDebugDialog();
+    
+    void retranslateUi();
+    void reloadIcons();
 public slots:
-    void    refreshFileList();
-    void    selectedFileChanged(int newCurrentFile);
-    void    createNewDatabase();
-    void    deleteDatabase();
-    void    importDatabase();
-    void    exportDatabase();
+    void putDebugMessage(QString msg);
+    void find(QString phrase);
+    void findNext();
 protected:
     virtual void changeEvent(QEvent* event);
+    virtual void keyPressEvent(QKeyEvent* event);
 private:
     
-    void    allocateWidgets();
-    void    createLayouts();
-    void    connectSlots();
+    void allocateWidgets();
+    void createLayouts();
+    void connectSlots();
     
     // widgets
-    QPushButton*    btnNew;
-    QPushButton*    btnDelete;
-    QPushButton*    btnOk;
-    QPushButton*    btnCancel;
-    QListWidget*    lstFileList;
-    QTextEdit*      txtInfo;
-    QPushButton*    btnExtras;
-    QAction*        mnaExtrasDelete;
-    QAction*        mnaExtrasImport;
-    QAction*        mnaExtrasExport;
+    QPushButton*    btnClose;
+    QDialogButtonBox* bottomButtonBox;
+    ksFilterWidget* wdgFind;
+    QPushButton*    btnFindNext;
+    QPushButton*    btnClear;
+    QTextEdit*      txtLog;
     
-    //layouts:
-    QSplitter*      layoutListOrInfo;
-    QHBoxLayout*    layoutBottom;
-    QDialogButtonBox* boxButtons;
-    QGridLayout*    layoutParent;
+    // layouts
+    QHBoxLayout*    layoutToolBar;
+    QVBoxLayout*    layoutParent;
     
-    //members
-    QStringList szFileList;
-    QString     szCurrentFile;
+    
+    
+
 };
 
 #endif

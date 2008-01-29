@@ -23,11 +23,13 @@
 ksStatisticsItem::ksStatisticsItem()
 {
     nY = 0;
+    bVisible = TRUE;
     pSourceItem = NULL;
 }
 
 ksStatisticsItem::ksStatisticsItem(const ksStatisticsItem &other)
 {
+    bVisible = TRUE;
     nY = 0;
     setCaption ( other.caption() );
     setX ( other.x() );
@@ -39,6 +41,7 @@ ksStatisticsItem::ksStatisticsItem(const ksStatisticsItem &other)
 
 ksStatisticsItem::ksStatisticsItem ( QString newCaption, QDate newX, int newY, QString newInformation )
 {
+    bVisible = TRUE;
     pSourceItem = NULL;
     szCaption = newCaption;
     dateX = newX;
@@ -58,6 +61,7 @@ void ksStatisticsItem::operator= (const ksStatisticsItem& newItem )
     setY ( newItem.y() );
     setInformation ( newItem.information() );
     setSourceItem(newItem.sourceItem());
+    setVisible(newItem.isVisible());
 }
 
 
@@ -84,7 +88,7 @@ bool ksStatisticsItem::operator>=(const ksStatisticsItem& other) const
 
 bool ksStatisticsItem::operator==(const ksStatisticsItem& other) const
 {
-    return x() == other.x();
+    return (x() == other.x()) && (y() == other.y()) && (caption() == other.caption());
 }
 
 bool ksStatisticsItem::operator!=(const ksStatisticsItem& other) const
@@ -93,5 +97,17 @@ bool ksStatisticsItem::operator!=(const ksStatisticsItem& other) const
 }
 
 
+bool ksStatisticsItem::hasMatchOn(QString keyword) const
+{
+    bool match = FALSE;
+    if(keyword.isEmpty())
+    {
+        match = TRUE;
+    }
+    match = szInformation.toLower().contains(keyword.toLower());
+    match = match || szCaption.toLower().contains(keyword.toLower());
+    
+    return match;
+}
 
 

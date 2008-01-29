@@ -26,6 +26,7 @@
 class xmlObject;
 class ksStatisticsWidget;
 class ksSubjectInformationWidget;
+class ksFilterWidget;
 
 class QVBoxLayout;
 class QHBoxLayout;
@@ -53,6 +54,7 @@ public:
     void setProperties(xmlObject* newProperties);
     
     void retranslateUi();
+    void reloadIcons();
     void setSelectedExam(xmlObject* exam);
     
 public slots:
@@ -75,6 +77,7 @@ private:
     //widgets
     ksStatisticsWidget* statistics;
     ksSubjectInformationWidget* information;
+    ksFilterWidget*     wdgFilter;
     QPushButton*        btnClose;
     QComboBox*          cmbSemesterSelection;
     QLabel*             lblSemesterSelection;

@@ -38,6 +38,7 @@
 
 
 // layouts
+#include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -164,10 +165,9 @@ void ksDatabaseProperties::allocateWidgets()
 
 void ksDatabaseProperties::createLayouts()
 {
-    layoutBottom = new QHBoxLayout;
-    layoutBottom->addStretch(1);
-    layoutBottom->addWidget(btnOk);
-    layoutBottom->addWidget(btnCancel);
+    boxBottom = new QDialogButtonBox;
+    boxBottom->addButton(btnOk, QDialogButtonBox::AcceptRole);
+    boxBottom->addButton(btnCancel, QDialogButtonBox::RejectRole);
     
     layoutSemesterList = new QGridLayout;
     layoutSemesterList->addWidget(lblStart, 0, 1);
@@ -213,7 +213,7 @@ void ksDatabaseProperties::createLayouts()
     layoutParent->addLayout(layoutRatingOther, 2, 1, 1, 2);
     layoutParent->addWidget(grpSemesterList, 3, 0, 1, 3);
     layoutParent->addWidget(grpCathegories, 4, 0, 1, 3);
-    layoutParent->addLayout(layoutBottom, 5, 0, 1, 3);
+    layoutParent->addWidget(boxBottom, 5, 0, 1, 3);
     
     setLayout(layoutParent);
 }

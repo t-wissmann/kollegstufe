@@ -78,6 +78,7 @@ void ksPlugin::initPluginCore(){
     m_pPluginCore->m_pParent = this;
     m_pPluginCore->printDebugMsg = &ksPlugin::printDebugMsg;
     m_pPluginCore->init();
+    setIdentifier(m_pPluginCore->identifier());
 }
 
 
@@ -465,7 +466,7 @@ void ksPlugin::saveConfig(xmlObject* target, bool localOrGlobal) //TRUE: local ;
 void ksPlugin::loadConfig(xmlObject* source, bool localOrGlobal) //TRUE: local ; FALSE: global
 {
     if(localOrGlobal)
-    {
+    {// local
         loadConfigFromXmlObject(&m_cLocalConfig, source);
         
         if((source && source->cGetAttributeByName("state"))) // always load , because localloaded has an higher priority
@@ -487,7 +488,7 @@ void ksPlugin::loadConfig(xmlObject* source, bool localOrGlobal) //TRUE: local ;
         }
     }
     else
-    {
+    {// global
         loadConfigFromXmlObject(&m_cGlobalConfig, source);
         
         if((source && source->cGetAttributeByName("state")) && !isLoaded())

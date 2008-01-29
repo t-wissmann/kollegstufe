@@ -42,10 +42,12 @@
 // own qobjects
 class ksDebugOutput;
 class ksPluginEngine;
+class ExamItem;
 
 // own widgets
 class ksSubjectStatusbar;
 class ksStatisticsWidget;
+class ksFilterWidget;
 
 // own dialogs
 class ksExamProperties;
@@ -56,6 +58,7 @@ class ksDatabaseProperties;
 class ksPluginConfigurationDialog;
 class ksAbout;
 class ksConfigure;
+class ksDebugDialog;
 
 
 // normal widgets
@@ -63,6 +66,7 @@ class QLabel;
 class QComboBox;
 class QListWidget;
 class QPushButton;
+class QToolButton;
 class QTreeWidget;
 class QStatusBar;
 
@@ -103,13 +107,18 @@ signals:
     //void languageChanged();
     void closed();
 public slots:
+    
+    // dialogs
     void showHelpDialog();
     void showAboutDialog();
     void showConfigureDialog();
     void showPluginConfigDialog();
+    void showDebugDialog();
     
     // Save/load
+    void loadGuiConfigToWidgets();
     void loadConfigFile();
+    void saveWidgetAttributesToConfig();
     void saveConfigFile();
     void showDatabaseSelection();
     void showDatabaseProperties();
@@ -136,6 +145,8 @@ public slots:
     void examAdd();
     void examDelete();
     void examEdit();
+    void setExamListFilter(QString filter);
+    void setExamListTableFilter(QString filter);
     
     void retranslateUi();
     
@@ -210,6 +221,7 @@ private:
     
     // help - menu
     QAction*        mnaShowHelp;
+    QAction*        mnaShowDebugDialog;
     QAction*        mnaAboutKs;
     QAction*        mnaAboutQt;
     // file - menu
@@ -223,15 +235,16 @@ private:
     
     
     // widgets for subject selection
-    QGridLayout*    layoutSubjectSelection;
+    QVBoxLayout*    layoutSubjectSelection;
+    QHBoxLayout*    layoutSubjectToolBar;
     QComboBox*      cmbCathegory;
     QListWidget*    lstSubjectList;
     QWidget*        wdgSubjectSelection;
-    QPushButton*    btnSubjectAdd;
-    QPushButton*    btnSubjectDelete;
+    QToolButton*    btnSubjectAdd;
+    QToolButton*    btnSubjectDelete;
     QPushButton*    btnSubjectEdit;
-    QPushButton*    btnSubjectMoveUp;
-    QPushButton*    btnSubjectMoveDown;
+    QToolButton*    btnSubjectMoveUp;
+    QToolButton*    btnSubjectMoveDown;
     
     // widgets for exam selection
     QGridLayout*    layoutExamList;
@@ -239,6 +252,7 @@ private:
     QGroupBox*      grpExamList;
     QLabel*         lblExamListStyle;
     QComboBox*      cmbExamListStyle;
+    ksFilterWidget* wdgExamFilter;
     QStackedWidget* stackedExamLists;
     QTreeWidget*    lstExamList;
     ksStatisticsWidget* statisticsExamList;
@@ -259,10 +273,14 @@ private:
     ksConfigure*            diaConfigureKs;
     ksPluginConfigurationDialog* diaPluginConfig;
     ksStatisticsDialog*     diaStatistics;
+    ksDebugDialog*          diaDebugDialog;
     
     // member variables
     ksPluginEngine* pPluginEngine;
     ksPluginInformation    pluginInformation;
+    
+    // exams
+    QList<ExamItem*>  lstExamItems;
     
     QTranslator appTranslator;
     bool        bWantsToBeShown;

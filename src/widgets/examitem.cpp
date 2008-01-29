@@ -61,4 +61,31 @@ bool ExamItem::thisIsEarlierDate( const QTreeWidgetItem & other ) const
                                                                            //if dateOwn was earlier than dateToCompare
 }
 
+bool ExamItem::hasMatchOn( QTreeWidgetItem* item, QString keyword)
+{
+    if(keyword.isEmpty())
+    {
+        return TRUE;
+    }
+    if(!item)
+    {
+        return FALSE;
+    }
+    bool hasMatch = FALSE;
+    for(int i = 0; i < item->columnCount(); i++)
+    {
+        if(item->text(i).toLower().contains(keyword.toLower()))
+        {
+            hasMatch = TRUE;
+            break;
+        }
+    }
+    return hasMatch;
+}
+bool ExamItem::hasMatchOn(QString keyword)
+{
+    return hasMatchOn(this, keyword);
+}
+
+
 

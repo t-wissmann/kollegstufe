@@ -18,83 +18,67 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSSUBJECTPROPERTIES_H
-#define KSSUBJECTPROPERTIES_H
+#ifndef KSFILTERWIDGET_H
+#define KSFILTERWIDGET_H
 
+#include <QWidget>
 
-// layouts
-class QHBoxLayout;
-class QVBoxLayout;
-class QGridLayout;
-class QDialogButtonBox;
-
-// widgets
-class QPushButton;
-class QLabel;
 class QLineEdit;
-class QSpinBox;
-class QRadioButton;
-class QDateEdit;
-class QGroupBox;
-
+class QToolButton;
+class QHBoxLayout;
+class QLabel;
 class QEvent;
-class xmlObject;
 
-#include <QDialog>
+class QKeyEvent;
 
 /**
-	@author Thorsten Wissmann <towi89@web.de>
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
-class ksSubjectProperties : public QDialog
+
+class ksFilterWidget : public QWidget
 {
 Q_OBJECT
+signals:
+    void filterChanged(QString);
+    void returnPressed();
 public:
-    ksSubjectProperties(QWidget *parent = 0);
+    ksFilterWidget(QWidget *parent = 0);
 
-    ~ksSubjectProperties();
-    void setSubjectToEdit(xmlObject* newSubjectToEdit);
-    void setCathegoryOfSubject(xmlObject* newCathegory); // needed to avoid multible same Names
+    ~ksFilterWidget();
     
     void retranslateUi();
     void reloadIcons();
+    
+    void changeEvent(QEvent* event);
+    
+    void setCaption(QString caption); // commit "" for default caption text
+    QString caption() const;
+    
+    void setCaptionVisible(bool visible);
+    bool isLabelVisible() const;
+    
+    QString filter() const;
+    void setFilter(QString filter);
+    
+    void focusTextInputField();
+    
 public slots:
-    void writeWidgetAttributesToSubject();
-    void checkForMultibleNames();
+    void filterTextChanged();
+    void clear();
     
 protected:
-    virtual void changeEvent(QEvent* event);
+    virtual void keyPressEvent(QKeyEvent* event);
 private:
-    void allocateWidgets();
-    void createLayouts();
-    void connectSlots();
-    void initWidgets();
+    void createGui();
     
-    // bottom widgets
-    QPushButton*    btnOk;
-    QPushButton*    btnCancel;
-    // input widgets
-    QLabel*         lblName;
-    QLineEdit*      txtName;
-    QLabel*         lblTeacher;
-    QLineEdit*      txtTeacher;
+    QToolButton*    btnClear;
+    QLineEdit*      txtFilter;
+    QLabel*         lblCaption;
     
-    QLabel*         lblWeightingPercentage;
-    QSpinBox*       spinWeightingOral;
-    QSpinBox*       spinWeightingWritten;
-    QLabel*         lblWeightingOral;
-    QLabel*         lblWeightingWritten;
-    QLabel*         lblWeightingToExplanation;
-    QLabel*         lblWeightingTo;
+    QHBoxLayout*    layoutParent;
     
-    
-    // layouts
-    QGridLayout*    layoutWeightingPercentage;
-    QDialogButtonBox* boxBottom;
-    QGridLayout*    layoutParent;
-
-    // members
-    xmlObject*      subjectToEdit;
-    xmlObject*      currentCathegory;
+    bool            m_bIsCustomLabel;
+    QString         m_szDefaultCaption;
 };
 
 #endif

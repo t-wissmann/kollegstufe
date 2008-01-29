@@ -30,6 +30,7 @@ Q_EXPORT_PLUGIN2 (kspwidgettesterinterface, kspWidgetTesterInterface);
 kspWidgetTesterInterface::kspWidgetTesterInterface()
  : QObject()
 {
+    m_szIdentifier = "kspWidgetTester";
     qDebug("plugin says i am loaded");
     mnaHello = 0;
 }
@@ -89,7 +90,6 @@ void kspWidgetTesterInterface::unload()
 
 void kspWidgetTesterInterface::retranslate()
 {
-    m_szIdentifier = "kspWidgetTester";
     m_szName = tr("Widget Tester");
     m_szDescription = tr("Tests some custom widgets of kollegstufe");
     m_szAuthor = "Thorsten Wissmann";

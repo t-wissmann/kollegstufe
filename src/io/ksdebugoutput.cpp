@@ -54,8 +54,10 @@ void ksDebugOutput::putStandartQtDebugOutut(QString outputString)
 }
 void ksDebugOutput::putDebugOutput(QString outputString)
 {
-    if (!bDebugMode)
+    /*if (!bDebugMode)
+    {
         return;
+    }*/
     emit printDebugLine(outputString);
 }
 void ksDebugOutput::print(QString msg)

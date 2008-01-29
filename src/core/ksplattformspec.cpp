@@ -502,6 +502,16 @@ void ksPlattformSpec::addMissingConfigAttributes(xmlObject* configFileToComplete
     {
         windowSettings->cGetObjectByName("splitterMain")->nAddAttribute("coord", "198");
     }
+    if (!windowSettings->cGetObjectByName("examlist"))
+    {
+        windowSettings->nAddObject("examlist");
+    }
+    if (!windowSettings->cGetObjectByName("examlist")->cGetAttributeByName("viewmode"))
+    {
+        windowSettings->cGetObjectByName("examlist")->nAddAttribute("viewmode", "table");
+    }
+    
+    
     if (!configFileToComplete->cGetObjectByName("language"))
     {
         configFileToComplete->nAddObject("language");

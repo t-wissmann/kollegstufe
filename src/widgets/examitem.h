@@ -22,6 +22,7 @@
 #define EXAMITEM_H
 
 #include <QTreeWidgetItem>
+#include <QString>
 class QTreeWidget;
 /**
 	@author Thorsten Wissmann <towi89@web.de>
@@ -30,6 +31,9 @@ class ExamItem : public QTreeWidgetItem
 {
 public:
     ExamItem(QTreeWidget* parent):QTreeWidgetItem(parent) {};
+    static bool     hasMatchOn( QTreeWidgetItem* item, QString keyword);
+    bool     hasMatchOn(QString keyword);
+    
     
     bool     operator< ( const QTreeWidgetItem & other ) const;
     bool     thisIsEarlierDate( const QTreeWidgetItem & other ) const;

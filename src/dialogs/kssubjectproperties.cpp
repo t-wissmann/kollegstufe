@@ -36,6 +36,7 @@
 #include <QGroupBox>
 
 // layouts
+#include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -119,10 +120,9 @@ void ksSubjectProperties::allocateWidgets()
 
 void ksSubjectProperties::createLayouts()
 {
-    layoutBottom = new QHBoxLayout;
-    layoutBottom->addStretch(1);
-    layoutBottom->addWidget(btnOk);
-    layoutBottom->addWidget(btnCancel);
+    boxBottom = new QDialogButtonBox;
+    boxBottom->addButton(btnOk, QDialogButtonBox::AcceptRole);
+    boxBottom->addButton(btnCancel, QDialogButtonBox::RejectRole);
     
     layoutWeightingPercentage = new QGridLayout;
     layoutWeightingPercentage->addWidget(lblWeightingPercentage, 0, 0, 2, 1);
@@ -140,7 +140,7 @@ void ksSubjectProperties::createLayouts()
     layoutParent->addWidget(lblTeacher, 1, 0);
     layoutParent->addWidget(txtTeacher, 1, 1);
     layoutParent->addLayout(layoutWeightingPercentage, 2,0, 1, 2);
-    layoutParent->addLayout(layoutBottom, 3,0, 1, 2);
+    layoutParent->addWidget(boxBottom, 3,0, 1, 2);
     
     setLayout(layoutParent);
     

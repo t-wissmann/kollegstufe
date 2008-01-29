@@ -61,11 +61,16 @@ public:
     xmlObject* sourceItem() const { return pSourceItem; };
     void setSourceItem(xmlObject* newSourceItem) { pSourceItem = newSourceItem; };
     
+    bool isVisible() const { return bVisible; };
+    void setVisible(bool visible) { bVisible = visible; };
+    
+    bool hasMatchOn(QString keyword) const;
     
 private:
     QString  szCaption;
     QDate    dateX;
     int      nY;
+    bool     bVisible;
     
     QString  szInformation;
     xmlObject* pSourceItem;

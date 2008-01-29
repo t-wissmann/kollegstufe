@@ -36,6 +36,7 @@ public:
     static QIcon  getIcon(QString name, int size = 128);
     static QPixmap  getIconPixmap(QString name, int size = 128);
     static QPixmap  getIconPixmapFromApplicationTheme(QString name, int size = 128);
+    static QPixmap  getIconPixmapFromKde3Theme(QString name, int size = 128);
     
 
 };

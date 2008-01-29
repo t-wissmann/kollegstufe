@@ -41,31 +41,40 @@
 #include <QMouseEvent>
 #include <QEvent>
 #include <QPaintEvent>
+#include <QKeyEvent>
 #include <QGradient>
 #include <QColor>
 #include <QLinearGradient>
 #include <QTextOption>
 #include <QMessageBox>
 
+#include <QStylePainter>
+#include <QStyleOption>
+#include <QStyleOptionFocusRect>
+#include <QStyleOptionFrame>
+
 ksStatisticsWidget::ksStatisticsWidget(QWidget *parent)
- : QFrame(parent)
+    : BASISWIDGET(parent)
 {
     nItemLabelVisibility = LabelAlwaysVisible;
-    setFrameStyle(QFrame::Box);
+    
     setMinimumWidth(100);
     setMinimumHeight(140);
     updateGridAndGraphProperties();
-    
     
     
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     // set to 'white' background brush
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(TRUE);
+    setFrameShape(QFrame::StyledPanel);
+    setLineWidth(1);
+    
     bItemListSorted = FALSE;
     nSelectedItemIndex = -1;
     nHoveredItemIndex = -1;
     setMouseTracking(TRUE);
+    setFocusPolicy(Qt::StrongFocus);
     resetDefaultColors();
     initMembers();
     allocateWidgets();
@@ -124,6 +133,7 @@ void ksStatisticsWidget::resetDefaultColors()
     configBtnHoveredColor.setAlpha(255);
     configBtnNormalColor = configBtnHoveredColor;
     configBtnNormalColor.setHsv(configBtnNormalColor.hue(), 0, configBtnNormalColor.value(), configBtnNormalColor.alpha()/2);
+    configBtnCurrentColor = configBtnNormalColor;
     //configBtnNormalColor.setNamedColor("#ff0000");
 }
 
@@ -137,7 +147,7 @@ void ksStatisticsWidget::reloadIcons()
 
 void ksStatisticsWidget::paintEvent(QPaintEvent *event)
 {
-    
+    //drawFrame();
     updateGridAndGraphProperties();
     drawGrid();
     drawGraph();
@@ -145,7 +155,8 @@ void ksStatisticsWidget::paintEvent(QPaintEvent *event)
     //drawSelectionRectangle(10, 10, 160, 90);
     drawConfigButton();
     drawConfigBox();
-    QFrame::paintEvent(event);
+    BASISWIDGET::paintEvent(event);    
+    
 }
 
 void ksStatisticsWidget::drawAxis(QPainter* painter)
@@ -236,7 +247,7 @@ void ksStatisticsWidget::drawGraph()
     graph.setBrush(palette().brush(QPalette::Text));
     graph.setPen(palette().brush(QPalette::Text).color());
     
-    int itemNumber = itemListSize();
+    int itemNumber = visibleItemList.size();
     if(itemNumber < 0)
     {
         itemNumber = 0;
@@ -246,20 +257,33 @@ void ksStatisticsWidget::drawGraph()
                                                         // and so, it won't be devided by zero
     
     
-    
-    for (int i = 0; i < itemList.size(); i++)
+    int lastY = 0;
+    int lastX = 0;
+    for (int i = 0; i < visibleItemList.size(); i++)
     {
         if(i >= 1)
         {
-            int x1 = YAxisLeft + arrowWidth + (int)((float)(i) * pointXDistance);
+            int x1 = lastX;
             int x2 = YAxisLeft + arrowWidth + (int)((float)(i+1) * pointXDistance);
-            int y1 = getScreenYForWorldY(itemList[i-1].y());
-            int y2 = getScreenYForWorldY(itemList[i].y());
+            int y1 = lastY;
+            int y2 = getScreenYForWorldY(visibleItemList[i].y());
             graph.drawLine(x1, y1, x2, y2);
         }
+        lastY = getScreenYForWorldY(visibleItemList[i].y());
+        lastX = YAxisLeft + arrowWidth + (int)((float)(i+1) * pointXDistance);
     }
 }
 
+void ksStatisticsWidget::drawFrame()
+{
+    QStylePainter painter(this);
+    QStyleOptionFrame option;
+    option.initFrom(this);
+    //QPalette pal = palette();
+    //pal.setBrush(QPalette::Base, QColor(0, 0, 0, 0));
+    //setPalette(pal);
+    painter.drawPrimitive(QStyle::PE_FrameLineEdit, option);
+}
 
 
 int  ksStatisticsWidget::getScreenYForWorldY(int worldY) const
@@ -311,20 +335,48 @@ void ksStatisticsWidget::updateGridAndGraphProperties()
 
 void ksStatisticsWidget::drawItems()
 {
-    int itemNumber = itemListSize();
-    if(itemNumber < 0)
+    int itemNumber = visibleItemList.size();
+    if(itemNumber <= 0)
     {
-        itemNumber = 0;
+        return;
     }
     float graphWidth =  (float)((width()-XAxisRight-arrowLength) - (YAxisLeft+scaleLineLength));
     float pointXDistance = graphWidth / ((float)itemNumber+1.0); // +1 because there will be a distance between Y-Axis an point
                                                         // and so, it won't be devided by zero
-    bool lastItemWasAboveGraph = TRUE;
+    int hoverVisibleIndex = -1; // index of hovered item in list "visibleItemList"
+    if(nHoveredItemIndex != -1)
+    {
+        // only search hovered item, if there is an item hovered
+        if(visibleItemList.size() == itemList.size()) // if no item is hidden
+        {// then hovered item has in both lists the same index
+            hoverVisibleIndex = nHoveredItemIndex;
+        }
+        else
+        {// else find hovered item in visibleItemList
+            hoverVisibleIndex = visibleItemList.indexOf(itemList[nHoveredItemIndex]);
+        }
+    }
+    // same thing as hovered item with the selected item
+    int selectedVisibleIndex = -1;
+    if(nSelectedItemIndex != -1)
+    {
+        // only search selected item, if there is an item selected
+        if(visibleItemList.size() == itemList.size()) // if no item is hidden
+        {// then selected item has in both lists the same index
+            selectedVisibleIndex = nSelectedItemIndex;
+        }
+        else
+        {// else find selected item in visibleItemList
+            selectedVisibleIndex = visibleItemList.indexOf(itemList[nSelectedItemIndex]);
+        }
+    }
     
-    for (int i = 0; i < itemList.size(); i++)
+    
+    bool lastItemWasAboveGraph = TRUE;
+    for (int i = 0; i < visibleItemList.size(); i++)
     {
         int x1 = YAxisLeft + arrowWidth + (int)((float)(i+1) * pointXDistance);
-        int y1 = getScreenYForWorldY(itemList[i].y());
+        int y1 = getScreenYForWorldY(visibleItemList[i].y());
         int aboveOrBelow = 1; // 1 = below , -1 = above
         Qt::AlignmentFlag alignment = Qt::AlignHCenter;
         
@@ -332,9 +384,9 @@ void ksStatisticsWidget::drawItems()
         
         if (i == 0) // if is first item
         {
-            if (itemList.size() > 1)
+            if (visibleItemList.size() > 1)
             {
-                int yAfter = getScreenYForWorldY(itemList[i+1].y());
+                int yAfter = getScreenYForWorldY(visibleItemList[i+1].y());
                 if(yAfter > y1)
                 {
                     aboveOrBelow = -1;
@@ -346,13 +398,13 @@ void ksStatisticsWidget::drawItems()
                     lastItemWasAboveGraph = FALSE;
                 }
             }
-            // if itemList.size() is 1, defaultValues fit
+            // if itemsToDraw.size() is 1, defaultValues fit
             
-        } else if ( i == itemList.size()-1)
+        } else if ( i == visibleItemList.size()-1) // if item is last item
         {
-            if (itemList.size() > 1)
+            if (visibleItemList.size() > 1)
             {
-                int yBefore = getScreenYForWorldY(itemList[i-1].y());
+                int yBefore = getScreenYForWorldY(visibleItemList[i-1].y());
                 if(yBefore > y1)
                 {
                     aboveOrBelow = -1;
@@ -364,12 +416,12 @@ void ksStatisticsWidget::drawItems()
                     lastItemWasAboveGraph = FALSE;
                 }
             }
-            // if itemList.size() is 1, defaultValues fit
+            // if itemsToDraw.size() is 1, defaultValues fit
         }
         else
         {
-            int yAfter = getScreenYForWorldY(itemList[i+1].y());
-            int yBefore = getScreenYForWorldY(itemList[i-1].y());
+            int yAfter = getScreenYForWorldY(visibleItemList[i+1].y());
+            int yBefore = getScreenYForWorldY(visibleItemList[i-1].y());
             if(y1 == yBefore && yAfter == y1) // if it is flat
             {
                 if(lastItemWasAboveGraph)
@@ -451,7 +503,8 @@ void ksStatisticsWidget::drawItems()
             }
         }
         
-        
+        bool bCurrentItemIsHovered = (i == hoverVisibleIndex);
+        bool bCurrentItemIsSelected = ( i == selectedVisibleIndex);
         
         // place circle and label
         
@@ -459,35 +512,37 @@ void ksStatisticsWidget::drawItems()
         {
             case LabelAlwaysVisible:
             {
-                drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, itemList[i].caption(),
-                              alignment, aboveOrBelow == -1, i == nSelectedItemIndex);
+                drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, visibleItemList[i].caption(),
+                              alignment, aboveOrBelow == -1, bCurrentItemIsSelected);
                 break;
             }
             case LabelSelectedVisible:
             {
-                if(i == nSelectedItemIndex || i == nHoveredItemIndex)
+                if(bCurrentItemIsSelected || bCurrentItemIsHovered)
                 {
-                    drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, itemList[i].caption(),
+                    drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, visibleItemList[i].caption(),
                               alignment, aboveOrBelow == -1, FALSE);
                 }
                 break;
             }
             case LabelNeverVisible:
             {
-                if(i == nHoveredItemIndex)
+                if(bCurrentItemIsHovered)
                 {
-                    drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, itemList[i].caption(),
+                    drawCaptionAt(x1, y1+(1+nPointDiameter/2)*aboveOrBelow, visibleItemList[i].caption(),
                                   alignment, aboveOrBelow == -1, FALSE);
                 }
                 break;
             }
         }
-        drawCircleAt(x1, y1, nPointDiameter+4 * ( i == nHoveredItemIndex)); // draw bigger if is selected
+        drawCircleAt(x1, y1, nPointDiameter+4 * bCurrentItemIsHovered); // draw bigger if is selected
         //drawCircleAt(x1, y1);
+        
     }
     
     
 }
+
 void ksStatisticsWidget::drawCircleAt(int circleX, int circleY, int diameter)
 {
     QLinearGradient bgGradient( circleX, circleY-diameter/2, circleX, circleY+diameter/2);
@@ -747,6 +802,10 @@ void ksStatisticsWidget::sortItemList()
         return;
     }
     qSort(itemList);
+    
+    //reset filter to item list and refresh visble item list
+    setFilter(szFilter);
+    refreshVisibleItemList();
     bItemListSorted = TRUE;
 }
 
@@ -795,6 +854,7 @@ void ksStatisticsWidget::setPointDiameter(int newPointDiameter)
 void ksStatisticsWidget::clearItemList()
 {
     itemList.clear();
+    visibleItemList.clear();
     bItemListSorted = TRUE;
 }
 
@@ -867,26 +927,35 @@ void ksStatisticsWidget::loadItemListFromSubject(xmlObject* subject)
 
 void ksStatisticsWidget::setSelectedItem(int index)
 {
+    if(index >= itemListSize())
+    {
+        index = -1;
+    }
+    if(index < -1)
+    {
+        index = itemListSize()-1;
+    }
     if(nSelectedItemIndex == index)
     {
         // if nothing has changed, then exit
         return;
     }
     nSelectedItemIndex = index;
-    if(nSelectedItemIndex >= itemListSize())
-    {
-        nSelectedItemIndex = -1;
-    }
-    if(nSelectedItemIndex < -1)
-    {
-        nSelectedItemIndex = itemListSize()-1;
-    }
     update();
+    emit currentItemChanged(index);
+    if(index != -1)
+    {
+        
+        emit currentItemChanged(itemList[index].sourceItem());
+    }else{
+        emit currentItemChanged((xmlObject*)NULL);
+    }
 }
 
 
 int ksStatisticsWidget::indexOfItem(xmlObject* item)
 {
+    sortItemList(); // ensure that item list is sorted
     if(item == NULL)
     {
         return -1;
@@ -905,23 +974,25 @@ int ksStatisticsWidget::itemIndexAt(int x, int y)
 {
     int result = -1;
     
-    int itemNumber = itemListSize();
+    
+    int itemNumber = visibleItemList.size();
     if(itemNumber < 0)
     {
         itemNumber = 0;
     }
     float graphWidth =  (float)((width()-XAxisRight-arrowLength) - (YAxisLeft+scaleLineLength));
     float pointXDistance = graphWidth / ((float)itemNumber+1.0); // +1 because there will be a distance between Y-Axis an point
-                                                        // and so, it won't be devided by zero
+    
     
     for(int i = 0; i < itemNumber; i++)
     {
         int x1 = YAxisLeft + arrowWidth + (int)((float)(i+1) * pointXDistance);
-        int y1 = getScreenYForWorldY(itemList[i].y());
+        int y1 = getScreenYForWorldY(visibleItemList[i].y());
+        
         QRect rect(x1 - nPointDiameter/2, y1 - nPointDiameter/2, nPointDiameter, nPointDiameter);
         if(rect.contains(x, y))
         {
-            result = i;
+            result = itemList.indexOf(visibleItemList[i], i);
             break;
         }
     }
@@ -1056,6 +1127,55 @@ void ksStatisticsWidget::leaveEvent(QEvent *)
     setConfigBtnTargetAlpha((-1)*width(), 0);
 }
 
+void ksStatisticsWidget::keyPressEvent(QKeyEvent* event)
+{
+    if(!event)
+    {
+        return;
+    }
+    int key = event->key();
+    if(key == Qt::Key_Up || key == Qt::Key_Left)
+    {
+        int index = nSelectedItemIndex;
+        index--; //select item before current
+        if(index < 0)
+        {
+            index = itemListSize()-1;
+        }
+        if(index != nSelectedItemIndex)
+        {
+            setSelectedItem(index);
+        }
+    }
+    else if(key == Qt::Key_Down || key == Qt::Key_Right)
+    {
+        int index = nSelectedItemIndex;
+        index++; // select next item
+        if(index >= itemListSize())
+        {
+            index = 0;
+        }
+        if(index != nSelectedItemIndex)
+        {
+            setSelectedItem(index);
+        }
+    }
+    else if((key == Qt::Key_Enter || key == Qt::Key_Return)
+             && (nSelectedItemIndex > 0) && (nSelectedItemIndex < itemListSize()))
+    {
+        emit itemTriggered(nSelectedItemIndex);
+    }
+    else if(key == Qt::Key_End)
+    {
+        setSelectedItem(itemListSize()-1);
+    }
+    else if(key == Qt::Key_Home)
+    {
+        setSelectedItem(0);
+    }
+    
+}
+
 
 void ksStatisticsWidget::mousePressEvent(QMouseEvent *event)
 {
@@ -1066,15 +1186,8 @@ void ksStatisticsWidget::mousePressEvent(QMouseEvent *event)
     int index = itemIndexAt(event->x(), event->y());
     if(index != nSelectedItemIndex)
     {
-        nSelectedItemIndex = index;
-        update();
-        emit currentItemChanged(index);
-        if(index != -1)
-        {
-            emit currentItemChanged(itemList[index].sourceItem());
-        }else{
-            emit currentItemChanged((xmlObject*)NULL);
-        }
+        
+        setSelectedItem(index);
     }
     if(index == -1)
     {
@@ -1106,11 +1219,6 @@ void ksStatisticsWidget::changeEvent ( QEvent * event )
     if(event->type() == QEvent::PaletteChange)
     {
         resetDefaultColors();
-        if(isVisible())
-        {
-            // just simulate a mouse cursor somewhere out of the config button
-            setConfigBtnTargetAlpha((-1)*width(), 0);
-        }
     }
 }
 
@@ -1226,3 +1334,48 @@ xmlObject* ksStatisticsWidget::selectedXmlSource() const
         return itemList[nSelectedItemIndex].sourceItem();
     }
 }
+
+
+void ksStatisticsWidget::setFilter(QString filter)
+{
+    szFilter = filter;
+    QStringList keylist = filter.split(" ", QString::SkipEmptyParts);
+    QString keyword = filter;
+    for(int i = 0; i < itemListSize(); i++)
+    {
+        ksStatisticsItem& item = itemList[i];
+        bool itemIsVisible = TRUE;
+        for(int i = 0; i < keylist.size() && itemIsVisible; i++)
+        {
+            keyword = keylist[i];
+            itemIsVisible = item.hasMatchOn(keyword);
+        }
+        item.setVisible(itemIsVisible);
+    }
+    refreshVisibleItemList();
+    update();
+}
+
+
+int  ksStatisticsWidget::visibleItems() const
+{
+    return visibleItemList.size();
+}
+
+int ksStatisticsWidget::itemListSize() const
+{
+    return itemList.size();
+}
+
+void ksStatisticsWidget::refreshVisibleItemList()
+{
+    visibleItemList.clear();
+    for(int i = 0; i < itemList.size(); i++)
+    {
+        if(itemList[i].isVisible())
+        {
+            visibleItemList.append(itemList[i]);
+        }
+    }
+}
+

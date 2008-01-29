@@ -23,6 +23,8 @@
 #include <widgets/ksstatisticsitem.h>
 #include <core/ksplattformspec.h>
 #include <widgets/kssubjectinformationwidget.h>
+#include <io/ksiconcatcher.h>
+#include <widgets/ksfilterwidget.h>
 
 #include <io/xmlparser.h>
 #include <core/dateConverter.h>
@@ -53,6 +55,7 @@ ksStatisticsDialog::ksStatisticsDialog(QWidget *parent)
     initWidgets();
     resize(400, 200);
     retranslateUi();
+    reloadIcons();
 }
 
 
@@ -124,6 +127,10 @@ void ksStatisticsDialog::retranslateUi()
     btnDecreaseSelection->setText(tr("<< Exam before"));
 }
 
+void ksStatisticsDialog::reloadIcons()
+{
+    btnClose->setIcon(ksIconCatcher::getIcon("fileclose", 16));
+}
 
 void ksStatisticsDialog::allocateWidgets()
 {
@@ -132,6 +139,7 @@ void ksStatisticsDialog::allocateWidgets()
     statistics = new ksStatisticsWidget;
     information = new ksSubjectInformationWidget;
     lblSemesterSelection = new QLabel;
+    wdgFilter = new ksFilterWidget;
     
     btnIncreaseSelection = new QPushButton;
     btnDecreaseSelection = new QPushButton;
@@ -143,6 +151,7 @@ void ksStatisticsDialog::createLayouts()
     layoutBottom = new QHBoxLayout;
     layoutBottom->addWidget(btnDecreaseSelection);
     layoutBottom->addWidget(btnIncreaseSelection);
+    layoutBottom->addWidget(wdgFilter);
     layoutBottom->addStretch(1);
     layoutBottom->addWidget(btnClose);
     
@@ -165,6 +174,7 @@ void ksStatisticsDialog::connectSlots()
     
     connect(btnIncreaseSelection, SIGNAL(clicked()), this, SLOT(increaseSelection()));
     connect(btnDecreaseSelection, SIGNAL(clicked()), this, SLOT(decreaseSelection()));
+    connect(wdgFilter, SIGNAL(filterChanged(QString)), statistics, SLOT(setFilter(QString)));
 }
 
 void ksStatisticsDialog::initWidgets()

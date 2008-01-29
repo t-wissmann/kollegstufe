@@ -36,6 +36,7 @@ class QGroupBox;
 class QListWidget;
 
 // layouts
+class QDialogButtonBox;
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
@@ -71,7 +72,7 @@ private:
     
     //layouts
     QGridLayout* layoutParent;
-    QHBoxLayout* layoutBottom;
+    QDialogButtonBox* boxBottom;
     
     // Widgets
     QPushButton* btnOk;

@@ -36,6 +36,7 @@
 #include <QGroupBox>
 
 // layouts
+#include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -144,11 +145,9 @@ void ksExamProperties::allocateWidgets()
 
 void ksExamProperties::createLayouts()
 {
-    layoutBottom = new QHBoxLayout;
-    layoutBottom->setMargin(0);
-    layoutBottom->addStretch(1);
-    layoutBottom->addWidget(btnOk);
-    layoutBottom->addWidget(btnCancel);
+    boxBottom = new QDialogButtonBox;
+    boxBottom->addButton(btnOk, QDialogButtonBox::AcceptRole);
+    boxBottom->addButton(btnCancel, QDialogButtonBox::RejectRole);
     
     layoutSemester = new QGridLayout;
     layoutSemester->addWidget(optSemester121, 0, 0);
@@ -177,7 +176,7 @@ void ksExamProperties::createLayouts()
     layoutParent->addWidget(grpSemester, 0, 2, 5, 1);
     
     
-    layoutParent->addLayout(layoutBottom, 5, 0, 1, 3);
+    layoutParent->addWidget(boxBottom, 5, 0, 1, 3);
     
     setLayout(layoutParent);
 }

@@ -23,6 +23,7 @@
 #include <io/ksdebugoutput.h>
 #include <io/xmlparser.h>
 #include <io/xmlloader.h>
+#include <core/ksplattformspec.h>
 #include <QDir>
 #include <QApplication>
 #include <QString>
@@ -82,14 +83,14 @@ void  ksPluginEngine::createPluginList()
     }
     foreach(QString fileName, pluginDir.entryList(QStringList() << "*kspwidg*", QDir::Files))
     {
-        ksDebugOutput::print(QString("plugin %pluginname was found").replace("%pluginname", fileName.toAscii().data()));
+        ksDebugOutput::print(QString("plugin %pluginname was found").replace("%pluginname", fileName));
         QPluginLoader loader(pluginDir.absoluteFilePath(fileName));
         QObject* instance = loader.instance();
         ksPluginInterface* newPluginInterface = qobject_cast<ksPluginInterface*>(instance);
         
         if(!newPluginInterface)
         {
-            ksDebugOutput::print(QString("ERROR: %errorstring").replace("%errorstring", loader.errorString().toAscii().data()));
+            ksDebugOutput::print(QString("ERROR: %errorstring").replace("%errorstring", loader.errorString()));
         }
         else
         {
@@ -163,7 +164,6 @@ void ksPluginEngine::unloadAllPlugins()
 void  ksPluginEngine::deletePluginList()
 {
     
-    
     ksPlugin* currentPlugin = NULL;
     for(int i = 0; i < m_listPlugins.size(); i++)
     {
@@ -195,12 +195,26 @@ void ksPluginEngine::savePluginConfigurations(xmlObject* target, bool localOrGlo
         return;
     }
     
-    target->nSetObjectCounter(m_listPlugins.size());
+    //target->nSetObjectCounter(m_listPlugins.size());
     xmlObject* currentObject = NULL;
+    ksPlugin*  currentPlugin = NULL;
     for(int i = 0; i < m_listPlugins.size(); i++)
     {
-        currentObject = target->cGetObjectByIdentifier(i);
-        m_listPlugins[i]->saveConfig(currentObject, localOrGlobal);
+        currentPlugin = m_listPlugins[i];
+        if(!currentPlugin)
+        {
+            continue;
+        }
+        currentObject = target->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(currentPlugin->identifier()));
+        if(!currentObject)
+        {
+            currentObject = target->cAddObject("plugin-config");
+            if(!currentObject)
+            {
+                return;
+            }
+        }
+        currentPlugin->saveConfig(currentObject, localOrGlobal);
     }
 }
 

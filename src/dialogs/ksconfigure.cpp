@@ -35,6 +35,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
+#include <QDialogButtonBox>
 
 #include <QApplication>
 #include <QString>
@@ -91,11 +92,9 @@ void ksConfigure::allocateWidgets()
 
 void ksConfigure::createLayouts()
 {
-    
-    layoutBottom = new QHBoxLayout;
-    layoutBottom->addStretch();
-    layoutBottom->addWidget(btnOk);
-    layoutBottom->addWidget(btnCancel);
+    boxBottom = new QDialogButtonBox;
+    boxBottom->addButton(btnOk, QDialogButtonBox::AcceptRole);
+    boxBottom->addButton(btnCancel, QDialogButtonBox::RejectRole);
     
     layoutLanguageSelection = new QGridLayout;
     layoutLanguageSelection->addWidget(lstLanguageSelection);
@@ -104,7 +103,7 @@ void ksConfigure::createLayouts()
     layoutParent = new QGridLayout;
     
     layoutParent->addWidget(grpLanguageSelection, 1, 0);
-    layoutParent->addLayout(layoutBottom, 2, 0);
+    layoutParent->addWidget(boxBottom, 2, 0);
     
     
     setLayout(layoutParent);

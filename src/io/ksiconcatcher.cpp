@@ -43,6 +43,7 @@ QIcon ksIconCatcher::getIcon(QString name, int size)
 QPixmap ksIconCatcher::getIconPixmap(QString name, int size)
 {
     return getIconPixmapFromApplicationTheme(name, size);
+    //return getIconPixmapFromKde3Theme(name, size);
 }
 
 QPixmap ksIconCatcher::getIconPixmapFromApplicationTheme(QString name, int size)
@@ -55,6 +56,23 @@ QPixmap ksIconCatcher::getIconPixmapFromApplicationTheme(QString name, int size)
     {
         filename += QString::number(size);
     }
+    filename += ".png";
+    
+    return QPixmap(iconDir.filePath(filename));
+}
+
+QPixmap ksIconCatcher::getIconPixmapFromKde3Theme(QString name, int size)
+{
+    QDir iconDir(QDir::home());
+    iconDir.cd(".kde");
+    iconDir.cd("share");
+    iconDir.cd("icons");
+    iconDir.cd("Flamenco");
+    iconDir.cd(QString::number(size) + "x" + QString::number(size));
+    iconDir.cd("actions");
+    
+    
+    QString filename = name;
     filename += ".png";
     
     return QPixmap(iconDir.filePath(filename));

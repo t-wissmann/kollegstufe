@@ -32,6 +32,7 @@
 #include <QAction>
 
 // layouts
+#include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -123,7 +124,7 @@ void    ksDatabaseSelection::allocateWidgets()
     txtInfo     = new QTextEdit;
     txtInfo->setReadOnly(TRUE);
     QPalette textPalette = palette();
-    textPalette.setBrush(QPalette::Base, palette().brush(QPalette::Window));
+    textPalette.setBrush(QPalette::Base,QBrush(QColor(123, 123, 123, 0)));
     textPalette.setBrush(QPalette::Text, palette().brush(QPalette::WindowText));
     txtInfo->setPalette(textPalette);
     
@@ -133,13 +134,15 @@ void    ksDatabaseSelection::allocateWidgets()
 
 void    ksDatabaseSelection::createLayouts()
 {
+    boxButtons = new QDialogButtonBox;
+    boxButtons->addButton(btnOk, QDialogButtonBox::AcceptRole);
+    boxButtons->addButton(btnCancel, QDialogButtonBox::RejectRole);
+    
     layoutBottom = new QHBoxLayout;
     layoutBottom->setMargin(0);
     layoutBottom->addWidget(btnNew);
     layoutBottom->addWidget(btnExtras);
-    layoutBottom->addStretch(1);
-    layoutBottom->addWidget(btnOk);
-    layoutBottom->addWidget(btnCancel);
+    layoutBottom->addWidget(boxButtons);
     
     layoutListOrInfo = new QSplitter(Qt::Horizontal);
     layoutListOrInfo->addWidget(lstFileList);

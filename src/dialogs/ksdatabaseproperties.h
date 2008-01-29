@@ -40,6 +40,7 @@ class QListWidget;
 class QTextEdit;
 
 // layouts
+class QDialogButtonBox;
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
@@ -116,7 +117,7 @@ private:
     ksCathegoryEditorWidget*    wdgCathegoryEditor;
     
     // Layouts
-    QHBoxLayout*    layoutBottom;
+    QDialogButtonBox* boxBottom;
     QGridLayout*    layoutSemesterList;
     QStackedWidget* stackMain;
     QGridLayout*    layoutParent;

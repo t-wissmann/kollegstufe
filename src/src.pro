@@ -46,7 +46,9 @@ widgets/ksstatisticsitem.cpp \
 widgets/ksstatisticswidget.cpp \
 widgets/kssubjectinformationwidget.cpp \
 widgets/kssubjectstatusbar.cpp \
-widgets/selectablelabel.cpp
+widgets/selectablelabel.cpp \
+ widgets/ksfilterwidget.cpp \
+ dialogs/ksdebugdialog.cpp
 HEADERS += core/configdialog.h \
 core/dateConverter.h \
 core/kollegstufeparent.h \
@@ -84,4 +86,6 @@ widgets/kssubjectstatusbar.h \
 widgets/nokeyscrollarea.h \
 widgets/qclickablelabel.h \
 widgets/selectablelabel.h \
- pluginengine/ksplugininterface.h
+ pluginengine/ksplugininterface.h \
+ widgets/ksfilterwidget.h \
+ dialogs/ksdebugdialog.h

@@ -28,7 +28,7 @@ class ksPlugin;
 
 typedef void (ksPlugin::*stringSetter) (QString);
 typedef void (ksPlugin::*qactionSetter) (QAction*);
-    
+
 
 /**
 	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>

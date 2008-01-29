@@ -35,16 +35,19 @@
 #include <dialogs/kssubjectproperties.h>
 #include <dialogs/ksexamproperties.h>
 #include <dialogs/ksabout.h>
+#include <dialogs/ksdebugdialog.h>
 
 // own widgets
 #include <widgets/kssubjectstatusbar.h>
 #include <widgets/ksstatisticswidget.h>
+#include <widgets/ksfilterwidget.h>
 
 // normal widgets
 #include <QComboBox>
 #include <QWidget>
 #include <QListWidget>
 #include <QPushButton>
+#include <QToolButton>
 #include <QTreeWidget>
 #include <QLabel>
 #include <QStatusBar>
@@ -176,13 +179,11 @@ void kollegstufeParent::allocateWidgets()
     wdgSubjectSelection = new QWidget;
     statusbar = new QStatusBar;
     // subject tools:
-    /*btnSubjectAdd       = new QPushButton(tr("Hinzufuegen"));
-    btnSubjectDelete    = new QPushButton("Entfernen");*/
-    btnSubjectAdd       = new QPushButton;
-    btnSubjectDelete    = new QPushButton;
+    btnSubjectAdd       = new QToolButton;
+    btnSubjectDelete    = new QToolButton;
     btnSubjectEdit      = new QPushButton;
-    btnSubjectMoveUp    = new QPushButton;
-    btnSubjectMoveDown  = new QPushButton;
+    btnSubjectMoveUp    = new QToolButton;
+    btnSubjectMoveDown  = new QToolButton;
     
     //exam selection
     grpExamList     = new QGroupBox;
@@ -191,6 +192,7 @@ void kollegstufeParent::allocateWidgets()
     cmbExamListStyle = new QComboBox;
     cmbExamListStyle->addItem("table");
     cmbExamListStyle->addItem("chart");
+    wdgExamFilter    = new ksFilterWidget;
     wdgSubjectStatusbar = new ksSubjectStatusbar;
     lstExamList     = new QTreeWidget;
     statisticsExamList = new ksStatisticsWidget;
@@ -212,6 +214,8 @@ void kollegstufeParent::allocateDialogs()
     diaAbout             = NULL;
     diaConfigureKs       = NULL;
     diaPluginConfig      = NULL;
+    diaDebugDialog = new ksDebugDialog(this);
+    connect(debugOutput, SIGNAL(printDebugLine(QString)), diaDebugDialog, SLOT(putDebugMessage(QString)));
     
     diaStatistics = new ksStatisticsDialog(this);
 }
@@ -261,11 +265,11 @@ void kollegstufeParent::createMenuBar()
     mnaConfigureKs      = mnmSettings->addAction("");
     
     // 5. Help - menu
-    mnaShowHelp   = mnmHelp->addAction("");
+    mnaShowHelp   = mnmHelp->addAction("help");
                     mnmHelp->addSeparator();
-    mnaAboutQt    = mnmHelp->addAction("");
-    mnaAboutKs    = mnmHelp->addAction("");
-    mnaStatistics->setCheckable(TRUE);
+    mnaShowDebugDialog = mnmHelp->addAction("debugdialog");
+    mnaAboutQt    = mnmHelp->addAction("about qt");
+    mnaAboutKs    = mnmHelp->addAction("about kollegstufe");
     
     // INFO: icons will be set at reloadIcons()
     // INFO: texts will be set at retranslateUi();
@@ -275,24 +279,29 @@ void kollegstufeParent::createMenuBar()
 void kollegstufeParent::createLayouts()
 {
     // Subject selection layout
-    layoutSubjectSelection = new QGridLayout;
+    layoutSubjectSelection = new QVBoxLayout;
+    layoutSubjectToolBar   = new QHBoxLayout;
+    layoutSubjectToolBar->setMargin(0);
     
-    layoutSubjectSelection->addWidget(cmbCathegory, 0, 0, 1, 4);
-    layoutSubjectSelection->addWidget(lstSubjectList, 1, 0, 1, 4);
-    layoutSubjectSelection->addWidget(btnSubjectAdd, 3, 0, 1, 1);
-    layoutSubjectSelection->addWidget(btnSubjectDelete, 3, 1, 1, 1);
-    layoutSubjectSelection->addWidget(btnSubjectMoveUp, 3, 2, 1, 1);
-    layoutSubjectSelection->addWidget(btnSubjectMoveDown, 3, 3, 1, 1);
+    layoutSubjectSelection->addWidget(cmbCathegory);
+    layoutSubjectSelection->addWidget(lstSubjectList);
+    layoutSubjectToolBar->addWidget(btnSubjectAdd);
+    layoutSubjectToolBar->addWidget(btnSubjectDelete);
+    layoutSubjectToolBar->addWidget(btnSubjectMoveUp);
+    layoutSubjectToolBar->addWidget(btnSubjectMoveDown);
+    layoutSubjectSelection->addLayout(layoutSubjectToolBar);
     wdgSubjectSelection->setLayout(layoutSubjectSelection);
     
-    //exam List layout
+    //exam List "toolbar" layout
     layoutExamToolbar = new QHBoxLayout;
     layoutExamToolbar->setMargin(0);
     layoutExamToolbar->addWidget(lblExamListStyle);
     layoutExamToolbar->addWidget(cmbExamListStyle);
+    layoutExamToolbar->addWidget(wdgExamFilter);
     layoutExamToolbar->addStretch(0);
     layoutExamToolbar->addWidget(wdgSubjectStatusbar);
     
+    // layout for exam selection group box
     
     layoutExamList = new QGridLayout;
     //layoutExamList->setMargin(2);
@@ -375,16 +384,19 @@ void kollegstufeParent::connectSlots()
     connect(diaStatistics, SIGNAL(accepted()), this, SLOT(refreshMnaStatisticsChecked()));
     // mnmHelp
     connect(mnaShowHelp, SIGNAL(triggered()), this, SLOT(showHelpDialog()));
+    connect(mnaShowDebugDialog, SIGNAL(triggered()), this, SLOT(showDebugDialog()));
     connect(mnaAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(mnaAboutKs, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
     
     //exam control
+    connect(wdgExamFilter, SIGNAL(filterChanged(QString)), this, SLOT(setExamListFilter(QString)));
     connect(cmbExamListStyle, SIGNAL(currentIndexChanged(int)), stackedExamLists, SLOT(setCurrentIndex(int)));
     connect(btnExamAdd, SIGNAL(clicked()), this, SLOT(examAdd()));
     connect(btnExamDelete, SIGNAL(clicked()), this, SLOT(examDelete()));
     connect(btnExamEdit, SIGNAL(clicked()), this, SLOT(examEdit()));
     connect(lstExamList, SIGNAL(doubleClicked( const QModelIndex &)), this, SLOT(examEdit()));
     connect(statisticsExamList, SIGNAL(itemDoubleClicked(int)), this, SLOT(examEdit()));
+    connect(statisticsExamList, SIGNAL(itemTriggered(int)), this, SLOT(examEdit()));
     
 }
 
@@ -407,6 +419,12 @@ void kollegstufeParent::initWidgets()
     
     // subject selection widgets:
     layoutSubjectSelection->setMargin(1);
+    // subject control
+    btnSubjectAdd->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    btnSubjectDelete->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    btnSubjectMoveUp->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    btnSubjectMoveDown->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
     
     // init main window / this
     splitterParent->setChildrenCollapsible(FALSE);
@@ -453,7 +471,9 @@ void kollegstufeParent::reloadIcons()
     btnExamAdd->setIcon(ksIconCatcher::getIcon(QString("add"), 16));
     btnExamDelete->setIcon(ksIconCatcher::getIcon(QString("remove"), 16));
     btnExamEdit->setIcon(ksIconCatcher::getIcon(QString("edit"), 16));
-    
+    // icons for exam view mode
+    cmbExamListStyle->setItemIcon(0, ksIconCatcher::getIcon(QString("view_detailed"), 16));
+    cmbExamListStyle->setItemIcon(1, ksIconCatcher::getIcon(QString("visualizations"), 16));
     
     
     //set icons for dialogs
@@ -523,6 +543,8 @@ void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
     refreshCathegoryList();
 }
 
+
+
 void kollegstufeParent::saveFile(QString newFilename)
 {
     if( newFilename == "")
@@ -590,26 +612,9 @@ void kollegstufeParent::loadConfigFile()
                                       + tr("It seems, you haven't got the necessary Read-Rights!"));
         return;
     }
-    // add missing Attributes in config File
-    ksPlattformSpec::addMissingConfigAttributes(&xmlConfig);
     
-    
-    // write config Attributes to widget-attributes:
-    // 1. window size
-    int nWidth  = xmlConfig.cGetObjectByName("window-settings")->cGetAttributeByName("width")->nValueToInt();
-    int nHeight = xmlConfig.cGetObjectByName("window-settings")->cGetAttributeByName("height")->nValueToInt();
-    resize(nWidth, nHeight);
-    // 2. splitter position
-    int nSplitterCoord = xmlConfig.cGetObjectByName("window-settings")->cGetObjectByName("splitterMain")->cGetAttributeByName("coord")->nValueToInt();
-    QList<int> list = splitterParent->sizes();
-    QList<int>::Iterator it = list.begin();
-    *it = nSplitterCoord;
-    ++it;
-    *it = this->width() - nSplitterCoord;
-    splitterParent->setSizes(list);
-    
-    // 3. update Language
-    reloadTranslator();
+    loadGuiConfigToWidgets(); // load gui config to widgets
+                    // there, the ksPlattformSpec::addMissingConfigAttributes() happens
     // 4. load plugins
     
     pPluginEngine->loadPluginConfigurations(xmlConfig.cGetObjectByName("plugins"), FALSE); // load global
@@ -639,12 +644,49 @@ void kollegstufeParent::loadConfigFile()
                 break;
         }
     }
+}
+
+void kollegstufeParent::loadGuiConfigToWidgets()
+{
+    // add missing Attributes in config File
+    ksPlattformSpec::addMissingConfigAttributes(&xmlConfig);
+    
+    
+    // write config Attributes to widget-attributes:
+    // 1. window size
+    int nWidth  = xmlConfig.cGetObjectByName("window-settings")->cGetAttributeByName("width")->nValueToInt();
+    int nHeight = xmlConfig.cGetObjectByName("window-settings")->cGetAttributeByName("height")->nValueToInt();
+    resize(nWidth, nHeight);
+    // 2. splitter position
+    int nSplitterCoord = xmlConfig.cGetObjectByName("window-settings")->cGetObjectByName("splitterMain")->
+            cGetAttributeByName("coord")->nValueToInt();
+    QList<int> list = splitterParent->sizes();
+    QList<int>::Iterator it = list.begin();
+    *it = nSplitterCoord;
+    ++it;
+    *it = this->width() - nSplitterCoord;
+    splitterParent->setSizes(list);
+    
+    // 3. exam list style
+    QString examListViewMode = xmlConfig.cGetObjectByName("window-settings")->cGetObjectByName("examlist")->
+            cGetAttributeByName("viewmode")->value();
+    if(examListViewMode == "table")
+    {
+        cmbExamListStyle->setCurrentIndex(0);
+    }
+    else if(examListViewMode == "chart")
+    {
+        cmbExamListStyle->setCurrentIndex(1);
+    }
+    
+    // 4. update Language
+    reloadTranslator();
+    
     
 }
 
-void kollegstufeParent::saveConfigFile()
+void kollegstufeParent::saveWidgetAttributesToConfig()
 {
-    debugOutput->putDebugOutput("Saving Config File");
     // add missing Attributes in config File
     ksPlattformSpec::addMissingConfigAttributes(&xmlConfig);
     // write widget-attributes to config Attributes:
@@ -656,8 +698,24 @@ void kollegstufeParent::saveConfigFile()
     QList<int> list = splitterParent->sizes();
     QList<int>::Iterator it = list.begin();
     xmlConfig.cGetObjectByName("window-settings")->cGetObjectByName("splitterMain")->cGetAttributeByName("coord")->SetValueToInt(*it);
-    // 3. language:
+    // 3. exam list view mode
+    QString examListViewMode = "table";
+    if(cmbExamListStyle->currentIndex() == 1) // if the chart is shown
+    {
+        examListViewMode = "chart";
+    }
+    xmlConfig.cGetObjectByName("window-settings")->cGetObjectByName("examlist")->
+            cGetAttributeByName("viewmode")->SetValue(ksPlattformSpec::qstringToSz(examListViewMode));
+    
+    // 4. language:
     // language is already saved to xmlconifig
+}
+
+void kollegstufeParent::saveConfigFile()
+{
+    debugOutput->putDebugOutput("Saving Config File");
+    saveWidgetAttributesToConfig(); // save gui options to config
+                //there the ksPlattformSpec::addMissingConfigAttributes() will happen
     // 4. plugins
     pPluginEngine->savePluginConfigurations(xmlConfig.cGetObjectByName("plugins"), FALSE); // FALSE : global
     
@@ -731,6 +789,7 @@ void kollegstufeParent::retranslateUi()
     // window menu
     mnaStatistics->setText(tr("Statistics"));
     // help menu
+    mnaShowDebugDialog->setText(tr("Debug-Window"));
     mnaShowHelp->setText(tr("User Manual"));
     mnaAboutQt->setText(tr("About Qt"));
     mnaAboutKs->setText(tr("About Kollegstufe"));
@@ -818,7 +877,6 @@ void kollegstufeParent::showDatabaseSelection()
     }
 }
 
-
 void kollegstufeParent::closeEvent(QCloseEvent* event)
 {
     if(askForSavingChangedDatabase())
@@ -855,7 +913,6 @@ void kollegstufeParent::changeEvent(QEvent* event)
         retranslateUi();
     }
 }
-
 
 bool kollegstufeParent::askForSavingChangedDatabase()
 {
@@ -946,6 +1003,16 @@ void kollegstufeParent::showPluginConfigDialog()
     }
     diaPluginConfig->setPluginEngine(pPluginEngine);
     diaPluginConfig->show();
+}
+
+void kollegstufeParent::showDebugDialog()
+{
+    if(!diaDebugDialog)
+    {
+        diaDebugDialog = new ksDebugDialog(this);
+        connect(debugOutput, SIGNAL(printDebugLine(QString)), diaDebugDialog, SLOT(putDebugMessage(QString)));
+    }
+    diaDebugDialog->show();
 }
 
 void kollegstufeParent::refreshMnaStatisticsChecked()
@@ -1118,6 +1185,48 @@ void kollegstufeParent::subjectMoveDown()
     
     refreshSubjectList(lstSubjectList->currentRow()+1);
     setDatabaseChanged();
+}
+
+
+void kollegstufeParent::setExamListFilter(QString filter)
+{
+    //qDebug("Exam list Filter has been set to \'%s\'", filter.toAscii().data());
+    // filter for chart
+    statisticsExamList->setFilter(filter);
+    
+    // filter for table
+    setExamListTableFilter(filter);
+    
+}
+
+void kollegstufeParent::setExamListTableFilter(QString filter)
+{
+    QStringList keys = filter.split(" ", QString::SkipEmptyParts);
+    ExamItem*        currentExam = !lstExamItems.isEmpty() ? lstExamItems.first() : NULL;
+    
+    for(int i = 0; i < lstExamItems.size(); i++)
+    {
+        currentExam = lstExamItems[i];
+        if(!currentExam)
+        {
+            continue;
+        }
+        
+        
+        QString keyword;
+        bool    hasMatch = TRUE;
+        for(int k = 0; k < keys.size(); k++)
+        {
+            keyword = keys[k];
+            if(!currentExam->hasMatchOn(keyword))
+            {
+                hasMatch = FALSE;
+                break;
+            }
+        }
+        currentExam->setHidden(!hasMatch);
+        
+    }
 }
 
 void kollegstufeParent::examAdd()
@@ -1300,6 +1409,7 @@ void kollegstufeParent::selectedSubjectChanged()
     }
     wdgSubjectStatusbar->setSubject(pluginInformation.currentSubject());
     refreshExamList();
+    selectExam(NULL); // unselect current Exam
 }
 
 void kollegstufeParent::selectedExamChanged()
@@ -1434,6 +1544,7 @@ void kollegstufeParent::refreshExamList()
     xmlObject* backupCurrentExam = pluginInformation.currentExam();
     
     // refresh list
+    lstExamItems.clear();
     lstExamList->clear();
     if(!pluginInformation.currentPropertyPart() || !pluginInformation.currentSubject())
     {
@@ -1507,7 +1618,7 @@ void kollegstufeParent::refreshExamList()
         examToAdd->setText(3, currentNumber);
         examToAdd->setText(4, currentType);
         examToAdd->setText(5, currentPoints);
-        
+        lstExamItems.append(examToAdd);
     }
     
     //resize columns so that texts can be seen:
@@ -1520,17 +1631,29 @@ void kollegstufeParent::refreshExamList()
     statisticsExamList->loadItemListFromSubject(pluginInformation.currentSubject());
     
     
-    // restore Selection from before refresh
-    selectExam(backupCurrentExam);
-    
     // refresh average computing components
     diaStatistics->refreshUiAndChildren();
     wdgSubjectStatusbar->calculateAverage();
+    
+    // restore Selection from before refresh
+    selectExam(backupCurrentExam);
+    
+    // refresh filter for examlist table
+    setExamListTableFilter(wdgExamFilter->filter());
     
 }
 
 void kollegstufeParent::selectExam(xmlObject* exam)
 {
+    
+    // refresh for statistics widget:
+    // get index in list of chart widget i.e. ksStatisticswidget i.e. exam list
+    int statIndex = statisticsExamList->indexOfItem(exam);
+    //qDebug("selected exam index is %d", statIndex);
+    // select new selected item in exam list chart
+    statisticsExamList->setSelectedItem(statIndex);
+        
+    
     if(exam == pluginInformation.currentExam())
     {
         return; // return if nothing would change
@@ -1545,12 +1668,7 @@ void kollegstufeParent::selectExam(xmlObject* exam)
     pluginInformation.setCurrentExam(exam);
     
     
-    // get index in list of chart widget i.e. ksStatisticswidget i.e. exam list
-    int statIndex = statisticsExamList->indexOfItem(exam);
-    // select new selected item in exam list chart
-    statisticsExamList->setSelectedItem(statIndex);
-        
-        // select new selected item in exam list table
+    // select new selected item in exam list table
     QString id = "foo";
     if(exam && exam->cGetAttributeByName("id"))
     {
