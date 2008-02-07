@@ -783,6 +783,34 @@ void ksPlattformSpec::addMissingPropertiesAttributes(xmlObject* propertiesToComp
     }
 }
 
+void ksPlattformSpec::addMissingSemesterAttributes(xmlObject*  semesterToComplete)
+{
+    if(!semesterToComplete)
+    {
+        return;
+    }
+    xmlAttribute* currentAttribute = NULL;
+    if(semesterToComplete->name() != QString("semester"))
+    {
+        semesterToComplete->setName("semester");
+    }
+    currentAttribute = semesterToComplete->cGetAttributeByName("name");
+    if(!currentAttribute)
+    {
+        semesterToComplete->nAddAttribute("name", "new semester");
+    }
+    currentAttribute = semesterToComplete->cGetAttributeByName("start");
+    if(!currentAttribute)
+    {
+        semesterToComplete->nAddAttribute("start", "20070101");
+    }
+    currentAttribute = semesterToComplete->cGetAttributeByName("end");
+    if(!currentAttribute)
+    {
+        semesterToComplete->nAddAttribute("end", "20070101");
+    }
+}
+
 
 
 QString  ksPlattformSpec::getSemesterContainigDate(xmlObject* pSemesterList, QString  timestamp)

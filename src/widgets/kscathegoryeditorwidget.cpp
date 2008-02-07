@@ -21,6 +21,7 @@
 #include "kscathegoryeditorwidget.h"
 #include <core/ksplattformspec.h>
 #include <io/xmlparser.h>
+#include <io/ksiconcatcher.h>
 
 // layouts
 #include <QHBoxLayout>
@@ -55,7 +56,8 @@ ksCathegoryEditorWidget::ksCathegoryEditorWidget(QWidget *parent)
     initWidgets();
     
     retranslateUi();
-    lstCathegoryList->setEditTriggers(QAbstractItemView::AllEditTriggers);
+    reloadIcons();
+    //lstCathegoryList->setEditTriggers(QAbstractItemView::AllEditTriggers);
 }
 
 
@@ -151,6 +153,25 @@ void ksCathegoryEditorWidget::retranslateUi()
     lblEnterNewName->setText(tr("Enter a new name:"));
     
     setWindowTitle(tr("Edit Cathegories"));
+}
+
+
+void ksCathegoryEditorWidget::reloadIcons()
+{
+    btnAdd->setIcon(ksIconCatcher::getIcon("add", 16));
+    btnDelete->setIcon(ksIconCatcher::getIcon("remove", 16));
+    btnMoveUp->setIcon(ksIconCatcher::getIcon("up", 16));
+    btnMoveDown->setIcon(ksIconCatcher::getIcon("down", 16));
+    //m_renameIcon = QIcon(); // empty icon
+    m_submitIcon = ksIconCatcher::getIcon("button_ok", 16);
+    if(isInRenameMode())
+    {
+        btnRename->setIcon(m_submitIcon);
+    }
+    else
+    {
+        btnRename->setIcon(m_renameIcon);
+    }
 }
 
 
@@ -427,6 +448,7 @@ void ksCathegoryEditorWidget::activateRenameMode()
     
     txtNewName->setFocus();
     btnRename->setText(tr("Submit"));
+    btnRename->setIcon(m_submitIcon);
     btnRename->setDefault(TRUE);
     
     emit renameModeChanged(bIsRenaming);
@@ -438,6 +460,7 @@ void ksCathegoryEditorWidget::deactivateRenameMode()
     
     
     btnRename->setText(tr("Rename"));
+    btnRename->setIcon(m_renameIcon);
     
     btnRename->setDefault(FALSE);
     lstCathegoryList->setFocus();

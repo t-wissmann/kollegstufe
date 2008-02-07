@@ -24,6 +24,7 @@
 #include <QDialog>
 
 class ksCathegoryEditorWidget;
+class ksSemesterListEditor;
 class xmlObject;
 
 class QEvent;
@@ -115,6 +116,7 @@ private:
     QGroupBox*                  grpCathegories;
     QHBoxLayout*                layoutCathegories;
     ksCathegoryEditorWidget*    wdgCathegoryEditor;
+    ksSemesterListEditor*       wdgSemesterList;
     
     // Layouts
     QDialogButtonBox* boxBottom;

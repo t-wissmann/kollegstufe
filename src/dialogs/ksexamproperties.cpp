@@ -192,6 +192,7 @@ void ksExamProperties::initWidgets()
 {
     spinNumber->setMinimum(0);
     spinNumber->setMaximum(999);
+    dteDate->setCalendarPopup(TRUE);
     btnOk->setDefault(TRUE);
 }
 

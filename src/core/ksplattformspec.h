@@ -72,6 +72,7 @@ public:
     static void   addMissingConfigAttributes(xmlObject* configFileToComplete);
     static void   addMissingDatabaseAttributes(xmlObject* databaseToComplete);
     static void   addMissingPropertiesAttributes(xmlObject* propertiesToComplete);
+    static void   addMissingSemesterAttributes(xmlObject*  semesterToComplete);
     static void   catchFileList(QStringList*    targetList);
     static QString getSemesterContainigDate(xmlObject* pSemesterList, QString  timestamp);
     static QString getUserName();

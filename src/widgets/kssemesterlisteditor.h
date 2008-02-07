@@ -18,74 +18,69 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksiconcatcher.h"
+#ifndef KSSEMESTERLISTEDITOR_H
+#define KSSEMESTERLISTEDITOR_H
 
-#include <QDir>
-#include <QApplication>
+#include <QWidget>
+#include <QList>
+class QVBoxLayout;
+class QHBoxLayout;
+class xmlObject;
 
-ksIconCatcher::ksIconCatcher()
+class QPushButton;
+class QLabel;
+class QScrollArea;
+
+class ksSemesterItemWidget;
+
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+class ksSemesterListEditor : public QWidget
 {
-}
-
-
-ksIconCatcher::~ksIconCatcher()
-{
-}
-
-
-    // icon catcher
-QIcon ksIconCatcher::getIcon(QString name, int size)
-{
-    return QIcon(getIconPixmap(name, size));
-}
-
-
-QPixmap ksIconCatcher::getIconPixmap(QString name, int size)
-{
-    bool iconFromKde3 = FALSE;
-    QPixmap resultPixmap;
-    if(iconFromKde3)
-    {
-        resultPixmap = getIconPixmapFromKde3Theme(name, size);
-    }
-    if(resultPixmap.isNull())
-    {
-        resultPixmap = getIconPixmapFromApplicationTheme(name, size);
-    }
-    return resultPixmap;
-}
-
-QPixmap ksIconCatcher::getIconPixmapFromApplicationTheme(QString name, int size)
-{
-    QDir iconDir(QApplication::applicationDirPath());
-    iconDir.cdUp();
-    iconDir.cd("pic");
-    QString filename = name;
-    if(size != 128)
-    {
-        filename += QString::number(size);
-    }
-    filename += ".png";
+Q_OBJECT
+public:
+    ksSemesterListEditor(QWidget *parent = 0);
+    ~ksSemesterListEditor();
     
-    return QPixmap(iconDir.filePath(filename));
-}
-
-QPixmap ksIconCatcher::getIconPixmapFromKde3Theme(QString name, int size)
-{
-    QDir iconDir(QDir::home());
-    iconDir.cd(".kde");
-    iconDir.cd("share");
-    iconDir.cd("icons");
-    iconDir.cd("Flamenco");
-    //iconDir.cd("Aqua_Project");
-    iconDir.cd(QString::number(size) + "x" + QString::number(size));
-    iconDir.cd("actions");
+    void retranslateUi();
+    void reloadIcons();
     
+    void setSemesterList(xmlObject* semesterlist);
+    ksSemesterItemWidget* selectedSemester();
+    int selectedSemesterIndex();
     
-    QString filename = name;
-    filename += ".png";
+    void applyChanges();
     
-    return QPixmap(iconDir.filePath(filename));
-}
+public slots:
+    void addSemester();
+    void deleteSemester();
+    
+protected slots:
+    void selectionChanged(ksSemesterItemWidget* selectedItem);
+private:
+    void allocateWidgets();
+    void createLayouts();
+    void connectSlots();
+    
+    // tool buttons
+    QPushButton* btnAdd;
+    QPushButton* btnDelete;
+    QPushButton* btnMoveUp;
+    QPushButton* btnMoveDown;
+    
+    QScrollArea* scrollSemesterList;
+    QWidget*     wdgSemesterListContainter;
+    
+    QHBoxLayout* layoutParent;
+    QVBoxLayout* layoutToolButtons;
+    QVBoxLayout* layoutSemesterList;
+    
+    QList<ksSemesterItemWidget*> lstSemesterItems;
+    
+    xmlObject*  m_pSourceList;
+    ksSemesterItemWidget*  m_pSelectedItem;
+    
+};
 
-
+#endif

@@ -23,6 +23,7 @@
 
 #include <QWidget>
 #include <QList>
+#include <QIcon>
 
 
 // normal widgets
@@ -145,6 +146,7 @@ public:
 
     ~ksCathegoryEditorWidget();
     void retranslateUi();
+    void reloadIcons();
     
     void setDatabaseToEdit(xmlObject* newDatabase);
     
@@ -207,7 +209,8 @@ private:
     
     xmlObject*          database;
     ksCathegoryHistory  cathList;
-    
+    QIcon               m_renameIcon;
+    QIcon               m_submitIcon;
 };
 
 #endif

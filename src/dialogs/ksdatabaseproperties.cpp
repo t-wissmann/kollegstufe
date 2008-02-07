@@ -22,6 +22,7 @@
 #include <core/ksplattformspec.h>
 #include <io/ksiconcatcher.h>
 #include <widgets/kscathegoryeditorwidget.h>
+#include <widgets/kssemesterlisteditor.h>
 
 #include <io/xmlparser.h>
 #include <core/dateConverter.h>
@@ -132,8 +133,12 @@ void ksDatabaseProperties::allocateWidgets()
     spinRatingBest  = new QSpinBox;
     spinRatingWorst = new QSpinBox;
     
+    wdgSemesterList = new ksSemesterListEditor;
     
     grpSemesterList = new QGroupBox;
+    // we don't need grpSemesterList anymore, now we have wdgSemesterList editor
+    grpSemesterList->setVisible(FALSE);
+    
     lblStart = new QLabel;
     lblEnd   = new QLabel;
     lblStart->setAlignment(Qt::AlignHCenter);
@@ -141,6 +146,9 @@ void ksDatabaseProperties::allocateWidgets()
     
     lblSemesterListInformation = new QTextEdit;
     lblSemesterListInformation->setReadOnly(TRUE);
+    // For test issues TODO
+    lblSemesterListInformation->setVisible(FALSE);
+    lblSemesterListInformation->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     
     lbl121 = new QLabel("12 / 1:");
     lbl122 = new QLabel("12 / 2:");
@@ -212,8 +220,9 @@ void ksDatabaseProperties::createLayouts()
     layoutParent->addWidget(optRatingPoints, 1, 2);
     layoutParent->addLayout(layoutRatingOther, 2, 1, 1, 2);
     layoutParent->addWidget(grpSemesterList, 3, 0, 1, 3);
-    layoutParent->addWidget(grpCathegories, 4, 0, 1, 3);
-    layoutParent->addWidget(boxBottom, 5, 0, 1, 3);
+    layoutParent->addWidget(wdgSemesterList, 4, 0, 1, 3);
+    layoutParent->addWidget(grpCathegories, 5, 0, 1, 3);
+    layoutParent->addWidget(boxBottom, 6, 0, 1, 3);
     
     setLayout(layoutParent);
 }
@@ -349,7 +358,7 @@ void ksDatabaseProperties::setDatabasePropertiesToEdit(xmlObject* newProperties)
         DateBuf[i]->setDate(qdateToCopy);
     }
     connectMinMaxDate();
-    
+    wdgSemesterList->setSemesterList(propertiesToEdit->cGetObjectByName("time"));
 }
 
 void ksDatabaseProperties::setDatabaseToEdit(xmlObject* newDatabase)
@@ -389,6 +398,9 @@ void ksDatabaseProperties::writeWidgetAttributesToProperties()
     propertiesToEdit->cGetObjectByName("rating")->cGetAttributeByName("best")->SetValueToInt(best);
     propertiesToEdit->cGetObjectByName("rating")->cGetAttributeByName("worst")->SetValueToInt(worst);
     
+    wdgSemesterList->applyChanges();
+    
+    /* // we don't need this anymore, now we have the ksSemesterListEditor
     // date
     QList<QDateEdit*>  DateBuf;
     DateBuf.append(dteSemester121Start);
@@ -428,7 +440,7 @@ void ksDatabaseProperties::writeWidgetAttributesToProperties()
         else
             currentSemester->cGetAttributeByName("start")->SetValue(dateToCopy.getDateString());
         
-    }
+    }*/
 }
 
 void ksDatabaseProperties::setMinMaxDate()
