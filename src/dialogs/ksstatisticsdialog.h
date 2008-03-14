@@ -86,12 +86,14 @@ private:
     QPushButton*        btnDecreaseSelection;
     
     //layouts
-    QGridLayout*        layoutParent;
+    QVBoxLayout*        layoutParent;
+    QHBoxLayout*        layoutChartAndInformation;
+    QVBoxLayout*        layoutInformation;
+    QHBoxLayout*        layoutSemesterSelection;
     QHBoxLayout*        layoutBottom;
     
     //members
-    QStringList semesterListUi; // list , that user can see
-    QStringList semesterListCode; // internal list
+    QStringList semesterList; 
     xmlObject*  subject;
     xmlObject*  properties;
 

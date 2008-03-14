@@ -63,7 +63,6 @@ public:
     void reloadIcons();
 public slots:
     void writeWidgetAttributesToProperties();
-    void setMinMaxDate();
     void setBtnOkNotDefault(bool newDefaultValue);
 protected:
     virtual void changeEvent(QEvent* event);
@@ -71,10 +70,6 @@ private:
     void    allocateWidgets();
     void    createLayouts();
     void    connectSlots();
-    
-    // date - min max 
-    void    connectMinMaxDate();
-    void    disconnectMinMaxDate();
     
     QPushButton*    btnOk;
     QPushButton*    btnCancel;
@@ -93,36 +88,18 @@ private:
     QLabel*         lblRatingWorst;
     QGridLayout*    layoutRatingOther;
     
-    // semester List
-    QGroupBox*      grpSemesterList;
-    QTextEdit*      lblSemesterListInformation;
-    QLabel*         lblStart;
-    QLabel*         lblEnd;
-    
-    QLabel*         lbl121;
-    QLabel*         lbl122;
-    QLabel*         lbl131;
-    QLabel*         lbl132;
-    
-    QDateEdit*      dteSemester121Start;
-    QDateEdit*      dteSemester122Start;
-    QDateEdit*      dteSemester131Start;
-    QDateEdit*      dteSemester132Start;
-    QDateEdit*      dteSemester121End;
-    QDateEdit*      dteSemester122End;
-    QDateEdit*      dteSemester131End;
-    QDateEdit*      dteSemester132End;
     
     QGroupBox*                  grpCathegories;
     QHBoxLayout*                layoutCathegories;
     ksCathegoryEditorWidget*    wdgCathegoryEditor;
+    QGroupBox*                  grpSemesterList;
     ksSemesterListEditor*       wdgSemesterList;
     
     // Layouts
     QDialogButtonBox* boxBottom;
-    QGridLayout*    layoutSemesterList;
-    QStackedWidget* stackMain;
-    QGridLayout*    layoutParent;
+    QStackedWidget*   stackMain;
+    QGridLayout*      layoutParent;
+    QVBoxLayout*      layoutSemesterList;
     
     QListWidget*    lstStackMainControl;
     xmlObject*      propertiesToEdit;

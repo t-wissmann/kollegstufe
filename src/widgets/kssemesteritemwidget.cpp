@@ -76,6 +76,9 @@ void ksSemesterItemWidget::createGui()
     
     setLayout(layoutParent);
     
+    connect(txtName, SIGNAL(textEdited(QString)), this, SLOT(setSelected()));
+    connect(dteStart,SIGNAL(dateChanged(QDate)), this, SLOT(setSelected()));
+    connect(dteEnd,SIGNAL(dateChanged(QDate)), this, SLOT(setSelected()));
 }
 
 
@@ -207,6 +210,37 @@ void ksSemesterItemWidget::writeDataTo(xmlObject* semester) const
     semester->cGetAttributeByName("start")->SetValue(startdate.getDateString());
     semester->cGetAttributeByName("end")->SetValue(enddate.getDateString());
     
+}
+
+// some getter & setter
+void ksSemesterItemWidget::setStartDate(QDate start)
+{
+    dteStart->setDate(start);
+}
+
+QDate ksSemesterItemWidget::startDate() const
+{
+    return dteStart->date();
+}
+
+void ksSemesterItemWidget::setEndDate(QDate end)
+{
+    dteEnd->setDate(end);
+}
+
+QDate ksSemesterItemWidget::endDate() const
+{
+    return dteEnd->date();
+}
+
+void ksSemesterItemWidget::setName(QString name)
+{
+    txtName->setText(name);
+}
+
+QString ksSemesterItemWidget::name()const
+{
+    return txtName->text();
 }
 
 

@@ -317,7 +317,8 @@ void ksPlugin::configHasChanged()
 {
     if(m_pInformation && m_pInformation->mainWindow())
     {
-        if(m_pConfigDia->currentConfigContainer() == &m_cLocalConfig)
+        if(state() == StateLocalLoaded
+           ||(m_pConfigDia && (m_pConfigDia->currentConfigContainer() == &m_cLocalConfig)))
         {   // only set database changed, if config, that has been changed, is local config
             // we don't need mainWindow()->setDatabaseChanged(TRUE) if global config has changed,
             // because global config isn't in database.xml file !

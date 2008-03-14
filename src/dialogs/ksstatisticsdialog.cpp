@@ -78,33 +78,11 @@ void ksStatisticsDialog::initMembers()
 {
     subject = NULL;
     properties = NULL;
-    semesterListCode.clear();
-    semesterListCode.append("all");
-    semesterListCode.append("12/1");
-    semesterListCode.append("12/2");
-    semesterListCode.append("13/1");
-    semesterListCode.append("13/2");
 }
 
 void ksStatisticsDialog::retranslateUi()
 {
-    int oldSemesterSelection = cmbSemesterSelection->currentIndex();
-    if(oldSemesterSelection < 0)
-    {
-        oldSemesterSelection = 0;
-    }
-    semesterListUi.clear();
-    semesterListUi.append(tr("All"));
-    semesterListUi.append("12 / 1");
-    semesterListUi.append("12 / 2");
-    semesterListUi.append("13 / 1");
-    semesterListUi.append("13 / 2");
-    
-    cmbSemesterSelection->clear();
-    cmbSemesterSelection->addItems(semesterListUi);
-    // restore old selection
-    cmbSemesterSelection->setCurrentIndex(oldSemesterSelection);
-    
+    cmbSemesterSelection->setItemText(0, tr("All"));
     
     lblSemesterSelection->setText(tr("Semester:"));
     
@@ -155,12 +133,25 @@ void ksStatisticsDialog::createLayouts()
     layoutBottom->addStretch(1);
     layoutBottom->addWidget(btnClose);
     
-    layoutParent = new QGridLayout;
-    layoutParent->addWidget(statistics,   0, 0, 2, 1);
-    layoutParent->addWidget(lblSemesterSelection,   0, 1);
-    layoutParent->addWidget(cmbSemesterSelection,   0, 2);
-    layoutParent->addWidget(information,   1, 1, 1, 2);
-    layoutParent->addLayout(layoutBottom, 2, 0, 1, 3);
+    
+    layoutSemesterSelection = new QHBoxLayout;
+    layoutSemesterSelection->setMargin(0);
+    layoutSemesterSelection->addWidget(lblSemesterSelection);
+    layoutSemesterSelection->addWidget(cmbSemesterSelection);
+    
+    layoutInformation = new QVBoxLayout;
+    layoutInformation->setMargin(0);
+    layoutInformation->addLayout(layoutSemesterSelection);
+    layoutInformation->addWidget(information);
+    
+    layoutChartAndInformation = new QHBoxLayout;
+    layoutChartAndInformation->setMargin(0);
+    layoutChartAndInformation->addWidget(statistics);
+    layoutChartAndInformation->addLayout(layoutInformation);
+    
+    layoutParent = new QVBoxLayout;
+    layoutParent->addLayout(layoutChartAndInformation);
+    layoutParent->addLayout(layoutBottom);
     layoutParent->setMargin(3);
     layoutParent->setSpacing(3);
     
@@ -182,6 +173,7 @@ void ksStatisticsDialog::initWidgets()
     lblSemesterSelection->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
     btnDecreaseSelection->setVisible(FALSE);
     btnIncreaseSelection->setVisible(FALSE);
+    cmbSemesterSelection->addItem("all");
 }
 
 void ksStatisticsDialog::setSubject(xmlObject* newSubject)
@@ -215,13 +207,45 @@ void ksStatisticsDialog::setProperties(xmlObject* newProperties)
     statistics->setMinMaxY(worst, best);
     information->setProperties(properties);
     
+    xmlObject* semesterList = properties->cGetObjectByName("time");
+    // remove items in combo box if there are to much
+    while((cmbSemesterSelection->count() - 1) > semesterList->nGetObjectCounter())
+    { // count() - 1 because the "all" item mustn't be contained in semesterList
+        cmbSemesterSelection->removeItem(cmbSemesterSelection->count() - 1); // remove last
+    }
+    while((cmbSemesterSelection->count() - 1) < semesterList->nGetObjectCounter())
+    {// add items if there are to few in the combo box
+        cmbSemesterSelection->addItem("foo");
+    }
+    if(semesterList->nGetObjectCounter()  <= 0)
+    {// if semester list is empty
+        // then hide semester-selection-combo-box
+        cmbSemesterSelection->setVisible(FALSE);
+        lblSemesterSelection->setVisible(FALSE);
+    }
+    else
+    {
+        // show combo box
+        lblSemesterSelection->setVisible(TRUE);
+        cmbSemesterSelection->setVisible(TRUE);
+        // copy names
+        for(int i = 0; i < semesterList->nGetObjectCounter(); i++)
+        {
+        cmbSemesterSelection->setItemText(i+1, semesterList->cGetObjectByIdentifier(i)->cGetAttributeByName("name")->value()); 
+        }
+    }
 }
 
 void ksStatisticsDialog::currentSemesterChanged(int newSelection)
 {
-    if(newSelection >= 0 && newSelection < semesterListCode.count())
+    if(newSelection >= 1 && newSelection < cmbSemesterSelection->count())
     {
-        information->setSemesterToShow(semesterListCode[newSelection]);
+        information->setSemesterToShow(cmbSemesterSelection->itemText(newSelection));
+    }
+    else
+    {
+        // if first item is selection , then "all" semesters are selected
+        information->setSemesterToShow("all");
     }
 }
 

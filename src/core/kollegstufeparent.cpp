@@ -144,7 +144,6 @@ void kollegstufeParent::initMembers()
     
     // init output
     debugOutput = new ksDebugOutput;
-    connect(debugOutput, SIGNAL(printDebugLine(QString)), debugOutput, SLOT(putStandartQtDebugOutut(QString)));
 }
 
 void kollegstufeParent::handleArguments()
@@ -153,6 +152,7 @@ void kollegstufeParent::handleArguments()
     if(args.contains("--debug"))
     {
         debugOutput->enableDebugMode();
+    connect(debugOutput, SIGNAL(printDebugLine(QString)), debugOutput, SLOT(putStandartQtDebugOutut(QString)));
     }
     if(args.contains("--help"))
     {
@@ -532,15 +532,17 @@ void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
     pluginInformation.setCurrentPropertyPart(currentDatabase.cGetObjectByName("properties"));
     ksPlattformSpec::addMissingPropertiesAttributes(pluginInformation.currentPropertyPart());
     
+    applyPropertyChanges(); // load properties to gui
+    
+    //refresh GUI
+    refreshCathegoryList();
+    pluginInformation.setCurrentDatabase(&currentDatabase);
+    
     // load plugin configs to plugin engine
     pPluginEngine->loadPluginConfigurations(currentDatabase.cGetObjectByName("plugins"), TRUE);  // local
     
-    applyPropertyChanges(); // load properties to gui
-    
     // reset Database change state:
     setDatabaseChanged(FALSE);
-    //refresh GUI
-    refreshCathegoryList();
 }
 
 
@@ -579,6 +581,9 @@ void kollegstufeParent::saveFile(QString newFilename)
     }
     //on success:
     setDatabaseChanged(FALSE);
+    
+    QString dbName = currentWindowTitle;
+    statusbar->showMessage(tr("Archive \"%filename\" was succesfully saved").replace("%filename", dbName) , 5000);
     
     return;
 }
@@ -1270,6 +1275,10 @@ void kollegstufeParent::examAdd()
         case QDialog::Rejected:
             pluginInformation.currentSubject()->nDeleteObject(newExam);
             refreshExamList();
+            // set dia-pointer to NULL, so that there is no SEGMENTAION fault
+            // if the current Exam is deleted and retranslateUi() is called
+            diaExamProperties->setProperties(NULL);
+            diaExamProperties->setExamToEdit(NULL);
             return;
             break;
         default:
@@ -1288,6 +1297,10 @@ void kollegstufeParent::examAdd()
         lstExamList->setCurrentItem(lstExamList->itemAt(0,0));
     }
     
+    // set dia-pointer to NULL, so that there is no SEGMENTAION fault
+    // if the current Exam is deleted and retranslateUi() is called
+    diaExamProperties->setProperties(NULL);
+    diaExamProperties->setExamToEdit(NULL);
     return;
 }
 
@@ -1368,6 +1381,11 @@ void kollegstufeParent::examEdit()
             refreshExamList();
             break;
     }
+    // set dia-pointer to NULL, so that there is no SEGMENTAION fault
+    // if the current Exam is deleted and retranslateUi() is called
+    diaExamProperties->setProperties(NULL);
+    diaExamProperties->setExamToEdit(NULL);
+    
 }
 
 void kollegstufeParent::selectedCathegoryChanged()
@@ -1499,7 +1517,6 @@ void kollegstufeParent::refreshCathegoryList()
     selectedSubjectChanged();
 }
 
-
 void kollegstufeParent::refreshSubjectList(int rowToSelectAfterRefresh)
 {
     if(rowToSelectAfterRefresh < 0 || rowToSelectAfterRefresh >= lstSubjectList->count())
@@ -1554,6 +1571,15 @@ void kollegstufeParent::refreshExamList()
     int best  = pluginInformation.currentPropertyPart()->cGetObjectByName("rating")->cGetAttributeByName("best")->nValueToInt();
     int worst = pluginInformation.currentPropertyPart()->cGetObjectByName("rating")->cGetAttributeByName("worst")->nValueToInt();
     
+    if(currentDatabase.cGetObjectByName("properties")->cGetObjectByName("time")->nGetObjectCounter() <= 0)
+    {//if semester list is empty, then we don't need the semester column
+        lstExamList->hideColumn(1);
+    }
+    else
+    {// else show it again
+        lstExamList->showColumn(1);
+    }
+    
     if (best > worst)
     {
         // point  mode
@@ -1602,6 +1628,7 @@ void kollegstufeParent::refreshExamList()
         // edit semester
         if(currentSemester == "auto")
             currentSemester = ksPlattformSpec::getSemesterContainigDate( currentDatabase.cGetObjectByName("properties")->cGetObjectByName("time"),  QString(currentDateClass.getDateString()));
+        /*
         if(currentSemester == "12/1")
             currentSemester = "12 / 1";
         if(currentSemester == "12/2")
@@ -1610,6 +1637,7 @@ void kollegstufeParent::refreshExamList()
             currentSemester = "13 / 1";
         if(currentSemester == "13/2")
             currentSemester = "13 / 2";
+        */
         
         examToAdd = new ExamItem(lstExamList);
         examToAdd->setText(0, currentXmlExam->cGetAttributeByName("id")->value());

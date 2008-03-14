@@ -21,6 +21,7 @@
 #ifndef KSPLUGININFORMATION_H
 #define KSPLUGININFORMATION_H
 
+#include <QObject>
 class xmlObject;
 class kollegstufeParent;
 class QMenu;
@@ -28,18 +29,28 @@ class QMenu;
 /**
 	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
-class ksPluginInformation{
+class ksPluginInformation : public QObject{
+    Q_OBJECT
 public:
     ksPluginInformation();
 
     ~ksPluginInformation();
     
+signals:
+    void currentDatabaseChanged();
+public:
     void setMainWindow(kollegstufeParent*  newMainWindow) { m_pMainWindow = newMainWindow; };
     kollegstufeParent* mainWindow() const { return m_pMainWindow; };
     
     void setAllDatabasePointersToNull();
     
-    void setCurrentDatabase(xmlObject*  newCurrentDatabase) { m_pCurrentDatabase = newCurrentDatabase; };
+    void setCurrentDatabase(xmlObject*  newCurrentDatabase) {
+        if(m_pCurrentDatabase != newCurrentDatabase)
+        {
+            m_pCurrentDatabase = newCurrentDatabase;
+            emit currentDatabaseChanged();
+        }
+    };
     xmlObject* currentDatabase() const { return m_pCurrentDatabase; };
     
     void setCurrentCategory(xmlObject*  newCurrentCategory) { m_pCurrentCategory = newCurrentCategory; };
@@ -60,6 +71,7 @@ public:
     void setCurrentDataPart(xmlObject* newDataPart) { m_pCurrentDataPart = newDataPart; };
     xmlObject* currentDataPart() const { return m_pCurrentDataPart; };
 
+    
 private:
     
     kollegstufeParent*  m_pMainWindow;

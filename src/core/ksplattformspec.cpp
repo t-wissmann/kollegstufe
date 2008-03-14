@@ -713,73 +713,13 @@ void ksPlattformSpec::addMissingPropertiesAttributes(xmlObject* propertiesToComp
     {
         propertiesToComplete->nAddObject("time");
     }
-    cDateConverter  dateToWrite;
-    cDateConverter  dateToRead;
-    
-    int nCurrentSemester;
-    QStringList Semesters;
-    xmlObject*  currentSemester;
-    Semesters.append("12/1");
-    Semesters.append("12/2");
-    Semesters.append("13/1");
-    Semesters.append("13/2");
-    for(nCurrentSemester = 0; nCurrentSemester < 4; nCurrentSemester++)
+    // ensure that all objectes in "time" are semesters
+    xmlObject* semesterList = propertiesToComplete->cGetObjectByName("time");
+    xmlObject* currentSemester;
+    for(int i = 0; i < semesterList->nGetObjectCounter(); i++)
     {
-        currentSemester = propertiesToComplete->cGetObjectByName("time")->cGetObjectByAttributeValue("name", Semesters[nCurrentSemester].toAscii().data());
-        
-        if(!currentSemester)
-            currentSemester = propertiesToComplete->cGetObjectByName("time")->cGetObjectByIdentifier(propertiesToComplete->cGetObjectByName("time")->nAddObject( "semester"));
-        
-        if(QString("semester") != currentSemester->szName)
-            currentSemester = propertiesToComplete->cGetObjectByName("time")->cGetObjectByIdentifier(propertiesToComplete->cGetObjectByName("time")->nAddObject( "semester"));
-        
-        if(!currentSemester->cGetAttributeByName("name"))
-            currentSemester->nAddAttribute( "name", Semesters[nCurrentSemester].toAscii().data());
-        
-        if(!currentSemester->cGetAttributeByName( "start"))
-        {
-            if(nCurrentSemester == 0) //IF IT'S the first semester, then generate a new start of the semester
-            {
-                dateToWrite.setToCurrentDate();
-                if(dateToWrite.Month() >= AUGUST && dateToWrite.Month() <= DECEMBER)
-                    dateToWrite.setMonth( SEPTEMBER );
-                if(dateToWrite.Month() >= JANUARY && dateToWrite.Month() < FEBRUARY)
-                {
-                    dateToWrite.setMonth( SEPTEMBER );
-                    dateToWrite.addYears( -1);
-                }
-                if(dateToWrite.Month() >= FEBRUARY && dateToWrite.Month() <= JULY) // not the first semester, so just set start of 
-                {                                                                  // this semester one day after on day after end of semester before
-                    dateToWrite.setMonth( FEBRUARY );
-                    dateToWrite.setDay( 1 );
-                }
-            }
-            else
-            {
-                dateToWrite.setDateString (propertiesToComplete->cGetObjectByName("time")->cGetObjectByAttributeValue("name", Semesters[nCurrentSemester-1].toAscii().data())->cGetAttributeByName( "end")->value());
-                dateToWrite.addDays( 1); //START IS ONE DAY after the end of the semester before
-            }
-            currentSemester->nAddAttribute( "start", dateToWrite.getDateString());
-        }
-        
-        if(!currentSemester->cGetAttributeByName( "end"))
-        {
-            dateToRead.setDateString(currentSemester->cGetAttributeByName( "start")->value());
-            if(dateToRead.Month() >= AUGUST && dateToRead.Month() <= DECEMBER)
-            {
-                dateToWrite.setMonth( FEBRUARY);
-                dateToWrite.addYears( 1);
-            }
-            if(dateToRead.Month() >= JANUARY && dateToRead.Month() < FEBRUARY)
-            {
-                dateToWrite.setMonth( FEBRUARY);
-            }
-            if(dateToRead.Month() >= FEBRUARY && dateToRead.Month() <= JULY)
-                dateToWrite.setMonth( JULY);
-            dateToWrite.setDay(LAST_DAY_OF_MONTH);
-            currentSemester->nAddAttribute( "end", dateToWrite.getDateString());
-        }
-        
+        currentSemester = semesterList->cGetObjectByIdentifier(i);
+        addMissingSemesterAttributes(currentSemester);
     }
 }
 

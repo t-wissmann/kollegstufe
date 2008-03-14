@@ -101,7 +101,7 @@ void ksExamProperties::retranslateUi()
     optWeightingWritten->setText(tr("written"));
     optWeightingOral->setText(tr("oral"));
     grpSemester->setTitle(tr("Semester:"));
-    optSemesterAuto->setText(tr("Automatische Zuordnung"));
+    optSemesterAuto->setText(tr("Automatical assignment"));
     spinNumber->setSpecialValueText(tr("no number"));
     resetWindowTitle();
     
@@ -136,10 +136,6 @@ void ksExamProperties::allocateWidgets()
     
     //semester Selection
     grpSemester     = new QGroupBox;
-    optSemester121  = new QRadioButton("12 / 1");
-    optSemester122  = new QRadioButton("12 / 2");
-    optSemester131  = new QRadioButton("13 / 1");
-    optSemester132  = new QRadioButton("13 / 2");
     optSemesterAuto  = new QRadioButton;
 }
 
@@ -150,11 +146,7 @@ void ksExamProperties::createLayouts()
     boxBottom->addButton(btnCancel, QDialogButtonBox::RejectRole);
     
     layoutSemester = new QGridLayout;
-    layoutSemester->addWidget(optSemester121, 0, 0);
-    layoutSemester->addWidget(optSemester122, 0, 1);
-    layoutSemester->addWidget(optSemester131, 1, 0);
-    layoutSemester->addWidget(optSemester132, 1, 1);
-    layoutSemester->addWidget(optSemesterAuto,2, 0, 1, 2);
+    layoutSemester->addWidget(optSemesterAuto, 0, 0, 1, 2);
     grpSemester->setLayout(layoutSemester);
     
     layoutWeighting = new QHBoxLayout;
@@ -242,6 +234,7 @@ void ksExamProperties::setProperties(xmlObject* newProperties)
     }
     ksPlattformSpec::addMissingPropertiesAttributes(properties);
     
+    // set best and worst rating
     int best  = properties->cGetObjectByName("rating")->cGetAttributeByName("best")->nValueToInt();
     int worst = properties->cGetObjectByName("rating")->cGetAttributeByName("worst")->nValueToInt();
     if (best > worst)
@@ -256,6 +249,44 @@ void ksExamProperties::setProperties(xmlObject* newProperties)
         spinPoints->setMinimum(best);
         spinPoints->setMaximum(worst);
     }
+    
+    // set exam list
+    xmlObject* propertiesSemester = properties->cGetObjectByName("time");
+    QRadioButton* currentRadioButton = NULL;
+    while(lstSemesterList.size() > propertiesSemester->nGetObjectCounter())
+    {// while there are to much radio buttons in gui
+        currentRadioButton = lstSemesterList.last();
+        lstSemesterList.removeLast();
+        if(currentRadioButton != NULL)
+        {
+            layoutSemester->removeWidget(currentRadioButton);
+            delete currentRadioButton;
+        }
+    }
+    while(lstSemesterList.size() < propertiesSemester->nGetObjectCounter())
+    {// while there are to few radio buttons in gui
+        currentRadioButton = new QRadioButton;
+        lstSemesterList.append(currentRadioButton);
+        int radioButtonIndex = lstSemesterList.size() - 1;
+        layoutSemester->addWidget(currentRadioButton, (int)(radioButtonIndex / 2) + 1, radioButtonIndex % 2);
+    }
+    if(lstSemesterList.size() <= 0)
+    {
+        // hide semester box if there aren't any semesters
+        grpSemester->setVisible(FALSE);
+    }
+    else
+    {
+        grpSemester->setVisible(TRUE);
+        // copy names
+        for(int i = 0; i < lstSemesterList.size(); i++)
+        {
+            currentRadioButton = lstSemesterList[i];
+            currentRadioButton->setText(propertiesSemester->cGetObjectByIdentifier(i)->cGetAttributeByName("name")->value());
+        }
+    }
+    
+    
 }
 
 void ksExamProperties::setExamToEdit(xmlObject* newExamToEdit)
@@ -263,7 +294,7 @@ void ksExamProperties::setExamToEdit(xmlObject* newExamToEdit)
     examToEdit = newExamToEdit;
     if (!newExamToEdit)
     {
-        QString errormsg = tr("Interner Pointer-Fehler: newExamToEdit = NULL !");
+        QString errormsg = tr("Internal Pointer-Error: newExamToEdit = NULL !");
         setWindowTitle(errormsg);
         txtType->setText(errormsg);
         return;
@@ -290,16 +321,22 @@ void ksExamProperties::setExamToEdit(xmlObject* newExamToEdit)
             cGetAttributeByName("value")->value();
     if(semester == "auto")
         optSemesterAuto->setChecked(TRUE);
-    else if(semester == "12/1")
-        optSemester121->setChecked(TRUE);
-    else if(semester == "12/2")
-        optSemester122->setChecked(TRUE);
-    else if(semester == "13/1")
-        optSemester131->setChecked(TRUE);
-    else if(semester == "13/2")
-        optSemester132->setChecked(TRUE);
-    else
-        optSemesterAuto->setChecked(TRUE);
+    else // find semester radio button
+    {
+        QRadioButton* currentRadioButton = NULL;
+        for(int i = 0; i < lstSemesterList.size(); i++)
+        {
+            currentRadioButton = lstSemesterList[i];
+            if(!currentRadioButton)
+            {
+                continue;
+            }
+            if(currentRadioButton->text() == semester)
+            {
+                currentRadioButton->setChecked(TRUE);
+            }
+        }
+    }
     
     QString weighting = examToEdit->cGetObjectByAttributeValue("name", "weighting")->
             cGetAttributeByName("value")->value();
@@ -348,14 +385,20 @@ void ksExamProperties::writeWidgetAttributesToExam()
     QString semester = "auto";
     if(optSemesterAuto->isChecked())
         semester = "auto";
-    else if(optSemester121->isChecked())
-        semester = "12/1";
-    else if(optSemester122->isChecked())
-        semester = "12/2";
-    else if(optSemester131->isChecked())
-        semester = "13/1";
-    else if(optSemester132->isChecked())
-        semester = "13/2";
+    else // find checked radio button
+    {
+        QRadioButton* currentRadioButton = NULL;
+        for(int i = 0; i < lstSemesterList.size(); i++)
+        {
+            currentRadioButton = lstSemesterList[i];
+            if(currentRadioButton && currentRadioButton->isChecked())
+            {
+                semester = currentRadioButton->text();
+                break;
+            }
+        }
+        
+    }
     examToEdit->cGetObjectByAttributeValue("name", "semester")->
             cGetAttributeByName("value")->SetValue(ksPlattformSpec::qstringToSz(semester));
     

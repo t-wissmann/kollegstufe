@@ -28,9 +28,12 @@
 #include <QPushButton>
 #include <QSizePolicy>
 
+#include <QMenu>
+#include <QAction>
 #include <QScrollArea>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QPalette>
 
 ksSemesterListEditor::ksSemesterListEditor(QWidget *parent)
  : QWidget(parent)
@@ -57,11 +60,20 @@ void ksSemesterListEditor::allocateWidgets()
     btnMoveUp = new QPushButton;
     btnMoveDown = new QPushButton;
     
-    // for the first time, we don't need to (and can't) use move up and down buttons
-    btnMoveUp->setVisible(FALSE);
-    btnMoveDown->setVisible(FALSE);
+    btnTemplates = new QPushButton;
+    mnuTemplates = new QMenu;
+    mnaEmptyList = mnuTemplates->addAction("empty");
+    mnaBavarianKollegstufe = mnuTemplates->addAction("bavarian ks");
+    btnTemplates->setMenu(mnuTemplates);
     
     scrollSemesterList = new QScrollArea;
+    
+    scrollSemesterList->setBackgroundRole(QPalette::NoRole);
+    QPalette pal = scrollSemesterList->palette();
+    pal.setBrush(scrollSemesterList->backgroundRole(), QBrush(QColor(255, 255, 255, 0)));
+    scrollSemesterList->setPalette(pal);
+    //scrollSemesterList->setAutoFillBackground(TRUE);
+    scrollSemesterList->setFrameStyle(QFrame::NoFrame);
     wdgSemesterListContainter = new QWidget;
     
     
@@ -75,6 +87,7 @@ void ksSemesterListEditor::createLayouts()
     layoutToolButtons->addWidget(btnDelete);
     layoutToolButtons->addWidget(btnMoveUp);
     layoutToolButtons->addWidget(btnMoveDown);
+    layoutToolButtons->addWidget(btnTemplates);
     
     layoutSemesterList = new QVBoxLayout;
     layoutSemesterList->setSpacing(0);
@@ -97,6 +110,10 @@ void ksSemesterListEditor::connectSlots()
 {
     connect(btnAdd, SIGNAL(clicked()), this, SLOT(addSemester()));
     connect(btnDelete, SIGNAL(clicked()), this, SLOT(deleteSemester()));
+    connect(btnMoveUp, SIGNAL(clicked()), this, SLOT(moveUp()));
+    connect(btnMoveDown, SIGNAL(clicked()), this, SLOT(moveDown()));
+    connect(mnaBavarianKollegstufe, SIGNAL(triggered()), this, SLOT(createBavarianKollegstufeTemplate()));
+    connect(mnaEmptyList, SIGNAL(triggered()), this, SLOT(clearSemesterList()));
 }
 
 
@@ -107,6 +124,10 @@ void ksSemesterListEditor::retranslateUi()
     
     btnMoveUp->setText(tr("Move Up"));
     btnMoveDown->setText(tr("Move Down"));
+    btnTemplates->setText(tr("Templates"));
+    
+    mnaEmptyList->setText(tr("Empty List"));
+    mnaBavarianKollegstufe->setText(tr("Bavarian Kollegstufe"));
 }
 
 
@@ -227,6 +248,33 @@ void ksSemesterListEditor::deleteSemester()
     m_pSelectedItem = NULL; // clear selection
 }
 
+void ksSemesterListEditor::moveUp()
+{
+    int currentIndex = selectedSemesterIndex();
+    if(currentIndex <= 0)
+    {//if currentIndex is 0, we can't move it up
+        return;
+    }
+    layoutSemesterList->removeWidget(lstSemesterItems[currentIndex]);
+    layoutSemesterList->insertWidget(currentIndex-1, lstSemesterItems[currentIndex]);
+    lstSemesterItems.move(currentIndex, currentIndex-1);
+    scrollSemesterList->ensureWidgetVisible(lstSemesterItems[currentIndex-1]);
+}
+
+void ksSemesterListEditor::moveDown()
+{
+    int currentIndex = selectedSemesterIndex();
+    if(currentIndex < 0 || currentIndex == lstSemesterItems.count()-1)
+    {// if currentIndex is the last in the list, we can't move it down
+        return;
+    }
+    layoutSemesterList->removeWidget(lstSemesterItems[currentIndex]);
+    layoutSemesterList->insertWidget(currentIndex+1, lstSemesterItems[currentIndex]);
+    lstSemesterItems.move(currentIndex, currentIndex+1);
+    scrollSemesterList->ensureWidgetVisible(lstSemesterItems[currentIndex+1]);
+    
+}
+
 void ksSemesterListEditor::applyChanges()
 {
     if(!m_pSourceList)
@@ -243,17 +291,117 @@ void ksSemesterListEditor::applyChanges()
         }
         if(currentWdg->semester() == NULL) // if this semester is NEW
         {
-            currentWdg->writeDataTo(m_pSourceList->cAddObject("semester"));
+            xmlObject* newSemester = m_pSourceList->cAddObject("semester");
+            currentWdg->writeDataTo(newSemester);
+            currentWdg->setSemester(newSemester);
         }
-        else if(currentWdg->isAboutToDelete()) // if this semester should be deleted
-        {
-            m_pSourceList->nDeleteObject(currentWdg->semester());
-        }
-        else
+        else 
         {
             // write currentWdg's date to it's semester
             currentWdg->applyChanges();
         }
     }
+    // move semester to their new positions
+    for(int i = 0; i < lstSemesterItems.size(); i++)
+    {
+        currentWdg = lstSemesterItems[i];
+        if(!currentWdg)
+        {
+            continue;
+        }
+        m_pSourceList->moveObjectTo(currentWdg->semester(), i);
+    }
+    // delete semesters, that should be deleted
+    for(int i = 0; i < lstSemesterItems.size(); i++)
+    {
+        currentWdg = lstSemesterItems[i];
+        if(!currentWdg)
+        {
+            continue;
+        }
+        if(currentWdg->isAboutToDelete()) // if this semester should be deleted
+        {
+            m_pSourceList->nDeleteObject(currentWdg->semester());
+        }
+    }
 }
+
+void ksSemesterListEditor::createBavarianKollegstufeTemplate()
+{
+    // at first: create a list of 4 semesters
+    // so: resize list, if there are to few items
+    ksSemesterItemWidget* currentWdg;
+    while(lstSemesterItems.size() < 4)
+    {
+        currentWdg = new ksSemesterItemWidget;
+        lstSemesterItems.append(currentWdg);
+        layoutSemesterList->addWidget(currentWdg);
+    }
+    // unhide the first 4 items
+    for(int i = 0; i < 4; i++)
+    {
+        if(lstSemesterItems[i])
+        {
+            lstSemesterItems[i]->setAboutToDelete(FALSE);
+        }
+    }
+    // and delete all other items
+    for(int i = 4; i < lstSemesterItems.size(); i++)
+    {
+        if(lstSemesterItems[i])
+        {
+            lstSemesterItems[i]->setAboutToDelete(TRUE);
+        }
+    }
+    QDate date = QDate::currentDate();
+    // get last september
+    while(date.month() != 9)
+    {
+        date = date.addMonths(-1);
+    }
+    while(date.dayOfWeek() != Qt::Tuesday)
+    {
+        date = date.addDays(-1);
+    }
+    
+    currentWdg = lstSemesterItems[0];
+    currentWdg->setStartDate(date);
+    date = date.addMonths(5); // go to february
+    currentWdg->setEndDate(date);
+    
+    date = date.addDays(1);
+    currentWdg = lstSemesterItems[1];
+    currentWdg->setStartDate(date);
+    date = date.addMonths(6); // go to August
+    currentWdg->setEndDate(date);
+    
+    date = date.addDays(1);
+    currentWdg = lstSemesterItems[2];
+    currentWdg->setStartDate(date);
+    while(date.month() != 2)
+    {
+        date = date.addMonths(1); // go to February
+    }
+    currentWdg->setEndDate(date);
+    
+    
+    date = date.addDays(1);
+    currentWdg = lstSemesterItems[3];
+    currentWdg->setStartDate(date);
+    date = date.addMonths(6); // go to August
+    currentWdg->setEndDate(date);
+    
+}
+
+void ksSemesterListEditor::clearSemesterList()
+{
+    for(int i = 0; i < lstSemesterItems.size(); i++)
+    {
+        if(lstSemesterItems[i])
+        {
+            lstSemesterItems[i]->setAboutToDelete(TRUE);
+        }
+    }
+}
+
 

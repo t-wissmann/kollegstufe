@@ -22,6 +22,7 @@
 #define KSEXAMPROPERTIES_H
 
 #include <QDialog>
+#include <QList>
 
 
 // layouts
@@ -54,7 +55,7 @@ public:
     void retranslateUi();
     void reloadIcons();
 public slots:
-    void setProperties(xmlObject*     newProperties);
+    void setProperties(xmlObject* newProperties);
     void setExamToEdit(xmlObject* newExamToEdit);
     void writeWidgetAttributesToExam();
 protected:
@@ -92,10 +93,7 @@ private:
     QHBoxLayout*    layoutWeighting;
     
     QGroupBox*      grpSemester;
-    QRadioButton*   optSemester121;
-    QRadioButton*   optSemester122;
-    QRadioButton*   optSemester131;
-    QRadioButton*   optSemester132;
+    QList<QRadioButton*> lstSemesterList;
     QRadioButton*   optSemesterAuto;
     
     //layouts

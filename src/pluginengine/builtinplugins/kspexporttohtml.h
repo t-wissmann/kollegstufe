@@ -18,28 +18,48 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "ksplugininformation.h"
-#include <stdlib.h>
+#ifndef KSPEXPORTTOHTML_H
+#define KSPEXPORTTOHTML_H
 
-ksPluginInformation::ksPluginInformation() : QObject()
+#include <pluginengine/ksplugin.h>
+
+
+/**
+	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
+*/
+
+class ConfigDialog;
+
+class kspExportToHtml : public ksPlugin
 {
-    setAllDatabasePointersToNull();
-    m_pMainWindow = NULL;
-    m_pPluginMenu = NULL;
-}
-
-
-ksPluginInformation::~ksPluginInformation()
-{
-}
-
-void ksPluginInformation::setAllDatabasePointersToNull()
-{
+    Q_OBJECT
     
-    m_pCurrentDatabase = NULL;
-    m_pCurrentCategory = NULL;
-    m_pCurrentSubject = NULL;
-    m_pCurrentExam = NULL;
-    m_pCurrentDataPart = NULL;
-    m_pCurrentPropertyPart = NULL;
-}
+            
+public:
+    kspExportToHtml();
+    virtual ~kspExportToHtml();
+    
+    
+    
+    
+    
+public slots:
+    void exportToHtml();
+    
+    
+protected:
+    
+    // core functions
+    virtual void load();
+    virtual void refresh();
+    virtual void unload();
+    virtual void retranslate();
+    virtual void createConfiguration(ksConfigContainer* config);
+    
+private:
+    
+    QAction*    mnaExportToHtml;
+    
+};
+
+#endif

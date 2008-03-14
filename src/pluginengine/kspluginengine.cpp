@@ -34,8 +34,8 @@
 #include "ksplugin.h"
 #include "ksplugininterface.h"
 //#include "kspwidgettester.h"
-//#include "kspexporttohtml.h"
-//#include "../../plugins/kspexporttohtml/kspexporttohtml.h"
+#include "builtinplugins/kspexporttohtml.h"
+#include "builtinplugins/kspbavarianabitur.h"
 
 ksPluginEngine::ksPluginEngine(QObject *parent)
  : QObject(parent)
@@ -70,7 +70,10 @@ void  ksPluginEngine::setPluginInformation(ksPluginInformation* newPluginInforma
 
 void  ksPluginEngine::createPluginList()
 {
-    //addPlugin(new kspExportToHtml);
+    
+    /// add built-in - plugins
+    addPlugin(new kspExportToHtml);
+    addPlugin(new kspBavarianAbitur);
     //addPlugin(new kspWidgetTester);
     
     //addPlugin(new ksPlugin);

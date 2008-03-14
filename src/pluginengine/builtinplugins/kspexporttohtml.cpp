@@ -32,9 +32,6 @@
 #include <QTextStream>
 
 #include <QMessageBox>
-#include <QtPlugin>
-
-Q_EXPORT_PLUGIN2(kspexporttohtml, kspExportToHtml)
 
 kspExportToHtml::kspExportToHtml()
  : ksPlugin()
@@ -42,7 +39,6 @@ kspExportToHtml::kspExportToHtml()
     setIdentifier("kspExportToHtml");
     setIsHavingAnAboutDialog(TRUE);
     setIsConfigurable(TRUE);
-    retranslateUi();
 }
 
 

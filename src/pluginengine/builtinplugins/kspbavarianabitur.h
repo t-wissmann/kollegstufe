@@ -18,43 +18,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KSPEXPORTTOHTML_H
-#define KSPEXPORTTOHTML_H
+#ifndef KSPBAVARIANABITUR_H
+#define KSPBAVARIANABITUR_H
 
 #include <pluginengine/ksplugin.h>
-
+class QAction;
+class ksSemesterAchievementsDialog;
 
 /**
 	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
-
-class ConfigDialog;
-
-class kspExportToHtml : public ksPlugin
+class kspBavarianAbitur : public ksPlugin
 {
-    Q_OBJECT
-    Q_INTERFACES(ksPlugin)
-    
-            
+Q_OBJECT
 public:
-    kspExportToHtml();
-    virtual ~kspExportToHtml();
-    
-    
-    virtual void configure() { //ksPlugin::configure();
-    };
-    virtual void about(){ //ksPlugin::about();
-    };
-    
-    
-    
+    kspBavarianAbitur();
+
+    virtual ~kspBavarianAbitur();
 public slots:
-    void exportToHtml();
-    
-    
+    void showSemesterAchievements();
+    void refreshSemesterAchievementsDialog();
+    void dialogVisibilityChanged(bool isVisibleNow);
 protected:
-    
-    // core functions
     virtual void load();
     virtual void refresh();
     virtual void unload();
@@ -62,9 +47,8 @@ protected:
     virtual void createConfiguration(ksConfigContainer* config);
     
 private:
-    
-    QAction*    mnaExportToHtml;
-    
+    QAction*    mnaSemesterAchievements;
+    ksSemesterAchievementsDialog* diaSemesterAchievementsDialog;
 };
 
 #endif

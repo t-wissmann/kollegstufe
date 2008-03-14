@@ -30,6 +30,8 @@ class xmlObject;
 class QPushButton;
 class QLabel;
 class QScrollArea;
+class QAction;
+class QMenu;
 
 class ksSemesterItemWidget;
 
@@ -55,6 +57,10 @@ public:
 public slots:
     void addSemester();
     void deleteSemester();
+    void moveUp();
+    void moveDown();
+    void createBavarianKollegstufeTemplate();
+    void clearSemesterList();
     
 protected slots:
     void selectionChanged(ksSemesterItemWidget* selectedItem);
@@ -75,6 +81,11 @@ private:
     QHBoxLayout* layoutParent;
     QVBoxLayout* layoutToolButtons;
     QVBoxLayout* layoutSemesterList;
+    
+    QPushButton* btnTemplates;
+    QMenu*       mnuTemplates;
+    QAction*     mnaBavarianKollegstufe;
+    QAction*     mnaEmptyList;
     
     QList<ksSemesterItemWidget*> lstSemesterItems;
     

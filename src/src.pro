@@ -6,8 +6,8 @@ TARGET = ../bin/kollegstufe
 
 DISTFILES += ../doc/help.htm
 
-TRANSLATIONS += ../translations/german.ts \
-../translations/english.ts
+TRANSLATIONS += ../translations/ks_german.ts \
+../translations/ks_english.ts
 
 SUBDIRS +=TEMPLATE = app
 
@@ -50,7 +50,10 @@ widgets/selectablelabel.cpp \
  widgets/ksfilterwidget.cpp \
  dialogs/ksdebugdialog.cpp \
  widgets/kssemesterlisteditor.cpp \
- widgets/kssemesteritemwidget.cpp
+ widgets/kssemesteritemwidget.cpp \
+ pluginengine/builtinplugins/kspexporttohtml.cpp \
+ pluginengine/builtinplugins/kspbavarianabitur.cpp \
+ pluginengine/builtinplugins/kssemesterachievementsdialog.cpp
 HEADERS += core/configdialog.h \
 core/dateConverter.h \
 core/kollegstufeparent.h \
@@ -92,4 +95,7 @@ widgets/selectablelabel.h \
  widgets/ksfilterwidget.h \
  dialogs/ksdebugdialog.h \
  widgets/kssemesterlisteditor.h \
- widgets/kssemesteritemwidget.h
+ widgets/kssemesteritemwidget.h \
+ pluginengine/builtinplugins/kspexporttohtml.h \
+ pluginengine/builtinplugins/kspbavarianabitur.h \
+ pluginengine/builtinplugins/kssemesterachievementsdialog.h

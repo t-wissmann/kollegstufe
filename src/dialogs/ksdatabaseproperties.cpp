@@ -101,10 +101,6 @@ void ksDatabaseProperties::retranslateUi()
     lblRatingBest->setText(tr("Best:"));
     lblRatingWorst->setText(tr("Worst:"));
     grpSemesterList->setTitle(tr("Beginning and End of semesters"));
-    lblStart->setText(tr("Beginning:"));
-    lblEnd->setText(tr("End:"));
-    lblSemesterListInformation->setText("<i>" + tr("Note:") + "</i> " + tr("If you aren't in a grade containing"
-            " of several semesters, you can ignore this and all semester specific options."));
     grpCathegories->setTitle(tr("Edit Subject Cathegories"));
     
     setWindowTitle(tr("Edit properties of Mark-Database"));
@@ -136,33 +132,6 @@ void ksDatabaseProperties::allocateWidgets()
     wdgSemesterList = new ksSemesterListEditor;
     
     grpSemesterList = new QGroupBox;
-    // we don't need grpSemesterList anymore, now we have wdgSemesterList editor
-    grpSemesterList->setVisible(FALSE);
-    
-    lblStart = new QLabel;
-    lblEnd   = new QLabel;
-    lblStart->setAlignment(Qt::AlignHCenter);
-    lblEnd->setAlignment(Qt::AlignHCenter);
-    
-    lblSemesterListInformation = new QTextEdit;
-    lblSemesterListInformation->setReadOnly(TRUE);
-    // For test issues TODO
-    lblSemesterListInformation->setVisible(FALSE);
-    lblSemesterListInformation->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    
-    lbl121 = new QLabel("12 / 1:");
-    lbl122 = new QLabel("12 / 2:");
-    lbl131 = new QLabel("13 / 1:");
-    lbl132 = new QLabel("13 / 2:");
-    
-    dteSemester121Start = new QDateEdit;
-    dteSemester121End   = new QDateEdit;
-    dteSemester122Start = new QDateEdit;
-    dteSemester122End   = new QDateEdit;
-    dteSemester131Start = new QDateEdit;
-    dteSemester131End   = new QDateEdit;
-    dteSemester132Start = new QDateEdit;
-    dteSemester132End   = new QDateEdit;
     
     grpCathegories = new QGroupBox;
     wdgCathegoryEditor = new ksCathegoryEditorWidget;
@@ -177,27 +146,9 @@ void ksDatabaseProperties::createLayouts()
     boxBottom->addButton(btnOk, QDialogButtonBox::AcceptRole);
     boxBottom->addButton(btnCancel, QDialogButtonBox::RejectRole);
     
-    layoutSemesterList = new QGridLayout;
-    layoutSemesterList->addWidget(lblStart, 0, 1);
-    layoutSemesterList->addWidget(lblEnd, 0, 2);
-    lblStart->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    lblEnd->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     
-    layoutSemesterList->addWidget(lbl121,              1, 0);
-    layoutSemesterList->addWidget(dteSemester121Start, 1, 1);
-    layoutSemesterList->addWidget(dteSemester121End,   1, 2);
-    layoutSemesterList->addWidget(lbl122,              2, 0);
-    layoutSemesterList->addWidget(dteSemester122Start, 2, 1);
-    layoutSemesterList->addWidget(dteSemester122End,   2, 2);
-    
-    layoutSemesterList->addWidget(lbl131,              3, 0);
-    layoutSemesterList->addWidget(dteSemester131Start, 3, 1);
-    layoutSemesterList->addWidget(dteSemester131End,   3, 2);
-    layoutSemesterList->addWidget(lbl132,              4, 0);
-    layoutSemesterList->addWidget(dteSemester132Start, 4, 1);
-    layoutSemesterList->addWidget(dteSemester132End,   4, 2);
-    layoutSemesterList->addWidget(lblSemesterListInformation, 5, 0, 1,3);
-    
+    layoutSemesterList = new QVBoxLayout;
+    layoutSemesterList->addWidget(wdgSemesterList);
     grpSemesterList->setLayout(layoutSemesterList);
     
     // rating
@@ -220,9 +171,8 @@ void ksDatabaseProperties::createLayouts()
     layoutParent->addWidget(optRatingPoints, 1, 2);
     layoutParent->addLayout(layoutRatingOther, 2, 1, 1, 2);
     layoutParent->addWidget(grpSemesterList, 3, 0, 1, 3);
-    layoutParent->addWidget(wdgSemesterList, 4, 0, 1, 3);
-    layoutParent->addWidget(grpCathegories, 5, 0, 1, 3);
-    layoutParent->addWidget(boxBottom, 6, 0, 1, 3);
+    layoutParent->addWidget(grpCathegories, 4, 0, 1, 3);
+    layoutParent->addWidget(boxBottom, 5, 0, 1, 3);
     
     setLayout(layoutParent);
 }
@@ -249,42 +199,8 @@ void ksDatabaseProperties::connectSlots()
     
     connect(wdgCathegoryEditor, SIGNAL(renameModeChanged(bool)), this, SLOT(setBtnOkNotDefault(bool)));
     
-    connectMinMaxDate();
 }
 
-void ksDatabaseProperties::connectMinMaxDate()
-{
-    QList<QDateEdit*>  DateBuf;
-    DateBuf.append(dteSemester121Start);
-    DateBuf.append(dteSemester121End);
-    DateBuf.append(dteSemester122Start);
-    DateBuf.append(dteSemester122End);
-    DateBuf.append(dteSemester131Start);
-    DateBuf.append(dteSemester131End);
-    DateBuf.append(dteSemester132Start);
-    DateBuf.append(dteSemester132End);
-    for (int i = 0; i < DateBuf.size(); i++)
-    {
-        connect(DateBuf[i], SIGNAL(dateChanged(QDate)), this, SLOT(setMinMaxDate()));
-    }
-}
-
-void ksDatabaseProperties::disconnectMinMaxDate()
-{
-    QList<QDateEdit*>  DateBuf;
-    DateBuf.append(dteSemester121Start);
-    DateBuf.append(dteSemester121End);
-    DateBuf.append(dteSemester122Start);
-    DateBuf.append(dteSemester122End);
-    DateBuf.append(dteSemester131Start);
-    DateBuf.append(dteSemester131End);
-    DateBuf.append(dteSemester132Start);
-    DateBuf.append(dteSemester132End);
-    for (int i = 0; i < DateBuf.size(); i++)
-    {
-        disconnect(DateBuf[i], SIGNAL(dateChanged(QDate)), this, SLOT(setMinMaxDate()));
-    }
-}
 
 
 void ksDatabaseProperties::setBtnOkNotDefault(bool newDefaultValue)
@@ -320,44 +236,6 @@ void ksDatabaseProperties::setDatabasePropertiesToEdit(xmlObject* newProperties)
         optRatingPoints->setChecked(TRUE);
     }
     
-    
-    //READ DATES
-    QList<QDateEdit*>  DateBuf;
-    DateBuf.append(dteSemester121Start);
-    DateBuf.append(dteSemester121End);
-    DateBuf.append(dteSemester122Start);
-    DateBuf.append(dteSemester122End);
-    DateBuf.append(dteSemester131Start);
-    DateBuf.append(dteSemester131End);
-    DateBuf.append(dteSemester132Start);
-    DateBuf.append(dteSemester132End);
-    
-    QStringList SemesterName;
-    SemesterName.append("12/1");
-    SemesterName.append("12/2");
-    SemesterName.append("13/1");
-    SemesterName.append("13/2");
-    
-    int             i = 0;
-    cDateConverter  dateToCopy;
-    xmlObject*      currentSemester;
-    QDate           qdateToCopy;
-    xmlObject*      currentAttributeObject;
-    disconnectMinMaxDate();
-    currentAttributeObject = propertiesToEdit->cGetObjectByName( "time" );
-    for(i=0; i < 8; i+=1)
-    {
-        currentSemester = currentAttributeObject->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(SemesterName[(int)(i/2)]));
-        if(!currentSemester)
-            continue;
-        if(i % 2)//if is 0 , 2, 4, 6 than i % 2 is 0 , so current date is a start date, else it is a end tag
-            dateToCopy.setDateString(currentSemester->cGetAttributeByName("end")->value());
-        else
-            dateToCopy.setDateString(currentSemester->cGetAttributeByName("start")->value());
-        qdateToCopy.setYMD( dateToCopy.Year(), dateToCopy.Month(), dateToCopy.Day());
-        DateBuf[i]->setDate(qdateToCopy);
-    }
-    connectMinMaxDate();
     wdgSemesterList->setSemesterList(propertiesToEdit->cGetObjectByName("time"));
 }
 
@@ -398,69 +276,8 @@ void ksDatabaseProperties::writeWidgetAttributesToProperties()
     propertiesToEdit->cGetObjectByName("rating")->cGetAttributeByName("best")->SetValueToInt(best);
     propertiesToEdit->cGetObjectByName("rating")->cGetAttributeByName("worst")->SetValueToInt(worst);
     
+    // Semester list
     wdgSemesterList->applyChanges();
-    
-    /* // we don't need this anymore, now we have the ksSemesterListEditor
-    // date
-    QList<QDateEdit*>  DateBuf;
-    DateBuf.append(dteSemester121Start);
-    DateBuf.append(dteSemester121End);
-    DateBuf.append(dteSemester122Start);
-    DateBuf.append(dteSemester122End);
-    DateBuf.append(dteSemester131Start);
-    DateBuf.append(dteSemester131End);
-    DateBuf.append(dteSemester132Start);
-    DateBuf.append(dteSemester132End);
-    
-    QStringList SemesterName;
-    SemesterName.append("12/1");
-    SemesterName.append("12/2");
-    SemesterName.append("13/1");
-    SemesterName.append("13/2");
-    
-    int             i = 0;
-    cDateConverter  dateToCopy;
-    xmlObject*      currentSemester;
-    QDate           qdateToCopy;
-    xmlObject*      currentAttributeObject;
-    
-    currentAttributeObject = propertiesToEdit->cGetObjectByName( "time" );
-    for(i=0; i < 8; i+=1)
-    {
-        currentSemester = currentAttributeObject->cGetObjectByAttributeValue("name", ksPlattformSpec::qstringToSz(SemesterName[(int)(i/2)]));
-        if(!currentSemester)
-            continue;
-        qdateToCopy = DateBuf[i]->date();
-        
-        dateToCopy.setDay(qdateToCopy.day());
-        dateToCopy.setMonth(qdateToCopy.month());
-        dateToCopy.setYear(qdateToCopy.year());
-        if(i % 2)//if is 0 , 2, 4, 6 than i % 2 is 0 , so current date is a start date, else it is a end tag
-            currentSemester->cGetAttributeByName("end")->SetValue(dateToCopy.getDateString());
-        else
-            currentSemester->cGetAttributeByName("start")->SetValue(dateToCopy.getDateString());
-        
-    }*/
-}
-
-void ksDatabaseProperties::setMinMaxDate()
-{
-    QList<QDateEdit*>  DateBuf;
-    DateBuf.append(dteSemester121Start);
-    DateBuf.append(dteSemester121End);
-    DateBuf.append(dteSemester122Start);
-    DateBuf.append(dteSemester122End);
-    DateBuf.append(dteSemester131Start);
-    DateBuf.append(dteSemester131End);
-    DateBuf.append(dteSemester132Start);
-    DateBuf.append(dteSemester132End);
-    
-    for(int i = 1; i < (DateBuf.size()); i++)
-    {
-        DateBuf[i-1]->setMaximumDate(DateBuf[i]->date());
-        DateBuf[i]->setMinimumDate(DateBuf[i-1]->date());
-    }
-    
 }
 
 

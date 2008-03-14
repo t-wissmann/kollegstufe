@@ -27,6 +27,8 @@
 	@author Thorsten Wissmann <kollegstufe@thorsten-wissmann.de>
 */
 
+#include <QDate>
+#include <QString>
 class QDateEdit;
 class QLineEdit;
 class QLabel;
@@ -52,13 +54,24 @@ public:
     
     void retranslateUi();
     
-    void setSelected(bool selected);
     bool isSelected() const { return m_bSelected; };
     bool isAboutToDelete() const { return m_bAboutToDelete; }; // says if this semester should be deleted when changes are applied
     void setAboutToDelete(bool deleteThis);
     
     void applyChanges();
     void writeDataTo(xmlObject* semester) const;
+    
+    // some getter & setter
+    void setStartDate(QDate start);
+    QDate startDate() const;
+    void setEndDate(QDate end);
+    QDate endDate() const;
+    void setName(QString name);
+    QString name()const;
+    
+    
+public slots:
+    void setSelected(bool selected = TRUE);
     
 protected:
     virtual void paintEvent(QPaintEvent* event);
