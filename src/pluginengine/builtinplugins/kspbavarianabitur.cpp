@@ -54,7 +54,7 @@ void kspBavarianAbitur::retranslate()
     setDescription(tr("Gives some specific features for the Bavarian Abitur"));
     if(mnaSemesterAchievements)
     {
-        mnaSemesterAchievements->setText("Show Semester Achievements");
+        mnaSemesterAchievements->setText(tr("Show Semester Achievements"));
     }
 }
 

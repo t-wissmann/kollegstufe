@@ -53,7 +53,8 @@ widgets/selectablelabel.cpp \
  widgets/kssemesteritemwidget.cpp \
  pluginengine/builtinplugins/kspexporttohtml.cpp \
  pluginengine/builtinplugins/kspbavarianabitur.cpp \
- pluginengine/builtinplugins/kssemesterachievementsdialog.cpp
+ pluginengine/builtinplugins/kssemesterachievementsdialog.cpp \
+ dialogs/kscategorychooserdialog.cpp
 HEADERS += core/configdialog.h \
 core/dateConverter.h \
 core/kollegstufeparent.h \
@@ -98,4 +99,5 @@ widgets/selectablelabel.h \
  widgets/kssemesteritemwidget.h \
  pluginengine/builtinplugins/kspexporttohtml.h \
  pluginengine/builtinplugins/kspbavarianabitur.h \
- pluginengine/builtinplugins/kssemesterachievementsdialog.h
+ pluginengine/builtinplugins/kssemesterachievementsdialog.h \
+ dialogs/kscategorychooserdialog.h

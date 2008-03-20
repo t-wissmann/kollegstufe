@@ -37,6 +37,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
+#include <QEvent>
 
 class SAWPointer{ // semester achievement pointer 
 public:
@@ -97,9 +98,25 @@ void ksSemesterAchievementsDialog::retranslateUi()
     spinColumnCount->setWhatsThis(lblColumnCount->whatsThis());
     spinMaxLabelCount->setSpecialValueText(tr("show all"));
     lblMaxLabelCount->setText(tr("Number of shown\nsemester achievements:"));
-    chkAscendingOrder->setText(tr("Sort items to ascending order"));
+    QString text = tr("Sort items to ascending order");
+    int linelength = 20; // create linewraps, so that lines have length 20
+    for(int i = linelength; i < text.length(); i += linelength)
+    {
+        while(i < text.length() && text[i] != QChar(' '))
+        {
+            ++i;
+        }
+        if(i >= text.length())
+        {
+            break;
+        }
+        text[i] = QChar('\n');
+        
+    }
+    chkAscendingOrder->setText(text);
     chkAscendingOrder->setWhatsThis(tr("If checked, the order Semester Achievements "
             "will show these items by an ascending average. If not checked, the average order is descending."));
+    
     setWindowTitle(tr("Semester Achievements"));
     dockControlSidebar->setWindowTitle(tr("Configuration"));
 }
@@ -187,6 +204,16 @@ void ksSemesterAchievementsDialog::createGui()
     
 }
 
+
+void ksSemesterAchievementsDialog::changeEvent(QEvent* event)
+{
+    
+    QWidget::changeEvent(event);
+    if(event && (event->type() == QEvent::LanguageChange))
+    {
+        retranslateUi();
+    }
+}
 
 void ksSemesterAchievementsDialog::setArchive(xmlObject* dataPart, xmlObject* semesterList, xmlObject* currentCategory)
 {

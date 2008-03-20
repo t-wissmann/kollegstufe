@@ -72,7 +72,7 @@ ksAbout::~ksAbout()
 void ksAbout::changeEvent(QEvent* event)
 {
     QWidget::changeEvent(event);
-    if(event->type() == QEvent::LanguageChange)
+    if(event && (event->type() == QEvent::LanguageChange))
     {
         retranslateUi();
     }

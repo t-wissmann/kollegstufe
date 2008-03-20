@@ -52,6 +52,7 @@ class ksFilterWidget;
 // own dialogs
 class ksExamProperties;
 class ksSubjectProperties;
+class ksCategoryChooserDialog;
 class ksDatabaseSelection;
 class ksStatisticsDialog;
 class ksDatabaseProperties;
@@ -140,6 +141,7 @@ public slots:
     void subjectEdit();
     void subjectMoveUp();
     void subjectMoveDown();
+    void subjectMoveToCategory();
     
     // exam control:
     void examAdd();
@@ -214,6 +216,7 @@ private:
     QAction*        mnaEditSubjectEdit;
     QAction*        mnaEditSubjectMoveUp;
     QAction*        mnaEditSubjectMoveDown;
+    QAction*        mnaEditSubjectMoveToCategory;
     QMenu*          mnmEditExam;
     QAction*        mnaEditExamAdd;
     QAction*        mnaEditExamEdit;
@@ -267,6 +270,7 @@ private:
     // dialog windows
     ksExamProperties*       diaExamProperties;
     ksSubjectProperties*    diaSubjectProperties;
+    ksCategoryChooserDialog* diaCategoryChooser;
     ksDatabaseProperties*   diaDatabaseProperties;
     ksDatabaseSelection*    diaDatabaseSelection;
     ksAbout*                diaAbout;
@@ -274,6 +278,7 @@ private:
     ksPluginConfigurationDialog* diaPluginConfig;
     ksStatisticsDialog*     diaStatistics;
     ksDebugDialog*          diaDebugDialog;
+    
     
     // member variables
     ksPluginEngine* pPluginEngine;
@@ -295,6 +300,7 @@ private:
     QString     currentWindowTitle;
     
     xmlObject   xmlConfig;
+    
     
     
 };

@@ -548,8 +548,8 @@ void ksStatisticsWidget::drawCircleAt(int circleX, int circleY, int diameter)
     QLinearGradient bgGradient( circleX, circleY-diameter/2, circleX, circleY+diameter/2);
     QColor  bgColorTop = palette().highlight().color();
     QColor  bgColorBottom = palette().highlight().color();
-    int newValueTop = rangeValue(bgColorTop.value() < 3 ? 100 : bgColorTop.value(), 0, 255);
-    int newValueBottom = rangeValue(bgColorTop.value()/2, 0, 255);
+    int newValueTop = rangeValue(bgColorTop.value() + 40, 0, 255);
+    int newValueBottom = rangeValue(bgColorTop.value() - 60, 0, 255);
     
     bgColorTop.setHsv( bgColorTop.hue(), bgColorTop.saturation(), newValueTop );
     bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueBottom);
@@ -612,8 +612,8 @@ void ksStatisticsWidget::drawCaptionAt(int captionX, int captionY, QString capti
     QLinearGradient bgGradient( captionX, captionY, captionX, captionY+captionHeight);
     QColor  bgColorTop = palette().highlight().color();
     QColor  bgColorBottom = palette().highlight().color();
-    int newValueTop = rangeValue(bgColorTop.value() < 3 ? 100 : bgColorTop.value(), 0, 255);
-    int newValueBottom = rangeValue(bgColorTop.value()/2, 0, 255);
+    int newValueTop = rangeValue(bgColorTop.value() + 30, 0, 255);
+    int newValueBottom = rangeValue(bgColorTop.value()- 30, 0, 255);
     
     bgColorBottom.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueBottom, 255);
     bgColorTop.setHsv( bgColorBottom.hue(), bgColorBottom.saturation(), newValueTop, 255);

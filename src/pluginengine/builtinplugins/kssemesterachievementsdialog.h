@@ -44,6 +44,7 @@ class ksConfigContainer;
 
 class QCloseEvent;
 class QShowEvent;
+class QEvent;
 
 #include<widgets/selectablelabel.h>
 
@@ -105,6 +106,7 @@ public slots:
 protected:
     void closeEvent(QCloseEvent*);
     void showEvent(QShowEvent*);
+    void changeEvent(QEvent* event);
 private:
     void createGui();
     // widgets

@@ -57,7 +57,7 @@ void kspExportToHtml::retranslate()
 
 void kspExportToHtml::load()
 {
-    qDebug("%s:%s gets loaded", identifier().toAscii().data(), name().toAscii().data());
+    //qDebug("%s:%s gets loaded", identifier().toAscii().data(), name().toAscii().data());
     mnaExportToHtml = new QAction(this);
     mnaExportToHtml->setText(tr("Export To Html"));
     addMenuAction(mnaExportToHtml);
@@ -71,7 +71,7 @@ void kspExportToHtml::refresh()
 
 void kspExportToHtml::unload()
 {
-    qDebug("%s:%s gets unloaded", identifier().toAscii().data(), name().toAscii().data());
+    //qDebug("%s:%s gets unloaded", identifier().toAscii().data(), name().toAscii().data());
     
     ksPlugin::disconnect(mnaExportToHtml, SIGNAL(triggered()), this, SLOT(exportToHtml()));
     removeMenuAction(mnaExportToHtml);

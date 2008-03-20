@@ -213,32 +213,32 @@ Dann werden nur die Optionen gezeigt, die auf diese Schlüsselwörter zutreffen.
 <context>
     <name>kollegstufeParent</name>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="750"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="754"/>
         <source>Edit Subject</source>
         <translation>Fach bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="752"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="756"/>
         <source>Subject Properties</source>
         <translation>Fach Eigenschaften</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="753"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="757"/>
         <source>New Exam</source>
         <translation>Neue Leistung</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="788"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="793"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="789"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="794"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="758"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="762"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
@@ -248,12 +248,12 @@ Dann werden nur die Optionen gezeigt, die auf diese Schlüsselwörter zutreffen.
         <translation type="obsolete">&amp;Extras</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="770"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="774"/>
         <source>Load archiv</source>
         <translation>Archiv laden</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="930"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="935"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
@@ -263,154 +263,154 @@ Dann werden nur die Optionen gezeigt, die auf diese Schlüsselwörter zutreffen.
         <translation type="obsolete">Eigenschaften</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="776"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="780"/>
         <source>Quit</source>
         <translation>Beenden</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="771"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="775"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="772"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="776"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="773"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="777"/>
         <source>Ctrl+Q</source>
         <translation>Ctrl+Q</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="795"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="800"/>
         <source>Statistics</source>
         <translation>Statistik</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="799"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="804"/>
         <source>About Qt</source>
         <translation>Über Qt</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="800"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="805"/>
         <source>About Kollegstufe</source>
         <translation>Über Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="807"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="812"/>
         <source>Semester</source>
         <translation>Semester</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="808"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="813"/>
         <source>Date</source>
         <translation>Datum</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="809"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="814"/>
         <source>Nr</source>
         <translation>Nr</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="810"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="815"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1587"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1613"/>
         <source>Points</source>
         <translation>Punkte</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="843"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="848"/>
         <source>Kollegstufe</source>
         <translation>Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="512"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="516"/>
         <source>Error when loading File - Kollegstufe</source>
         <translation>Fehler beim Datei-laden - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="513"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="517"/>
         <source>Error when trying to load File &lt;i&gt;</source>
         <translation>Fehler beim laden der Datei &lt;i&gt;</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="514"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="518"/>
         <source>It seems, you haven&apos;t got enough Read-Rights</source>
         <translation>Wahrscheinlich haben Sie nicht die nötigen Leserechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="569"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="573"/>
         <source>Error when creating Folder - Kollegstufe</source>
         <translation>Fehler beim Ordner-Erstellen - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="598"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="602"/>
         <source>It seems, you haven&apos;t got the necessary Write-Rights!</source>
         <translation>Wahrscheinlich haben Sie nicht die nötigen Schreib-Rechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="577"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="581"/>
         <source>Error during saving file- Kollegstufe</source>
         <translation>Fehler beim Datei-Speicher - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="732"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="736"/>
         <source>Fehler beim Ordner-Erstellen - Kollegstufe</source>
         <translation>Fehler beim Ordner-Erstellen - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="604"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="608"/>
         <source>Fehler beim Datei-Laden/Erstellen - Kollegstufe</source>
         <translation>Fehler beim Datei-Laden/Erstellen - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="606"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="610"/>
         <source>It seems, you haven&apos;t got the necessary Write- or Read-Rights!</source>
         <translation>Wahrscheinlich haben Sie nicht die nötigen Schreib- und/oder Leserechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="615"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="619"/>
         <source>Fehler beim Datei-Laden - Kollegstufe</source>
         <translation>Fehler beim Datei-Laden - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="617"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="621"/>
         <source>It seems, you haven&apos;t got the necessary Read-Rights!</source>
         <translation>Wahrscheinlich haben Sie nicht die nötigen Leserechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="742"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="746"/>
         <source>Anscheinend haben sie nicht die noetigen Schreibrechte dazu!</source>
         <translation>Anscheinend haben sie nicht die nötigen Schreibrechte dazu!</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="740"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="744"/>
         <source>Fehler beim Datei-Schreiben - Kollegstufe</source>
         <translation>Fehler beim Datei-Schreiben - Kollegstufe</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="931"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="936"/>
         <source>Discard</source>
         <translation>Verwerfen</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="932"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="937"/>
         <source>Don&apos;t Close</source>
         <translation>Nicht Schließen</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="937"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="942"/>
         <source>Seit dem letzten Speichern haben sich Daten verandert!
 Moechten Sie diese vor dem Schliessen speichern oder verwerfen ?</source>
         <translation>Seit dem letzten Speichern haben sich Daten verändert!
 Möchten Sie diese vor dem Schließen speichern oder verwerfen ?</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="938"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="943"/>
         <source>Closing Database - Kollegstufe</source>
         <translation>Archiv schließen - Kollegstufe</translation>
     </message>
@@ -425,12 +425,12 @@ Möchten Sie diese vor dem Schließen speichern oder verwerfen ?</translation>
         <translation type="obsolete">&apos; löschen ?</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1112"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1117"/>
         <source>Deleting a subject</source>
         <translation>Fach Löschen</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1323"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1349"/>
         <source>Do you really want to delete </source>
         <translation>Möchten Sie wirklich </translation>
     </message>
@@ -450,189 +450,199 @@ Möchten Sie diese vor dem Schließen speichern oder verwerfen ?</translation>
         <translation type="obsolete">Arbeit Löschen</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1413"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1439"/>
         <source>Properties of subject </source>
         <translation>Eigenschaften des Faches </translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1420"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1446"/>
         <source>No Subject Selected</source>
         <translation>Kein Fach ausgewählt</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1592"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1618"/>
         <source>Mark</source>
         <translation>Note</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="793"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="798"/>
         <source>Configure Kollegstufe</source>
         <translation>Kollegstufe einrichten</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="825"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="830"/>
         <source>Add Subject</source>
         <translation>Fach hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="826"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="831"/>
         <source>Delete Subject</source>
         <translation>Fach entfernen</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="827"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="832"/>
         <source>Move Subject Up</source>
         <translation>Fach nach oben verschieben</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="828"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="833"/>
         <source>Move Subject Down</source>
         <translation>Fach nach unten verschieben</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="767"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="771"/>
         <source>&amp;Window</source>
         <translation>&amp;Fenster</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="768"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="772"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="824"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="829"/>
         <source>Click to edit the properties of currently selected subject</source>
         <translation>Klicken Sie, um die Eigenschaften des aktuell ausgewählten Faches zu bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="830"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="835"/>
         <source>Adds a new exam to currently selected subject</source>
         <translation>Fügt eine neue Leistung zum aktuell ausgewählten Fach hinzu</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="831"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="836"/>
         <source>Click to edit the properties of currently selected exam</source>
         <translation>Klicken Sie um die Eigenschaften der aktuell ausgewählten Leistung zu bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="832"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="837"/>
         <source>Removes the currently selected exam</source>
         <translation>Löscht die aktuell ausgewählte Leistung</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="775"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="779"/>
         <source>Properties</source>
         <translation>Eigenschaften</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="798"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="803"/>
         <source>User Manual</source>
         <translation>Handbuch</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="759"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="763"/>
         <source>&amp;Edit</source>
         <translation>&amp;Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="779"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="783"/>
         <source>Subject</source>
         <translation>Fach</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="787"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="792"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="783"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="787"/>
         <source>Move Up</source>
         <translation>Nach Oben verschieben</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="784"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="788"/>
         <source>Move Down</source>
         <translation>Nach Unten verschieben</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="786"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="791"/>
         <source>Exam</source>
         <translation>Examen</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="792"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="797"/>
         <source>Configure Plugins</source>
         <translation>Plugins einrichten</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="763"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="767"/>
         <source>Plugins</source>
         <translation>Plugins</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="766"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="770"/>
         <source>&amp;Settings</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="803"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="808"/>
         <source>List style:</source>
         <translation>Listenstil:</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="804"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="809"/>
         <source>Table</source>
         <translation>Tabelle</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="805"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="810"/>
         <source>Chart</source>
         <translation>Diagramm</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1107"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1112"/>
         <source>Do you really want to delete the subject &apos;%subjectname&apos; ?</source>
         <translation>Möchten Sie wirklich das Fach &apos;%subjectname&apos; löschen ?</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1338"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1364"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1344"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1370"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1334"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1360"/>
         <source> from %date ?</source>
         <translation> vom %date ?</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1339"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1365"/>
         <source>Deleting an Exam</source>
         <translation>Löschen eines Examens</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="797"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="802"/>
         <source>Debug-Window</source>
         <translation>Debug-Fenster</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1313"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1339"/>
         <source>Select a subject first</source>
         <translation>Wählen Sie zuerst ein Fach aus</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="1365"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1391"/>
         <source>Select an exam first</source>
         <translation>Wählen Sie zuerst ein Examen aus</translation>
     </message>
     <message>
-        <location filename="../src/core/kollegstufeparent.cpp" line="586"/>
+        <location filename="../src/core/kollegstufeparent.cpp" line="590"/>
         <source>Archive &quot;%filename&quot; was succesfully saved</source>
         <translation>Das Archiv &quot;%filename&quot; wurde erfolgreich gespeichert</translation>
+    </message>
+    <message>
+        <location filename="../src/core/kollegstufeparent.cpp" line="789"/>
+        <source>Move to category</source>
+        <translation>In andere Kategorie verschieben</translation>
+    </message>
+    <message>
+        <location filename="../src/core/kollegstufeparent.cpp" line="1206"/>
+        <source>Please select a subject first</source>
+        <translation>Wählen Sie bitte erst ein Fach aus</translation>
     </message>
 </context>
 <context>
@@ -712,6 +722,34 @@ Möchten Sie diese vor dem Schließen speichern oder verwerfen ?</translation>
         <source>This software was released under the GPL.</source>
         <translation>This program is free software; you can redistribute it and/or modify  it under the terms of the GNU General Public License as published by  the Free Software Foundation; either version 2 of the License, or     (at your option) any later version.&lt;br&gt;&lt;br&gt;
 This program is distributed in the hope that it will be useful,       but WITHOUT ANY WARRANTY; without even the implied warranty of        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         GNU General Public License for more details.                          &lt;br&gt;&lt;br&gt;You should have received a copy of the GNU General Public License     along with this program; if not, write to the                         Free Software Foundation, Inc.,                                       59 Temple Place - Suite 330, Boston, MA  02111-1307, USA or see http://www.gnu.org/licenses/gpl-3.0.html for more details.</translation>
+    </message>
+</context>
+<context>
+    <name>ksCategoryChooserDialog</name>
+    <message>
+        <location filename="../src/dialogs/kscategorychooserdialog.cpp" line="92"/>
+        <source>Move Subject to a new Category</source>
+        <translation>Fach in eine andere Kategorie verschieben</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/kscategorychooserdialog.cpp" line="93"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/kscategorychooserdialog.cpp" line="94"/>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/kscategorychooserdialog.cpp" line="95"/>
+        <source>The Subject %subjectname already exists in this category!</source>
+        <translation>Das Fach %subjectname existiert bereits in dieser Kategorie!</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/kscategorychooserdialog.cpp" line="96"/>
+        <source>Select a category for the subject %subjectname:</source>
+        <translation>Wählen sie eine Kategorie für das Fach %subjectname aus:</translation>
     </message>
 </context>
 <context>
@@ -1405,49 +1443,49 @@ This program is distributed in the hope that it will be useful,       but WITHOU
 <context>
     <name>ksSemesterAchievementsDialog</name>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="94"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="95"/>
         <source>Category:</source>
         <translation>Kategorie:</translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="95"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="96"/>
         <source>Column Count:</source>
         <translation>Anzahl der Spalten:</translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="96"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="97"/>
         <source>Here you can configure, in how many columns the semester achievements shall be shown.</source>
         <translation>Hier können sie einrichten, in wie vielen Spalten die Halbjahresleistungen angezeigt werden sollen.</translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="98"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="99"/>
         <source>show all</source>
         <translation>alle zeigen</translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="99"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="100"/>
         <source>Number of shown
 semester achievements:</source>
         <translation>Anzahl anzuzeigender
 Halbjahresleistungen:</translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="100"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="101"/>
         <source>Sort items to ascending order</source>
         <translation>Sortiere Elemente in aufsteigender Reihenfolge</translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="102"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="118"/>
         <source>If checked, the order Semester Achievements will show these items by an ascending average. If not checked, the average order is descending.</source>
         <translation>In ausgewähltem Zustand wird die Reihenfolge der Halbjahresleistungen aufsteigend sein, wenn nicht ausgewählt, dann absteigend.</translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="103"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="120"/>
         <source>Semester Achievements</source>
         <translation>Halbjahresleistungen</translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="104"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="121"/>
         <source>Configuration</source>
         <translation>Einstellungen</translation>
     </message>
@@ -1691,13 +1729,18 @@ If this is not selected, the currently selected category in the main window will
         <source>Enter the name of the category, that shall be selected, when the &quot;Semester Achievement&quot; dialog gets started.</source>
         <translation>Geben Sie den Namen der Kategorie an, die ausgewählt werden soll, wenn das Halbjahresleistungs-Fenster aufgerufen wird.</translation>
     </message>
+    <message>
+        <location filename="../src/pluginengine/builtinplugins/kspbavarianabitur.cpp" line="57"/>
+        <source>Show Semester Achievements</source>
+        <translation>Zeige Halbjahresleistungen</translation>
+    </message>
 </context>
 <context>
     <name>kspExportToHtml</name>
     <message>
         <location filename="../src/pluginengine/builtinplugins/kspexporttohtml.cpp" line="52"/>
         <source>To Html Exporter</source>
-        <translation>Zu Html Exportierer</translation>
+        <translation>Nach Html Exportierer</translation>
     </message>
     <message>
         <location filename="../src/pluginengine/builtinplugins/kspexporttohtml.cpp" line="54"/>
@@ -1707,7 +1750,7 @@ If this is not selected, the currently selected category in the main window will
     <message>
         <location filename="../src/pluginengine/builtinplugins/kspexporttohtml.cpp" line="62"/>
         <source>Export To Html</source>
-        <translation>Zu Html exportieren</translation>
+        <translation>Nach Html exportieren</translation>
     </message>
     <message>
         <location filename="../src/pluginengine/builtinplugins/kspexporttohtml.cpp" line="180"/>

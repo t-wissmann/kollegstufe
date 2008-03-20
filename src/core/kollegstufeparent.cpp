@@ -31,6 +31,7 @@
 #include <dialogs/ksdatabaseproperties.h>
 #include <dialogs/ksstatisticsdialog.h>
 #include <dialogs/ksconfigure.h>
+#include <dialogs/kscategorychooserdialog.h>
 #include <pluginengine/kspluginconfigurationdialog.h>
 #include <dialogs/kssubjectproperties.h>
 #include <dialogs/ksexamproperties.h>
@@ -209,6 +210,7 @@ void kollegstufeParent::allocateDialogs()
 {
     diaExamProperties    = NULL;
     diaSubjectProperties = NULL;
+    diaCategoryChooser   = NULL;
     diaDatabaseSelection = NULL;
     diaDatabaseProperties= NULL;
     diaAbout             = NULL;
@@ -249,6 +251,7 @@ void kollegstufeParent::createMenuBar()
     mnaEditSubjectEdit  = mnmEditSubject->addAction("");
     mnaEditSubjectMoveUp= mnmEditSubject->addAction("");
     mnaEditSubjectMoveDown= mnmEditSubject->addAction("");
+    mnaEditSubjectMoveToCategory = mnmEditSubject->addAction("");
     
     mnmEditExam         = mnmEdit->addMenu("");
     mnaEditExamAdd      = mnmEditExam->addAction("");
@@ -367,6 +370,7 @@ void kollegstufeParent::connectSlots()
     connect(mnaEditSubjectEdit, SIGNAL(triggered()), this, SLOT(subjectEdit()));
     connect(mnaEditSubjectMoveUp, SIGNAL(triggered()), this, SLOT(subjectMoveUp()));
     connect(mnaEditSubjectMoveDown, SIGNAL(triggered()), this, SLOT(subjectMoveDown()));
+    connect(mnaEditSubjectMoveToCategory, SIGNAL(triggered()), this, SLOT(subjectMoveToCategory()));
     
     connect(mnaEditExamAdd, SIGNAL(triggered()), this, SLOT(examAdd()));
     connect(mnaEditExamDelete, SIGNAL(triggered()), this, SLOT(examDelete()));
@@ -782,6 +786,7 @@ void kollegstufeParent::retranslateUi()
     mnaEditSubjectEdit->setText(tr("Edit"));
     mnaEditSubjectMoveUp->setText(tr("Move Up"));
     mnaEditSubjectMoveDown->setText(tr("Move Down"));
+    mnaEditSubjectMoveToCategory->setText(tr("Move to category"));
     
     mnmEditExam->setTitle(tr("Exam"));
     mnaEditExamAdd->setText(tr("Add"));
@@ -1051,7 +1056,7 @@ void kollegstufeParent::subjectAdd()
     ksPlattformSpec::addMissingSubjectAttributes(newSubject);
     
      // set strings to current subject name
-    szNewSubjectName = newSubject->cGetAttributeByName("name")->value();
+    szNewSubjectName = ksPlattformSpec::szToUmlauts(newSubject->cGetAttributeByName("name")->value());
     szBasicName = szNewSubjectName;
     
     //Find first "free" Subject Name
@@ -1079,7 +1084,7 @@ void kollegstufeParent::subjectAdd()
         case QDialog::Accepted:
             setDatabaseChanged();
             refreshSubjectList();
-            szNewSubjectName = newSubject->cGetAttributeByName("name")->value();
+            szNewSubjectName = ksPlattformSpec::szToUmlauts(newSubject->cGetAttributeByName("name")->value());
             if(lstSubjectList->findItems(szNewSubjectName, Qt::MatchExactly).size() > 0)
             {
                 lstSubjectList->setCurrentItem(lstSubjectList->findItems(szNewSubjectName, Qt::MatchExactly).first());
@@ -1192,6 +1197,27 @@ void kollegstufeParent::subjectMoveDown()
     setDatabaseChanged();
 }
 
+void kollegstufeParent::subjectMoveToCategory()
+{
+    xmlObject* currentSubject = pluginInformation.currentSubject();
+    xmlObject* currentDataPart = pluginInformation.currentDataPart();
+    if(!currentSubject || !currentDataPart)
+    {
+        statusbar->showMessage(tr("Please select a subject first"), 3000);
+        return;
+    }
+    if(!diaCategoryChooser)
+    {
+        diaCategoryChooser = new ksCategoryChooserDialog(this);
+    }
+    diaCategoryChooser->setData(currentDataPart, currentSubject);
+    if(diaCategoryChooser->exec() == QDialog::Accepted)
+    {
+        setDatabaseChanged(TRUE);
+        // select new category
+        cmbCathegory->setCurrentIndex(cmbCathegory->findText(diaCategoryChooser->categorySelected()));
+    }
+}
 
 void kollegstufeParent::setExamListFilter(QString filter)
 {

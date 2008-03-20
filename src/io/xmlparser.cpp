@@ -426,8 +426,25 @@ int             xmlObject::nAddObject(char* szNewName)
     if(szNewName)
         strncpy(cGetObjectByIdentifier(nObjectCounter-1)->szName, szNewName, 79);
     return (nObjectCounter-1);
-    
 }
+
+
+xmlObject*      xmlObject::cAddExistingObject(xmlObject* object)
+{
+    if(object == NULL)
+    {
+        return NULL;
+    }
+    int newId = nAddObject();
+    if(newId < 0)
+    {
+        return NULL;
+    }
+    delete cObjectList[newId]; // delete old object
+    cObjectList[newId] = object;  // replace it by new object
+    return object;
+}
+
 
 int             xmlObject::nDeleteObject(int nIdentifier)
 {
@@ -480,6 +497,24 @@ int xmlObject::nDeleteObject(xmlObject* objectToDelete)
         }
     }
     return nDeleteObject(nIdentifier);
+}
+
+
+xmlObject*      xmlObject::cTakeObjectFromList(xmlObject* object)
+{
+    int id = nGetIdentifierOf(object);
+    if(id < 0 || id >= nObjectListSize){
+        return object;
+    }
+    cObjectList[id] = NULL; // remove object from object list
+    //reduce list by one element
+    for(int i = id; i < (nObjectListSize-1); i++)
+    {
+        cObjectList[i] = cObjectList[i+1];
+    }
+    nObjectCounter--;
+    
+    return object;
 }
 
 xmlObject*      xmlObject::cGetObjectByIdentifier (int nIdentifier)

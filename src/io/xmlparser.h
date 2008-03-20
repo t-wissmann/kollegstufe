@@ -84,8 +84,10 @@ class xmlObject
         int             nAddObject(void);
         xmlObject*      cAddObject(char* szNewName = "");
         int             nAddObject(char* szNewName);
+        xmlObject*      cAddExistingObject(xmlObject* object);
         int             nDeleteObject(int nIdentifier);
         int             nDeleteObject(xmlObject* objectToDelete);
+        xmlObject*      cTakeObjectFromList(xmlObject* object);
         xmlObject*      cGetObjectByIdentifier (int nIdentifier);
         xmlObject*      cGetObjectByName (char szObjectName[80]);
         xmlObject*      cGetObjectByAttributeValue (char szAttributeName[80], char szAttributeValue[80]);
