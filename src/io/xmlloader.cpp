@@ -122,6 +122,27 @@ bool xmlLoader::parseNextTag(xmlObject* target)
     seekInBufTo('<');
     m_nParsingPosition++; // if tag looks like this: "<  header>"
     seekInBufTo(' ', FALSE);
+    
+    // check if it is a comment
+    if(m_szBuf[m_nParsingPosition]   == '!' &&
+       m_szBuf[m_nParsingPosition+1] == '-' &&
+       m_szBuf[m_nParsingPosition+2] == '-')
+    {
+        if(!seekInBufTo("-->"))
+        {
+            // each comment MUST have an end tag
+            return FALSE;
+        }
+        // currently:   ->-<-->foo
+        // so we must move to first char after end-tag of coment
+        m_nParsingPosition += 3;
+        //so:       -->->f<--oo
+        // this was a comment:
+        target->setName("!--");
+        return TRUE;
+    }
+    // so it is NO comment
+    
     // parse tag name
     if(!parseTagName(target))
     {
@@ -196,6 +217,12 @@ bool xmlLoader::parseNextTag(xmlObject* target)
         if(!parseNextTag(newTag))
         {
             return FALSE;
+        }
+        if(!strcmp(newTag->name(), "!--"))
+        {
+            // delete newTag, if this child tag was a comment
+            // TODO don't delete it(currently),,, it causes an unknown bug ;(
+            //target->nDeleteObject(newTag);
         }
     }
     return TRUE;

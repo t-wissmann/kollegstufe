@@ -22,6 +22,7 @@
 
 #include "../ksplugin.h"
 #include <io/xmlparser.h>
+#include <io/ksiconcatcher.h>
 #include <widgets/selectablelabel.h>
 #include <core/ksplattformspec.h>
 #include <core/ksconfigoption.h>
@@ -32,6 +33,7 @@
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QDockWidget>
+#include <QPushButton>
 
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -82,6 +84,7 @@ ksSemesterAchievementsDialog::ksSemesterAchievementsDialog(QWidget *parent)
     setAttribute(Qt::WA_QuitOnClose, FALSE);
     createGui();
     retranslateUi();
+    reloadIcons();
 }
 
 
@@ -119,6 +122,8 @@ void ksSemesterAchievementsDialog::retranslateUi()
     
     setWindowTitle(tr("Semester Achievements"));
     dockControlSidebar->setWindowTitle(tr("Configuration"));
+    
+    btnQuit->setText(tr("Quit"));
 }
 
 void ksSemesterAchievementsDialog::createGui()
@@ -143,13 +148,18 @@ void ksSemesterAchievementsDialog::createGui()
     chkAscendingOrder = new QCheckBox;
     chkAscendingOrder->setChecked(FALSE);
     
+    //bottom bar
+    btnQuit = new QPushButton;
+    
     // connect slots
     connect(cmbCategorySelection, SIGNAL(currentIndexChanged( int )), this, SLOT(categoryChanged(int)));
     connect(spinColumnCount, SIGNAL(valueChanged( int )), this, SLOT(spinboxColumnCountChanged()));
     connect(spinMaxLabelCount, SIGNAL(valueChanged(int)), this, SLOT(spinboxColumnCountChanged()));
     connect(chkAscendingOrder, SIGNAL(stateChanged(int)), this, SLOT(sortSemesterAchievements()));
-    
-    
+    connect(btnQuit, SIGNAL(clicked()), this, SLOT(close()));
+    connect(btnQuit, SIGNAL(clicked()), this, SLOT(saveUiStateToConfig()));
+    // some slots are connected at the end of createGui();
+        
     
     // layouts
     layoutSemesterAchievements = new QGridLayout;
@@ -187,9 +197,14 @@ void ksSemesterAchievementsDialog::createGui()
     dockControlSidebar->setFeatures(QDockWidget::DockWidgetMovable);
     addDockWidget(Qt::LeftDockWidgetArea, dockControlSidebar);
     
-    layoutParent = new QHBoxLayout;
+    layoutBottomBar = new QHBoxLayout;
+    layoutBottomBar->addStretch(1);
+    layoutBottomBar->addWidget(btnQuit);
+    
+    layoutParent = new QVBoxLayout;
     //layoutParent->addLayout(layoutControlSidebar);
     layoutParent->addLayout(layoutSemesterAchievements);
+    layoutParent->addLayout(layoutBottomBar);
     
     wdgCentral = new QWidget;
     wdgCentral->setLayout(layoutParent);
@@ -202,6 +217,11 @@ void ksSemesterAchievementsDialog::createGui()
     connect(dockControlSidebar, SIGNAL(dockLocationChanged (Qt::DockWidgetArea)), this, SLOT(saveUiStateToConfig()));
     
     
+}
+
+void ksSemesterAchievementsDialog::reloadIcons()
+{
+    btnQuit->setIcon(ksIconCatcher::getIcon("exit", 16));
 }
 
 

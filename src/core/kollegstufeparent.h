@@ -87,6 +87,7 @@ class QVBoxLayout;
 class QGridLayout;
 class QStackedLayout;
 class QSplitter;
+class QScrollArea;
 
 // other Q_Objects
 class QCloseEvent;
@@ -259,6 +260,7 @@ private:
     QStackedWidget* stackedExamLists;
     QTreeWidget*    lstExamList;
     ksStatisticsWidget* statisticsExamList;
+    QScrollArea*        scrollStatisticsExamList;
     ksSubjectStatusbar* wdgSubjectStatusbar;
     QPushButton*    btnExamAdd;
     QPushButton*    btnExamDelete;

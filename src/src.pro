@@ -1,7 +1,7 @@
-CONFIG += warn_on \
-	  thread \
+CONFIG += thread \
           qt \
- assistant
+ assistant \
+ warn_off
 TARGET = ../bin/kollegstufe
 
 DISTFILES += ../doc/help.htm
@@ -101,3 +101,7 @@ widgets/selectablelabel.h \
  pluginengine/builtinplugins/kspbavarianabitur.h \
  pluginengine/builtinplugins/kssemesterachievementsdialog.h \
  dialogs/kscategorychooserdialog.h
+TEMPLATE = app
+
+CONFIG -= warn_on
+

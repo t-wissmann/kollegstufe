@@ -91,7 +91,7 @@ public:
     int minimumY() const;
     int maximumY() const;
     
-    void setMinMaxY(int newMinimumY, int newMinimumY);
+    void setMinMaxY(int newMinimumY, int newMaximumY);
     
     int pointDiameter() const;
     void setPointDiameter(int newPointDiameter);

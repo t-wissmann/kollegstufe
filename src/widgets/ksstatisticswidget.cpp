@@ -862,7 +862,6 @@ void ksStatisticsWidget::addItem(ksStatisticsItem newItem)
 {
     itemList.append(newItem);
     bItemListSorted = FALSE;
-    setMinimumWidth(marginLeft + 10 + marginRight + (itemList.count()+1) * 45);
 }
 
 void ksStatisticsWidget::loadItemListFromSubject(xmlObject* subject)
@@ -911,17 +910,26 @@ void ksStatisticsWidget::loadItemListFromSubject(xmlObject* subject)
         QDate   currentDate;
         currentDate.setYMD(cDate.Year(), cDate.Month(), cDate.Day());
         
+        // add some information
+        QString information;
+        //get semester
+        information += ksPlattformSpec::szToUmlauts(currentExam->
+                cGetObjectByAttributeValue("name", "semester")->cGetAttributeByName("value")->value());
+        information += "\n";
+        //get comment
+        information += ksPlattformSpec::szToUmlauts(currentExam->
+                cGetObjectByAttributeValue("name", "comment")->szGetContent());
+        
         //write variants to ksStatisticItem class
         itemToAdd.setX(currentDate);
         itemToAdd.setY(currentPoints);
         itemToAdd.setCaption(currentCaption);
         itemToAdd.setSourceItem(currentExam);
-        
+        itemToAdd.setInformation(information);
         // add itemToAdd to statistics widget
         addItem(itemToAdd);
         
     }
-    
     update();
 }
 
@@ -1377,5 +1385,7 @@ void ksStatisticsWidget::refreshVisibleItemList()
             visibleItemList.append(itemList[i]);
         }
     }
+    // set Minimum Width according to number of visible items
+    setMinimumWidth(marginLeft + 10 + marginRight + (visibleItemList.count()+1) * 45);
 }
 

@@ -34,6 +34,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPalette>
+#include <QStringList>
 
 ksSemesterListEditor::ksSemesterListEditor(QWidget *parent)
  : QWidget(parent)
@@ -333,9 +334,8 @@ void ksSemesterListEditor::createBavarianKollegstufeTemplate()
     ksSemesterItemWidget* currentWdg;
     while(lstSemesterItems.size() < 4)
     {
-        currentWdg = new ksSemesterItemWidget;
-        lstSemesterItems.append(currentWdg);
-        layoutSemesterList->addWidget(currentWdg);
+        // add missing semesters
+        addSemester();
     }
     // unhide the first 4 items
     for(int i = 0; i < 4; i++)
@@ -365,18 +365,21 @@ void ksSemesterListEditor::createBavarianKollegstufeTemplate()
     }
     
     currentWdg = lstSemesterItems[0];
+    currentWdg->setName("12/1");
     currentWdg->setStartDate(date);
     date = date.addMonths(5); // go to february
     currentWdg->setEndDate(date);
     
     date = date.addDays(1);
     currentWdg = lstSemesterItems[1];
+    currentWdg->setName("12/2");
     currentWdg->setStartDate(date);
     date = date.addMonths(6); // go to August
     currentWdg->setEndDate(date);
     
     date = date.addDays(1);
     currentWdg = lstSemesterItems[2];
+    currentWdg->setName("13/1");
     currentWdg->setStartDate(date);
     while(date.month() != 2)
     {
@@ -387,6 +390,7 @@ void ksSemesterListEditor::createBavarianKollegstufeTemplate()
     
     date = date.addDays(1);
     currentWdg = lstSemesterItems[3];
+    currentWdg->setName("13/2");
     currentWdg->setStartDate(date);
     date = date.addMonths(6); // go to August
     currentWdg->setEndDate(date);

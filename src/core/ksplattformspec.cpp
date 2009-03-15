@@ -646,6 +646,11 @@ void    ksPlattformSpec::addMissingExamAttributes(xmlObject*  ExamToComplete)
     }
     if(!ExamToComplete->cGetObjectByAttributeValue("name", "weighting")->cGetAttributeByName("value"))
         ExamToComplete->cGetObjectByAttributeValue("name", "weighting")->nAddAttribute("value", "oral");
+    if(!ExamToComplete->cGetObjectByAttributeValue("name", "comment"))
+    {
+        newObject = ExamToComplete->cGetObjectByIdentifier(ExamToComplete->nAddObject("attribute"));
+        newObject->nAddAttribute("name", "comment");
+    }
 }
 
 

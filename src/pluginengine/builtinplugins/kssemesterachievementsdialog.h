@@ -37,6 +37,7 @@ class QComboBox;
 class QSpinBox;
 class QCheckBox;
 class QDockWidget;
+class QPushButton;
 
 class xmlObject;
 class ksPlugin;
@@ -87,6 +88,7 @@ public:
     void setArchive(xmlObject* dataPart, xmlObject* semesterList, xmlObject* currentCategory = NULL);
     
     void retranslateUi();
+    void reloadIcons();
     void refreshSemesterLabelList();
     
     xmlObject* selectedCategory();
@@ -121,6 +123,7 @@ private:
     
     QCheckBox*   chkAscendingOrder;
     
+    QPushButton* btnQuit;
     
     // layouts
     QGridLayout* layoutSemesterAchievements;
@@ -128,7 +131,8 @@ private:
     QVBoxLayout* layoutControlSidebar; // actually left
     QDockWidget* dockControlSidebar;
     QWidget*     wdgControlSidebar;
-    QHBoxLayout* layoutParent;
+    QVBoxLayout* layoutParent;
+    QHBoxLayout* layoutBottomBar;
     QWidget*     wdgCentral;
     // sidebar layouts
     QHBoxLayout* layoutCategorySelection;

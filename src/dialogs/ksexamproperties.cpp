@@ -34,6 +34,7 @@
 #include <QLineEdit>
 #include <QDateEdit>
 #include <QGroupBox>
+#include <QTextEdit>
 
 // layouts
 #include <QDialogButtonBox>
@@ -100,9 +101,11 @@ void ksExamProperties::retranslateUi()
     lblWeighting->setText(tr("Weighting:"));
     optWeightingWritten->setText(tr("written"));
     optWeightingOral->setText(tr("oral"));
+    grpComment->setTitle(tr("Comment"));
     grpSemester->setTitle(tr("Semester:"));
     optSemesterAuto->setText(tr("Automatical assignment"));
     spinNumber->setSpecialValueText(tr("no number"));
+    btnShowComment->setText(tr("Comment"));
     resetWindowTitle();
     
 }
@@ -137,6 +140,16 @@ void ksExamProperties::allocateWidgets()
     //semester Selection
     grpSemester     = new QGroupBox;
     optSemesterAuto  = new QRadioButton;
+    
+    // comment
+    grpComment = new QGroupBox;
+    txtComment = new QTextEdit;
+    txtComment->setAcceptRichText(FALSE);
+    txtComment->setMinimumSize(100, 80);
+    txtComment->setBaseSize(100, 80);
+    txtComment->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Ignored);
+    btnShowComment = new QPushButton;
+    btnShowComment->setCheckable(TRUE);
 }
 
 void ksExamProperties::createLayouts()
@@ -144,15 +157,25 @@ void ksExamProperties::createLayouts()
     boxBottom = new QDialogButtonBox;
     boxBottom->addButton(btnOk, QDialogButtonBox::AcceptRole);
     boxBottom->addButton(btnCancel, QDialogButtonBox::RejectRole);
-    
+    // semester
     layoutSemester = new QGridLayout;
     layoutSemester->addWidget(optSemesterAuto, 0, 0, 1, 2);
     grpSemester->setLayout(layoutSemester);
+    // comment
+    layoutComment = new QHBoxLayout;
+    layoutComment->setMargin(0);
+    layoutComment->addWidget(txtComment);
+    grpComment->setLayout(layoutComment);
     
     layoutWeighting = new QHBoxLayout;
     layoutWeighting->addWidget(lblWeighting);
     layoutWeighting->addWidget(optWeightingOral);
     layoutWeighting->addWidget(optWeightingWritten);
+    
+    layoutBottom = new QHBoxLayout;
+    layoutBottom->setMargin(0);
+    layoutBottom->addWidget(btnShowComment);
+    layoutBottom->addWidget(boxBottom);
     
     layoutParent = new QGridLayout;
     layoutParent->addWidget(lblNumber, 0, 0);
@@ -166,9 +189,10 @@ void ksExamProperties::createLayouts()
     layoutParent->addLayout(layoutWeighting, 4, 0, 1, 2);
     
     layoutParent->addWidget(grpSemester, 0, 2, 5, 1);
+    layoutParent->addWidget(grpComment, 5, 0, 1, 3);
+    grpComment->setVisible(FALSE);
     
-    
-    layoutParent->addWidget(boxBottom, 5, 0, 1, 3);
+    layoutParent->addLayout(layoutBottom, 6, 0, 1, 3);
     
     setLayout(layoutParent);
 }
@@ -178,6 +202,7 @@ void ksExamProperties::connectSlots()
     connect(btnCancel, SIGNAL(clicked()), this, SLOT(reject()));
     connect(btnOk,     SIGNAL(clicked()), this, SLOT(accept()));
     connect(this,      SIGNAL(accepted()), this, SLOT(writeWidgetAttributesToExam()));
+    connect(btnShowComment, SIGNAL(toggled(bool)), grpComment, SLOT(setVisible(bool)));
 }
 
 void ksExamProperties::initWidgets()
@@ -345,6 +370,11 @@ void ksExamProperties::setExamToEdit(xmlObject* newExamToEdit)
     else
         optWeightingOral->setChecked(TRUE);
     
+    // comment
+    char* szComment = examToEdit->cGetObjectByAttributeValue("name", "comment")->
+            szGetContent();
+    txtComment->setPlainText(ksPlattformSpec::szToUmlauts(szComment));
+    
     // set window title
     resetWindowTitle();
 }
@@ -416,6 +446,11 @@ void ksExamProperties::writeWidgetAttributesToExam()
     examToEdit->cGetObjectByAttributeValue("name", "weighting")->
             cGetAttributeByName("value")->SetValue(ksPlattformSpec::qstringToSz(weighting));
     
+    // COMMENT
+    QString szComment = txtComment->toPlainText();
+    
+    examToEdit->cGetObjectByAttributeValue("name", "comment")->
+            nSetContent(ksPlattformSpec::qstringToSz(szComment));
     
 }
 

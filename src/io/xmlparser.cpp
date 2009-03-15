@@ -25,6 +25,7 @@
 #include "xmlloader.h"
 #include "xmlencoder.h"
 
+#include <QtCore>
 
 int nLayer; //nLayer shows the depth of the current object
 
@@ -393,8 +394,6 @@ long           xmlObject::nSetObjectCounter(int nNewObjectCounter)
         cObjectList[i] = new xmlObject;
     }
     
-    
-    
     return 0;
 }
 
@@ -458,6 +457,7 @@ int             xmlObject::nDeleteObject(int nIdentifier)
     int nNewObjectCounter = nObjectCounter-1;
     int nCurrentObjectItem = 0;
     
+    qDebug("heyhey");
     cObjectList = (xmlObject**) malloc(nNewObjectCounter * sizeof(xmlObject*));
     
     delete cOldObjectList[nIdentifier];

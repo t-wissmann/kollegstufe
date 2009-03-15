@@ -39,6 +39,7 @@ class QSpinBox;
 class QRadioButton;
 class QDateEdit;
 class QGroupBox;
+class QTextEdit;
 
 class QEvent;
 class xmlObject;
@@ -96,8 +97,15 @@ private:
     QList<QRadioButton*> lstSemesterList;
     QRadioButton*   optSemesterAuto;
     
+    // under semesters and other properties:
+    QGroupBox*      grpComment;
+    QTextEdit*      txtComment;
+    QPushButton*    btnShowComment;
+    
     //layouts
     QGridLayout*    layoutSemester;
+    QHBoxLayout*    layoutComment;
+    QHBoxLayout*    layoutBottom;
     QDialogButtonBox* boxBottom;
     QGridLayout*    layoutParent;
     

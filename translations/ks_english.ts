@@ -656,15 +656,15 @@ Do You want to save or discard it bevore closing ?</translation>
         <translation>License</translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksabout.cpp" line="177"/>
-        <source>The manager for your marks during the &lt;i&gt;Kollegstufe&lt;/i&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/dialogs/ksabout.cpp" line="187"/>
         <source>This software was released under the GPL.</source>
         <translation>This program is free software; you can redistribute it and/or modify  it under the terms of the GNU General Public License as published by  the Free Software Foundation; either version 2 of the License, or     (at your option) any later version.&lt;br&gt;&lt;br&gt;
 This program is distributed in the hope that it will be useful,       but WITHOUT ANY WARRANTY; without even the implied warranty of        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         GNU General Public License for more details.                          &lt;br&gt;&lt;br&gt;You should have received a copy of the GNU General Public License     along with this program; if not, write to the                         Free Software Foundation, Inc.,                                       59 Temple Place - Suite 330, Boston, MA  02111-1307, USA or see http://www.gnu.org/licenses/gpl-3.0.html for more details.</translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ksabout.cpp" line="177"/>
+        <source>A manager for your marks at school</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1054,52 +1054,52 @@ This program is distributed in the hope that it will be useful,       but WITHOU
 <context>
     <name>ksExamProperties</name>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="94"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="95"/>
         <source>Ok</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="95"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="96"/>
         <source>Cancel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="96"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="97"/>
         <source>Number:</source>
         <translation type="unfinished">Number:</translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="97"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="98"/>
         <source>Type:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="242"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="264"/>
         <source>Points:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="99"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="100"/>
         <source>Date:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="100"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="101"/>
         <source>Weighting:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="101"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="102"/>
         <source>written</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="102"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="103"/>
         <source>oral</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="103"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="105"/>
         <source>Semester:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1109,43 +1109,48 @@ This program is distributed in the hope that it will be useful,       but WITHOU
         <translation type="obsolete">Automatical assignment</translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="248"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="270"/>
         <source>Mark:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="105"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="107"/>
         <source>no number</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="357"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="384"/>
         <source>Interner Pointer-Fehler: newExamToEdit = NULL !</source>
         <translation>Internal Pointer-Error: newExamToEdit = NULL !</translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="207"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="229"/>
         <source>Editing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="220"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="242"/>
         <source> </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="218"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="240"/>
         <source>from</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="104"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="106"/>
         <source>Automatical assignment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialogs/ksexamproperties.cpp" line="297"/>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="319"/>
         <source>Internal Pointer-Error: newExamToEdit = NULL !</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dialogs/ksexamproperties.cpp" line="108"/>
+        <source>Comment</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1342,49 +1347,54 @@ This program is distributed in the hope that it will be useful,       but WITHOU
 <context>
     <name>ksSemesterAchievementsDialog</name>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="95"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="98"/>
         <source>Category:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="96"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="99"/>
         <source>Column Count:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="97"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="100"/>
         <source>Here you can configure, in how many columns the semester achievements shall be shown.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="99"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="102"/>
         <source>show all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="100"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="103"/>
         <source>Number of shown
 semester achievements:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="101"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="104"/>
         <source>Sort items to ascending order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="118"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="121"/>
         <source>If checked, the order Semester Achievements will show these items by an ascending average. If not checked, the average order is descending.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="120"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="123"/>
         <source>Semester Achievements</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="121"/>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="124"/>
         <source>Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/pluginengine/builtinplugins/kssemesterachievementsdialog.cpp" line="126"/>
+        <source>Quit</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1404,37 +1414,37 @@ semester achievements:</source>
 <context>
     <name>ksSemesterListEditor</name>
     <message>
-        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="122"/>
+        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="123"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="123"/>
+        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="124"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="125"/>
+        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="126"/>
         <source>Move Up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="126"/>
+        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="127"/>
         <source>Move Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="127"/>
+        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="128"/>
         <source>Templates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="129"/>
+        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="130"/>
         <source>Empty List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="130"/>
+        <location filename="../src/widgets/kssemesterlisteditor.cpp" line="131"/>
         <source>Bavarian Kollegstufe</source>
         <translation type="unfinished"></translation>
     </message>

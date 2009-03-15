@@ -116,6 +116,7 @@ void ksSemesterItemWidget::setSemester(xmlObject* semester)
 
 void ksSemesterItemWidget::setSelected(bool selected)
 {
+    //qDebug("%d was selected to %d", this, selected);
     if(selected == m_bSelected)
     {
         return; // return if nothing would be changed

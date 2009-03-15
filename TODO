@@ -1,0 +1,8 @@
+
+
+"computing Semseter"2009-02-27:
+ksStatisticsWidget:
+ksStatisticsItem.information():
+print semester name of Exam into the Information instead of "auto"
+
+

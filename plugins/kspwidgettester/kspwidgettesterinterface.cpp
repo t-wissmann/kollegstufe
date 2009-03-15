@@ -31,14 +31,14 @@ kspWidgetTesterInterface::kspWidgetTesterInterface()
  : QObject()
 {
     m_szIdentifier = "kspWidgetTester";
-    qDebug("plugin says i am loaded");
+    //qDebug("plugin says i am loaded");
     mnaHello = 0;
 }
 
 
 kspWidgetTesterInterface::~kspWidgetTesterInterface()
 {
-    qDebug("plugin says goodbye");
+    //qDebug("plugin says goodbye");
     if(mnaHello)
     {
         disconnect(mnaHello, SIGNAL(triggered()), this, SLOT(sayHello()));

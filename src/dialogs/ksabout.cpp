@@ -174,7 +174,7 @@ void ksAbout::retranslateUi()
     tabContainer->setTabText(2, tr("License"));
     
     QString infoText;
-    infoText += "<br>" + tr("The manager for your marks during the <i>Kollegstufe</i>.") + "<br>";
+    infoText += "<br>" + tr("A manager for your marks at school") + "<br>";
     infoText += "<p>(c) Thorsten Wi&szlig;mann<br></p>";
     lblInfoAbout->setText(infoText);
     

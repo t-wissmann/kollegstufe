@@ -64,6 +64,7 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QSplitter>
+#include <QScrollArea>
 
 // other qt-classes
 #include <QApplication>
@@ -197,12 +198,14 @@ void kollegstufeParent::allocateWidgets()
     wdgSubjectStatusbar = new ksSubjectStatusbar;
     lstExamList     = new QTreeWidget;
     statisticsExamList = new ksStatisticsWidget;
+    scrollStatisticsExamList = new QScrollArea;
+    scrollStatisticsExamList->setWidget(statisticsExamList);
     btnExamAdd      = new QPushButton;
     btnExamDelete   = new QPushButton;
     btnExamEdit     = new QPushButton;
     
     stackedExamLists->addWidget(lstExamList);
-    stackedExamLists->addWidget(statisticsExamList);
+    stackedExamLists->addWidget(scrollStatisticsExamList);
     
 }
 
@@ -428,8 +431,14 @@ void kollegstufeParent::initWidgets()
     btnSubjectDelete->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     btnSubjectMoveUp->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     btnSubjectMoveDown->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-
     
+    // init scrollarea of statisticsExamList
+    scrollStatisticsExamList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollStatisticsExamList->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scrollStatisticsExamList->setBackgroundRole(QPalette::Base);
+    scrollStatisticsExamList->setAutoFillBackground(FALSE);
+    scrollStatisticsExamList->setWidgetResizable(TRUE);
+    statisticsExamList->setFrameStyle(QFrame::NoFrame);
     // init main window / this
     splitterParent->setChildrenCollapsible(FALSE);
     
@@ -548,7 +557,6 @@ void kollegstufeParent::loadFile(QString newFilename, bool showErrorMsg)
     // reset Database change state:
     setDatabaseChanged(FALSE);
 }
-
 
 
 void kollegstufeParent::saveFile(QString newFilename)
