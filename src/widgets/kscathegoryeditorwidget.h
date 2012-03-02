@@ -112,7 +112,8 @@ class ksCathegoryHistory : public QList<ksCathegoryHistoryItem>
 {
 public:
     ksCathegoryHistory(){
-        QList<ksCathegoryHistoryItem>::QList();
+        //twi: entfernt am 2012-03-02
+        //QList<ksCathegoryHistoryItem>::QList();
     };
     ~ksCathegoryHistory(){};
     

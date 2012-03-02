@@ -31,7 +31,8 @@ kspBavarianAbitur::kspBavarianAbitur()
         
 {
     mnaSemesterAchievements = NULL;
-    ksPlugin::ksPlugin();
+    //twi: entfernt am 2012-03-02
+    //ksPlugin::ksPlugin();
     setIdentifier("kspBavarianAbitur");
     setIsHavingAnAboutDialog(FALSE);
     setIsConfigurable(TRUE);
