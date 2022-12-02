@@ -1,5 +1,7 @@
 # kollegstufe
 
+![](pic/kollegstufe.png)
+
 A qt4 software for handling your own grades at school.
 I wrote the software during my final years at school (2007 to 2009).
 The name `kollegstufe` refers to the final two years in Bavarian school before
