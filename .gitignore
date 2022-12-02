@@ -1,0 +1,20 @@
+/compileOnWin32.bat
+/doc
+/pic/screnshots/beta0-pic1.jpg
+/pic/screnshots/beta0-pic234.jpg
+/pic/screnshots/beta0-pic567.jpg
+moc_*.cpp
+*.o
+/src/ReadMe
+# also in .gitignore:
+*~
+.*.swp
+bin/kollegstufe
+Makefile
+*.kdevelop
+*.kdevelop.pcs
+*.kdevses
+/templates/cpp
+/templates/h
+/src/linenumber
+
